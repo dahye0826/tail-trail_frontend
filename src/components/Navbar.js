@@ -1,6 +1,14 @@
 import "./Navbar.css"
+import { useLocation } from "react-router-dom"
 
 function Navbar({ isLoggedIn }) {
+  const location = useLocation()
+  const path = location.pathname
+
+  // Determine active page based on URL path
+  const isPlacesActive = path.includes("/places")
+  const isCommunityActive = path.includes("/community") || path === "/"
+
   return (
     <nav className="navbar navbar-expand-lg navbar-light mb-4">
       <div className="container">
@@ -14,13 +22,13 @@ function Navbar({ isLoggedIn }) {
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav me-auto">
             <li className="nav-item">
-              <a className="nav-link" href="/">
+              <a className={`nav-link ${isPlacesActive ? "active" : ""}`} href="/places">
                 <i className="bi bi-map me-1"></i>
-                장소 목록
+                장소
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link active" href="/community">
+              <a className={`nav-link ${isCommunityActive ? "active" : ""}`} href="/community">
                 <i className="bi bi-people me-1"></i>
                 커뮤니티
               </a>

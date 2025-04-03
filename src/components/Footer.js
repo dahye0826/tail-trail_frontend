@@ -11,8 +11,8 @@ function Footer() {
               반려동물지도
             </h5>
             <p className="footer-description mt-3">
-              반려동물과 함께하는 모든 순간을 더 특별하게 만들어주는 공간입니다. 다양한 장소 정보와 경험을 공유하며 더
-              행복한 반려생활을 만들어가요.
+            반려동물과의 시간은 매 순간이 특별합니다.함께한 눈빛, 산책길, 여행의 추억을 이곳에 담아보세요.
+            이 페이지는 당신과 반려동물이 나눈 소중한 순간들을 함께 기억하고, 더 많이 나눌 수 있는 공간입니다.
             </p>
           </div>
 
@@ -20,8 +20,8 @@ function Footer() {
             <h5 className="footer-subtitle">바로가기</h5>
             <ul className="footer-links">
               <li>
-                <a href="/">
-                  <i className="bi bi-map me-2"></i>장소 목록
+                <a href="/places">
+                  <i className="bi bi-map me-2"></i>장소
                 </a>
               </li>
               <li>

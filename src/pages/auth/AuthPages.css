@@ -1,0 +1,89 @@
+:root {
+    --primary-color: #4ecdc4;
+    --secondary-color: #a5e1e9;
+    --accent-color: #2a9d8f;
+    --text-color: #2c3e50;
+    --light-bg: #f0f9fa;
+    --border-color: #d1eeef;
+  }
+  
+  .auth-background {
+    background-color: white;
+    padding: 1rem 0 3rem;
+    margin-bottom: -3rem;
+  }
+  
+  .auth-card {
+    background-color: var(--light-bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+  }
+  
+  .auth-card-body {
+    background-color: var(--light-bg);
+  }
+  
+  .auth-title {
+    color: var(--accent-color);
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  
+  .auth-subtitle {
+    color: var(--text-color);
+    font-size: 0.95rem;
+  }
+  
+  .pet-info-title {
+    color: var(--accent-color);
+    font-weight: 600;
+  }
+  
+  .form-control,
+  .form-select {
+    border-color: var(--border-color);
+    background-color: white;
+  }
+  
+  .form-control:focus,
+  .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(78, 205, 196, 0.25);
+  }
+  
+  .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+  }
+  
+  .btn-primary:disabled {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    opacity: 0.65;
+  }
+  
+  .auth-link {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .auth-link:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+  }
+  
+  @media (max-width: 768px) {
+    .auth-card-body {
+      padding: 1.5rem !important;
+    }
+  }
+  
+  

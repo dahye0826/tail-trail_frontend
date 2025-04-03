@@ -1,0 +1,165 @@
+:root {
+  --primary-color: #4ecdc4;
+  --secondary-color: #a5e1e9;
+  --accent-color: #2a9d8f;
+  --text-color: #2c3e50;
+  --light-bg: #f0f9fa;
+  --border-color: #d1eeef;
+}
+
+body {
+  background-color: white;
+}
+
+/* Change the places-background to white */
+.places-background {
+  background-color: white;
+  padding: 1rem 0 3rem;
+  margin-bottom: -3rem;
+}
+
+/* Change the place-detail-container to light blue */
+.place-detail-container {
+  background-color: var(--light-bg);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  border: 1px solid var(--border-color);
+}
+
+h3 {
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+.info-card {
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  background-color: white;
+  border: 1px solid var(--border-color);
+}
+
+.info-card h4 {
+  color: var(--accent-color);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.info-card dt {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.info-card dd {
+  margin-bottom: 0.5rem;
+}
+
+.review-card {
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--primary-color);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  background-color: white;
+  margin-bottom: 1rem;
+}
+
+.review-card .card-title {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.rating-display {
+  font-size: 0.9rem;
+  vertical-align: middle;
+}
+
+.rating-text {
+  margin-left: 0.5rem;
+  color: #6c757d;
+}
+
+.map-placeholder {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: white;
+  border: 1px solid var(--border-color);
+}
+
+.map-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.map-overlay p {
+  background-color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+/* Change the admin-controls-container to light blue */
+.admin-controls-container {
+  text-align: right;
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: var(--light-bg);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.35rem 0.65rem;
+  margin-right: 0.3rem;
+  margin-bottom: 0.3rem;
+  border-radius: 20px;
+}
+
+.category-badge {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.amenity-badge {
+  background-color: var(--light-bg);
+  color: var(--accent-color);
+  border: 1px solid var(--border-color);
+}
+
+.container {
+  max-width: 1140px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 768px) {
+  .place-detail-container {
+    padding: 1rem;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+  }
+
+  .info-card .row {
+    flex-direction: column;
+  }
+
+  .info-card .col-md-6:last-child h4 {
+    margin-top: 1.5rem;
+  }
+}
+

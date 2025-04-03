@@ -1,0 +1,223 @@
+:root {
+  --primary-color: #4ecdc4;
+  --secondary-color: #a5e1e9;
+  --accent-color: #2a9d8f;
+  --text-color: #2c3e50;
+  --light-bg: #f0f9fa;
+  --border-color: #d1eeef;
+}
+
+body {
+  background-color: white;
+}
+
+/* Change the places-background to white */
+.places-background {
+  background-color: white;
+  padding: 1rem 0 3rem;
+  margin-bottom: -3rem;
+}
+
+.container {
+  max-width: 1140px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Change the place-list-container to light blue */
+.place-list-container {
+  background-color: var(--light-bg);
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+  margin-top: 2rem;
+  margin-bottom: 0;
+  border: 1px solid var(--border-color);
+  border-bottom: none;
+}
+
+/* Change the place-header to light blue */
+.place-header {
+  text-align: center;
+  background-color: var(--light-bg);
+  padding: 2rem;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: 0;
+  border: 1px solid var(--border-color);
+  border-bottom: none;
+}
+
+.place-header h2 {
+  color: var(--accent-color);
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 1rem;
+}
+
+.place-header .subtitle {
+  color: var(--text-color);
+  font-size: 0.95rem;
+  margin-bottom: 0;
+}
+
+.place-header p {
+  color: var(--text-color);
+  font-size: 1.1rem;
+}
+
+.place-header .subtitle {
+  color: #888;
+  font-size: 0.95rem;
+  font-style: italic;
+}
+
+/* Change the filter-container to light blue */
+.filter-container {
+  margin-bottom: 0;
+  padding: 1rem;
+  background-color: var(--light-bg);
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+  border-top: none;
+}
+
+.filter-container .form-select,
+.filter-container .form-control {
+  border-color: var(--border-color);
+}
+
+.filter-container .form-select:focus,
+.filter-container .form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(78, 205, 196, 0.25);
+}
+
+.place-card {
+  transition: all 0.3s ease;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  background-color: white;
+}
+
+.place-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.place-card .card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+
+.place-card .card-title {
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+.place-card .location {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.place-card .rating {
+  font-size: 0.9rem;
+}
+
+.place-card .badges {
+  margin-top: 0.5rem;
+}
+
+.place-card .badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.35rem 0.65rem;
+  margin-right: 0.3rem;
+  margin-bottom: 0.3rem;
+  border-radius: 20px;
+}
+
+.place-card .badge.bg-secondary {
+  background-color: var(--accent-color) !important;
+  color: white;
+  border: none;
+}
+
+.place-card .badge:not(.bg-secondary) {
+  background-color: var(--light-bg);
+  color: var(--accent-color);
+  border: 1px solid var(--border-color);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+/* Change the pagination-container to light blue */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+  background-color: var(--light-bg);
+  border-radius: 0 0 8px 8px;
+  border: 1px solid var(--border-color);
+  border-top: none;
+  margin-top: 0;
+}
+
+.pagination .page-link {
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+.pagination .page-item.active .page-link {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.pagination .page-link:hover {
+  background-color: var(--light-bg);
+  color: var(--accent-color);
+}
+
+/* Change the admin-controls-container to light blue */
+.admin-controls-container {
+  text-align: right;
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: var(--light-bg);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .place-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .place-header p {
+    font-size: 0.9rem;
+  }
+}
+
+/* Add a container to group all elements */
+.places-content-wrapper {
+  background-color: var(--light-bg);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+
