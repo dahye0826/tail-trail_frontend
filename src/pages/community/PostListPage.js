@@ -13,14 +13,19 @@ function PostListPage() {
   const[currentPage,setCurrentPage]= useState(1)
   const [searchTerm, setSearchTerm] = useState("")
   const[posts,setPosts] = useState([])
+  const[totalPages,setTotalPages] = useState(1)
+  const[issearching,setIsSearching]=useState(False)
 
 
   const navigate = useNavigate()
+
+
 
   const handleSearch = async()=>{
     
     console.log("검색 실행됨");
     if(!searchTerm.trim()) return
+
 
     try{
       setLoading(true)
@@ -41,13 +46,46 @@ function PostListPage() {
 
       setPosts(formattedPosts)
       setCurrentPage(1)
-      //setTotalPages(response.data.totalPages)
+      setTotalPages(response.data.totalPages)
+      setIsSearching(true) // 검색상태
       setLoading(false)
     }catch(error){ 
     console.error("검색오류:",error)}
     setLoading(false)
     
   }
+
+  //페이지 변경 or 검색 상태 변경 시 자동으로 API를 요청해서 게시글을 불러오는 역할
+  useEffect(()=>{
+
+    const fetchPosts = async () =>{
+      setLoading(true)
+      try{
+        const response = await axios.get("http://localhost:9000/api/community",{
+          params: issearching
+            ?{search: searchTerm, page:currentPage, size:10}
+            :{page: currentPage,size: 10},
+        })
+        
+      const formattedPosts = response.data.content.map((post)=>({
+        ...post,
+        createdAt:post.createdAt.split("T")[0],
+      }))
+
+      setPosts(formattedPosts)
+      setTotalPages(response.data.totalPages)
+      setLoading(false)
+    }catch(error){
+      console.log("게시물 불러오기 오류:",error)
+      setLoading(false)
+    }
+  }
+  fetchPosts()
+  
+  },[currentPage,issearching])
+
+
+
 
   const handleKeyDown = (e)=>{
     if (e.key=="Enter"){
@@ -69,6 +107,22 @@ function PostListPage() {
     navigate(`/community/post/${postId}`)
   }
 
+  const handlePageChange= (page) =>{
+    if (page<1 || page>totalPages) return
+    setCurrentPage(page)
+  }
+
+  const getPageNumbers = () =>{
+    const pageNumbers =[]
+    const maxPagesToShow = 3
+    let startPage = Math.max(1,currentPage - Math.floor(maxPagesToShow / 2))
+    let endPage = startPage +maxPagesToShow-1
+
+    if (endPage>totalPages)
+
+
+
+  }
     
   return (
    
