@@ -7,12 +7,17 @@ function Footer() {
         <div className="row">
           <div className="col-lg-5 mb-4 mb-lg-0">
             <h5 className="footer-title">
-              <i className="bi bi-house-heart me-2"></i>
-              반려동물지도
+              <img
+                src={process.env.PUBLIC_URL + "/images/logo.png" || "/placeholder.svg"}
+                alt="이음길"
+                className="footer-logo me-2"
+                style={{ height: "35px", width: "auto", display: "inline-block" }}
+              />
+              이음길
             </h5>
             <p className="footer-description mt-3">
-            반려동물과의 시간은 매 순간이 특별합니다.함께한 눈빛, 산책길, 여행의 추억을 이곳에 담아보세요.
-            이 페이지는 당신과 반려동물이 나눈 소중한 순간들을 함께 기억하고, 더 많이 나눌 수 있는 공간입니다.
+              반려동물과의 시간은 매 순간이 특별합니다. 함께한 눈빛, 산책길, 여행의 추억을 이곳에 담아보세요. 이
+              페이지는 당신과 반려동물이 나눈 소중한 순간들을 함께 기억하고, 더 많이 나눌 수 있는 공간입니다.
             </p>
           </div>
 
@@ -41,7 +46,7 @@ function Footer() {
             <h5 className="footer-subtitle">문의하기</h5>
             <ul className="footer-contact">
               <li>
-                <i className="bi bi-envelope me-2"></i>petmap@example.com
+                <i className="bi bi-envelope me-2"></i>ieumgil@example.com
               </li>
               <li>
                 <i className="bi bi-telephone me-2"></i>02-123-4567
@@ -56,7 +61,7 @@ function Footer() {
         <div className="footer-bottom mt-4 pt-3">
           <div className="row">
             <div className="col-md-6 mb-2 mb-md-0">
-              <p className="copyright">© 2023 반려동물지도. All rights reserved.</p>
+              <p className="copyright">© 2023 이음길. All rights reserved.</p>
             </div>
             <div className="col-md-6 text-md-end">
               <a href="/terms" className="footer-bottom-link me-3">

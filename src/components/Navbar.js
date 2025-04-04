@@ -13,8 +13,13 @@ function Navbar({ isLoggedIn }) {
     <nav className="navbar navbar-expand-lg navbar-light mb-4">
       <div className="container">
         <a className="navbar-brand" href="/">
-          <i className="bi bi-house-heart me-2"></i>
-          반려동물지도
+          <img
+            src={process.env.PUBLIC_URL + "/images/logo.png" || "/placeholder.svg"}
+            alt="이음길"
+            className="navbar-logo me-2"
+            style={{ height: "40px", width: "auto", display: "inline-block" }}
+          />
+          이음길
         </a>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
           <span className="navbar-toggler-icon"></span>

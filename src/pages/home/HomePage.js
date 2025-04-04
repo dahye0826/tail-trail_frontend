@@ -32,49 +32,51 @@ const HomePage = () => {
 
       <div className="home-page">
         {/* 메인 배너 섹션 */}
-        <div className="banner-section">
+        <div
+          className="banner-section"
+          style={{
+            backgroundImage: `url(${process.env.PUBLIC_URL}/images/lawon01.png)`,
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "right bottom", // 이미지를 오른쪽 하단으로 정렬하여 다리 부분이 보이도록 함
+            backgroundSize: "110% auto", // 이미지 크기를 약간 줄여 더 많은 부분이 보이도록 함
+            height: "500px",
+            maxWidth: "1200px", // 최대 너비 설정
+            margin: "0 auto", // 중앙 정렬
+            borderRadius: "12px", // 모서리 둥글게
+          }}
+        >
+          <div className="banner-overlay" style={{ borderRadius: "12px" }}></div>
           <Container>
-            <Row className="align-items-center">
-              <Col lg={6} className="mb-4 mb-lg-0">
-                <h1 className="display-4 fw-bold mb-3 animate-text">
-                  반려동물과 함께하는 <br />
-                  특별한 여행
-                </h1>
-                <p className="lead mb-4 animate-text-delay">
-                  소중한 반려동물과 함께 갈 수 있는 장소를 찾고, 여행 경험을 공유하며, 새로운 반려인 친구들을
-                  만나보세요!
-                </p>
-                <div className="d-flex flex-wrap gap-3 animate-text-delay-2">
-                  <div className="login-signup-container">
-                    <h4 className="login-cta-text mb-3">함께 시작해볼까요?</h4>
+            <Row className="align-items-center h-100">
+              <Col lg={6} className="mb-4 mb-lg-0 text-white">
+                <div className="logo-container mb-4" style={{ marginTop: "-180px" }}>
+                  <img
+                    src={process.env.PUBLIC_URL + "/images/logo.png" || "/placeholder.svg"}
+                    alt="이음길"
+                    className="main-logo"
+                    style={{ width: "80px", height: "auto", display: "block", marginBottom: "15px" }}
+                  />
+                  <div className="d-flex align-items-center mb-3">
+                    <h1 className="display-4 fw-bold animate-text text-white">이음길</h1>
+                  </div>
+                  <p className="lead mb-4 animate-text-delay text-white">꼬리를 따라 이어지는 여행길</p>
+                </div>
+              </Col>
+              <Col lg={6} className="mb-4 mb-lg-0 d-flex justify-content-end">
+                <div className="login-signup-container animate-text-delay-2">
+                  <h4 className="login-cta-text mb-3">함께 시작해볼까요?</h4>
+                  <div className="text-center">
                     <Button as={Link} to="/login" variant="light" size="lg" className="btn-login me-2">
                       로그인
                     </Button>
                     <Button as={Link} to="/signup" variant="secondary" size="lg" className="btn-signup">
                       회원가입
                     </Button>
-                    <p className="login-benefit-text mt-2">
-                      <i className="bi bi-heart-fill me-2"></i>
-                      회원가입 시 모든 기능을 이용할 수 있습니다
-                    </p>
                   </div>
-                </div>
-              </Col>
-              <Col lg={6} className="position-relative">
-                <div className="position-relative">
-                  <img
-                    src="/placeholder.svg?height=400&width=600"
-                    alt="반려동물 여행"
-                    className="img-fluid rounded shadow-lg main-image"
-                  />
-                  {/* 발자국 애니메이션 */}
-                  <div className="paw-prints-animation">
-                    {[...Array(8)].map((_, i) => (
-                      <div key={i} className={`paw-print paw-print-${i + 1}`}>
-                        <i className="bi bi-paw-fill"></i>
-                      </div>
-                    ))}
-                  </div>
+                  <p className="login-benefit-text mt-2 text-center">
+                    <i className="bi bi-heart-fill me-2"></i>
+                    회원가입 시 모든 기능을 이용할 수 있습니다
+                  </p>
                 </div>
               </Col>
             </Row>
@@ -84,7 +86,7 @@ const HomePage = () => {
         {/* 주요 기능 소개 섹션 */}
         <Container className="py-5">
           <div className="text-center mb-5">
-            <h2 className="fw-bold section-title">반려동물 지도 서비스</h2>
+            <h2 className="fw-bold section-title">이음길 서비스</h2>
             <p className="lead text-muted">반려동물과 함께 방문할 수 있는 다양한 장소를 찾고 경험을 공유하세요</p>
           </div>
 
