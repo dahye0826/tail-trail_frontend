@@ -17,6 +17,15 @@
   color: var(--accent-color);
   font-weight: 700;
   font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-logo {
+  height: 40px;
+  width: auto;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .navbar-nav .nav-link {

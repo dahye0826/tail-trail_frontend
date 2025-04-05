@@ -18,6 +18,15 @@
   color: var(--accent-color);
   font-weight: 700;
   font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+}
+
+.footer-logo {
+  height: 35px;
+  width: auto;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .footer-subtitle {
