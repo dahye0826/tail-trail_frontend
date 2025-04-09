@@ -9,6 +9,8 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import "./HomePage.css"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
+// 기존 import 문 아래에 추가
+import KakaoMap from "../../components/KakaoMap"
 
 const HomePage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -49,7 +51,7 @@ const HomePage = () => {
           <Container>
             <Row className="align-items-center h-100">
               <Col lg={6} className="mb-4 mb-lg-0 text-white">
-                <div className="logo-container mb-4" style={{ marginTop: "-180px" }}>
+                <div className="logo-container mb-4" style={{ marginTop: "-50px" }}>
                   <img
                     src={process.env.PUBLIC_URL + "/images/logo.png" || "/placeholder.svg"}
                     alt="이음길"
@@ -283,14 +285,39 @@ const HomePage = () => {
             <Row className="align-items-center">
               <Col lg={6} className="order-lg-2 mb-4 mb-lg-0">
                 <div className={`map-image-container ${scrollPosition > 1000 ? "animate-slide-in-right" : ""}`}>
-                  <img
-                    src="/placeholder.svg?height=400&width=600"
-                    alt="지도 검색"
-                    className="img-fluid rounded shadow-lg"
+                  {/* 이미지 대신 실제 지도 표시 */}
+                  <KakaoMap
+                    readOnly={true}
+                    initialLocation={{
+                      name: "서울 시청",
+                      address: "서울특별시 중구 세종대로 110",
+                      lat: 37.5666805,
+                      lng: 126.9784147,
+                    }}
+                    markerPositions={[
+                      {
+                        name: "서울 시청",
+                        address: "서울특별시 중구 세종대로 110",
+                        lat: 37.5666805,
+                        lng: 126.9784147,
+                      },
+                      {
+                        name: "경복궁",
+                        address: "서울특별시 종로구 사직로 161",
+                        lat: 37.579617,
+                        lng: 126.977041,
+                      },
+                      {
+                        name: "남산타워",
+                        address: "서울특별시 용산구 남산공원길 105",
+                        lat: 37.551348,
+                        lng: 126.988123,
+                      },
+                    ]}
+                    height="400px"
+                    showSearchBar={false}
+                    defaultLevel={9}
                   />
-                  <div className="map-marker-animation">
-                    <FaMapMarkedAlt className="map-marker" />
-                  </div>
                 </div>
               </Col>
               <Col lg={6} className="order-lg-1">
@@ -327,4 +354,3 @@ const HomePage = () => {
 }
 
 export default HomePage
-

@@ -7,6 +7,7 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import "./PostDetailPage.css"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
+import KakaoMap from "../../components/KakaoMap"
 
 function PostDetailPage() {
   const [post, setPost] = useState(null)
@@ -53,6 +54,9 @@ function PostDetailPage() {
             viewCount: 142,
             locationName: "해운대 해수욕장",
             locationId: 1,
+            locationAddress: "부산광역시 해운대구 우동",
+            locationLat: 35.1585,
+            locationLng: 129.1607,
             images: ["/placeholder.svg?height=400&width=600", "/placeholder.svg?height=400&width=600"],
           }
 
@@ -237,9 +241,27 @@ function PostDetailPage() {
             </div>
 
             {post.locationName && (
-              <div className="post-location mt-2" onClick={handleLocationClick}>
-                <i className="bi bi-geo-alt me-1"></i>
-                <span className="location-name">{post.locationName}</span>
+              <div className="post-location-section mt-3 mb-4">
+                <div className="post-location mt-2 mb-2" onClick={handleLocationClick}>
+                  <i className="bi bi-geo-alt me-1"></i>
+                  <span className="location-name">{post.locationName}</span>
+                </div>
+
+                {/* 지도 표시 영역 추가 */}
+                <div className="location-map mt-2">
+                  <KakaoMap
+                    readOnly={true}
+                    initialLocation={{
+                      name: post.locationName,
+                      address: post.locationAddress || "",
+                      lat: post.locationLat || 37.5665,
+                      lng: post.locationLng || 126.978,
+                    }}
+                    height="300px"
+                    showSearchBar={false}
+                    defaultLevel={4}
+                  />
+                </div>
               </div>
             )}
           </div>
@@ -392,4 +414,3 @@ function PostDetailPage() {
 }
 
 export default PostDetailPage
-

@@ -7,6 +7,7 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import "./PlaceDetailPage.css"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
+import KakaoMap from "../../components/KakaoMap"
 
 function PlaceDetailPage() {
   const [place, setPlace] = useState(null)
@@ -58,6 +59,8 @@ function PlaceDetailPage() {
               },
             ],
             images: ["/placeholder.svg?height=400&width=800", "/placeholder.svg?height=400&width=800"],
+            lat: 35.1586,
+            lng: 129.1615,
           }
 
           console.log("Setting place data:", mockPlaceDetail) // 디버깅용
@@ -213,13 +216,19 @@ function PlaceDetailPage() {
           <div className="row mt-4">
             <div className="col">
               <h3 className="mb-3">위치</h3>
-              <div className="map-placeholder">
-                <img src="/placeholder.svg?height=400&width=800" alt="지도" className="img-fluid rounded shadow-sm" />
-                <div className="map-overlay">
-                  <p>
-                    <i className="bi bi-map"></i> 지도 준비 중입니다
-                  </p>
-                </div>
+              <div className="map-container">
+                <KakaoMap
+                  readOnly={true}
+                  initialLocation={{
+                    name: place.name,
+                    address: place.address,
+                    lat: place.lat || 37.5665, // 기본값 설정
+                    lng: place.lng || 126.978, // 기본값 설정
+                  }}
+                  height="400px"
+                  showSearchBar={false}
+                  defaultLevel={3}
+                />
               </div>
             </div>
           </div>
@@ -238,4 +247,3 @@ function PlaceDetailPage() {
 }
 
 export default PlaceDetailPage
-
