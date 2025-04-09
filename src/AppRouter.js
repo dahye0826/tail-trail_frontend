@@ -12,6 +12,7 @@ import MyPostsPage from "./pages/mypage/MyPostsPage"
 import ProfileEditPage from "./pages/mypage/ProfileEditPage"
 import RatedPlacesPage from "./pages/mypage/RatedPlacesPage"
 import HomePage from "./pages/home/HomePage"
+import MapViewPage from "./pages/map/MapViewPage"
 
 
 function AppRouter() {
@@ -31,6 +32,8 @@ function AppRouter() {
         <Route path="/mypage/posts" element={<MyPostsPage />} />
         <Route path="/mypage/rated" element={<RatedPlacesPage />} />
         <Route path="/mypage/edit-profile" element={<ProfileEditPage />} />
+        <Route path="/map" element={<MapViewPage />} />
+        
         
       </Routes>
     </BrowserRouter>

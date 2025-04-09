@@ -25,6 +25,15 @@
   background-color: #f0f9fa;
 }
 
+.search-results .registered-place {
+  background-color: rgba(78, 205, 196, 0.1);
+  border-left: 3px solid #4ecdc4;
+}
+
+.search-results .registered-place:hover {
+  background-color: rgba(78, 205, 196, 0.2);
+}
+
 .map-view {
   border-radius: 4px;
   overflow: hidden;

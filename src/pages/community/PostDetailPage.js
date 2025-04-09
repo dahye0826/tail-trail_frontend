@@ -52,11 +52,27 @@ function PostDetailPage() {
             createdAt: "2023-05-15",
             updatedAt: "2023-05-15",
             viewCount: 142,
-            locationName: "해운대 해수욕장",
-            locationId: 1,
-            locationAddress: "부산광역시 해운대구 우동",
-            locationLat: 35.1585,
-            locationLng: 129.1607,
+
+            // 등록된 장소(Places 엔티티) 정보
+            place: {
+              id: 1,
+              name: "해운대 반려견 비치파크",
+              address: "부산광역시 해운대구 우동",
+              region: "부산",
+              category: "여행지",
+              description: "반려견과 함께 해변을 즐길 수 있는 특별한 공간입니다.",
+              rating: 4.5,
+              amenities: ["반려견 전용 공간", "물놀이 시설", "샤워 시설"],
+              lat: 35.1585,
+              lng: 129.1607,
+            },
+
+            // 사용자 지정 위치 정보 (place가 null인 경우에만 사용)
+            locationName: null,
+            locationAddress: null,
+            locationLat: null,
+            locationLng: null,
+
             images: ["/placeholder.svg?height=400&width=600", "/placeholder.svg?height=400&width=600"],
           }
 
@@ -176,9 +192,10 @@ function PostDetailPage() {
     navigate("/community")
   }
 
-  const handleLocationClick = () => {
-    if (post?.locationId) {
-      navigate(`/location/${post.locationId}`)
+  // 장소 상세 페이지로 이동
+  const handlePlaceClick = () => {
+    if (post?.place?.id) {
+      navigate(`/places/place/${post.place.id}`)
     }
   }
 
@@ -202,6 +219,28 @@ function PostDetailPage() {
       </>
     )
   }
+
+  // 위치 정보 결정 (등록된 장소 또는 사용자 지정 위치)
+  const locationInfo = post.place
+    ? {
+        id: post.place.id,
+        name: post.place.name,
+        address: post.place.address,
+        lat: post.place.lat,
+        lng: post.place.lng,
+        isRegisteredPlace: true,
+        category: post.place.category,
+        rating: post.place.rating,
+      }
+    : post.locationName
+      ? {
+          name: post.locationName,
+          address: post.locationAddress || "",
+          lat: post.locationLat || 37.5665,
+          lng: post.locationLng || 126.978,
+          isCustomLocation: true,
+        }
+      : null
 
   return (
     <>
@@ -240,28 +279,56 @@ function PostDetailPage() {
               </div>
             </div>
 
-            {post.locationName && (
+            {locationInfo && (
               <div className="post-location-section mt-3 mb-4">
-                <div className="post-location mt-2 mb-2" onClick={handleLocationClick}>
+                <div
+                  className={`post-location mt-2 mb-2 ${locationInfo.isRegisteredPlace ? "registered-place-badge" : ""}`}
+                  onClick={locationInfo.isRegisteredPlace ? handlePlaceClick : null}
+                  style={{ cursor: locationInfo.isRegisteredPlace ? "pointer" : "default" }}
+                >
                   <i className="bi bi-geo-alt me-1"></i>
-                  <span className="location-name">{post.locationName}</span>
+                  <span className="location-name">{locationInfo.name}</span>
+                  {locationInfo.isRegisteredPlace && <span className="badge bg-primary ms-2">등록된 장소</span>}
                 </div>
 
-                {/* 지도 표시 영역 추가 */}
+                {/* 지도 표시 영역 */}
                 <div className="location-map mt-2">
                   <KakaoMap
                     readOnly={true}
-                    initialLocation={{
-                      name: post.locationName,
-                      address: post.locationAddress || "",
-                      lat: post.locationLat || 37.5665,
-                      lng: post.locationLng || 126.978,
-                    }}
+                    initialLocation={locationInfo}
                     height="300px"
                     showSearchBar={false}
                     defaultLevel={4}
                   />
                 </div>
+
+                {/* 등록된 장소인 경우 추가 정보 표시 */}
+                {locationInfo.isRegisteredPlace && (
+                  <div className="place-info mt-2 p-3 bg-light rounded">
+                    <div className="d-flex justify-content-between align-items-start">
+                      <div>
+                        <p className="mb-1">
+                          <strong>주소:</strong> {locationInfo.address}
+                        </p>
+                        {locationInfo.category && (
+                          <span className="badge bg-secondary me-2">{locationInfo.category}</span>
+                        )}
+                        {locationInfo.rating && (
+                          <span className="rating-display">
+                            {[...Array(Math.floor(locationInfo.rating))].map((_, i) => (
+                              <i key={i} className="bi bi-star-fill text-warning"></i>
+                            ))}
+                            {locationInfo.rating % 1 !== 0 && <i className="bi bi-star-half text-warning"></i>}
+                            <span className="rating-text">({locationInfo.rating})</span>
+                          </span>
+                        )}
+                      </div>
+                      <button className="btn btn-sm btn-outline-primary" onClick={handlePlaceClick}>
+                        장소 상세보기
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

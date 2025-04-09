@@ -141,6 +141,28 @@
   box-shadow: 0 0 0 0.2rem rgba(78, 205, 196, 0.25);
 }
 
+/* 등록된 장소 관련 스타일 추가 */
+.registered-place-badge {
+  background-color: rgba(78, 205, 196, 0.1);
+  border-left: 3px solid var(--primary-color);
+  padding-left: 10px;
+}
+
+.place-info {
+  background-color: rgba(78, 205, 196, 0.05);
+  border: 1px solid var(--border-color);
+}
+
+.rating-display {
+  font-size: 0.9rem;
+  vertical-align: middle;
+}
+
+.rating-text {
+  margin-left: 0.5rem;
+  color: #6c757d;
+}
+
 @media (max-width: 768px) {
   .post-detail-container {
     padding: 1.5rem;
@@ -170,4 +192,3 @@
     justify-content: space-between;
   }
 }
-

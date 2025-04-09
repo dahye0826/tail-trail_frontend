@@ -220,14 +220,19 @@ function PlaceDetailPage() {
                 <KakaoMap
                   readOnly={true}
                   initialLocation={{
+                    id: place.id, // Places 엔티티 ID 추가
                     name: place.name,
                     address: place.address,
                     lat: place.lat || 37.5665, // 기본값 설정
                     lng: place.lng || 126.978, // 기본값 설정
+                    isRegisteredPlace: true, // 등록된 장소임을 표시
+                    category: place.category,
+                    rating: place.rating,
                   }}
                   height="400px"
                   showSearchBar={false}
                   defaultLevel={3}
+                  showRegisteredPlaces={false} // 장소 상세 페이지에서는 등록된 장소 검색 비활성화
                 />
               </div>
             </div>

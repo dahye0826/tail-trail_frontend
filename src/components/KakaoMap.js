@@ -30,6 +30,7 @@ const KakaoMap = ({
   const [mapLoadError, setMapLoadError] = useState(null)
   const [searchKeyword, setSearchKeyword] = useState("")
   const [searchResults, setSearchResults] = useState([])
+  const [registeredPlaces, setRegisteredPlaces] = useState([])
   const [selectedLocation, setSelectedLocation] = useState(initialLocation)
 
   // 카카오맵 스크립트 로드
@@ -69,6 +70,32 @@ const KakaoMap = ({
       clearMarkers()
     }
   }, [])
+
+  // 등록된 장소(Places) 불러오기
+  useEffect(() => {
+    fetchRegisteredPlaces()
+  }, [])
+
+  // 등록된 장소(Places) 조회 함수
+  const fetchRegisteredPlaces = async () => {
+    try {
+      // 실제 구현에서는 API 호출로 대체
+      // const response = await axios.get('/api/places');
+      // setRegisteredPlaces(response.data);
+
+      // 테스트용 목업 데이터 (mockPlaces 사용)
+      // 실제 구현 시 API 호출로 대체
+      import("../pages/places/mockData")
+        .then((module) => {
+          setRegisteredPlaces(module.mockPlaces)
+        })
+        .catch((error) => {
+          console.error("Error loading mock places:", error)
+        })
+    } catch (error) {
+      console.error("Error fetching registered places:", error)
+    }
+  }
 
   // 지도 초기화
   useEffect(() => {
@@ -117,37 +144,6 @@ const KakaoMap = ({
       // 지도 인스턴스 생성
       const mapInstance = new window.kakao.maps.Map(mapRef.current, options)
       mapInstanceRef.current = mapInstance
-
-      // 지도 클릭 이벤트 (읽기 전용이 아닐 때만)
-      if (!readOnly) {
-        window.kakao.maps.event.addListener(mapInstance, "click", (mouseEvent) => {
-          if (onLocationSelect) {
-            const latlng = mouseEvent.latLng
-            const clickedLocation = {
-              lat: latlng.getLat(),
-              lng: latlng.getLng(),
-              name: "선택한 위치",
-              address: "주소 정보 없음",
-            }
-
-            // 좌표를 주소로 변환
-            const geocoder = new window.kakao.maps.services.Geocoder()
-            geocoder.coord2Address(latlng.getLng(), latlng.getLat(), (result, status) => {
-              if (status === window.kakao.maps.services.Status.OK) {
-                const address = result[0].address.address_name || "주소 정보 없음"
-                clickedLocation.address = address
-                clickedLocation.name = address
-
-                setSelectedLocation(clickedLocation)
-                onLocationSelect(clickedLocation)
-
-                clearMarkers()
-                addMarker(clickedLocation)
-              }
-            })
-          }
-        })
-      }
 
       // 초기 마커 표시
       updateMarkers()
@@ -235,40 +231,49 @@ const KakaoMap = ({
     infoWindowsRef.current = []
   }
 
-  // 장소 검색 함수
-  const searchPlaces = () => {
+  // 장소 검색 함수 - 등록된 장소만 검색
+  const searchPlaces = async () => {
     if (!searchKeyword.trim()) return
 
-    if (kakaoMapLoaded && window.kakao && window.kakao.maps) {
-      const places = new window.kakao.maps.services.Places()
+    // 검색 결과 초기화
+    setSearchResults([])
 
-      places.keywordSearch(searchKeyword, (result, status) => {
-        if (status === window.kakao.maps.services.Status.OK) {
-          const locations = result.map((place) => ({
-            id: place.id,
-            name: place.place_name,
-            address: place.address_name,
-            lat: Number.parseFloat(place.y),
-            lng: Number.parseFloat(place.x),
-          }))
+    // 등록된 장소(Places) 검색
+    if (registeredPlaces.length > 0) {
+      // 키워드로 등록된 장소 필터링
+      const filteredPlaces = registeredPlaces.filter(
+        (place) =>
+          place.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+          place.address.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+          (place.description && place.description.toLowerCase().includes(searchKeyword.toLowerCase())),
+      )
 
-          setSearchResults(locations)
+      // 검색 결과 형식으로 변환
+      const registeredResults = filteredPlaces.map((place) => ({
+        id: place.id, // Places 엔티티 ID
+        name: place.name,
+        address: place.address,
+        lat: place.lat || 37.5665, // 기본값 설정
+        lng: place.lng || 126.978, // 기본값 설정
+        isRegisteredPlace: true, // 등록된 장소임을 표시
+        category: place.category, // 카테고리 정보
+        rating: place.rating, // 평점 정보
+      }))
 
-          // 검색 결과가 있으면 첫 번째 결과로 지도 중심 이동
-          if (locations.length > 0) {
-            const position = new window.kakao.maps.LatLng(locations[0].lat, locations[0].lng)
-            mapInstanceRef.current.setCenter(position)
+      // 검색 결과 설정
+      setSearchResults(registeredResults)
 
-            // 검색 결과에 마커 표시
-            clearMarkers()
-            locations.forEach((loc) => {
-              addMarker(loc)
-            })
-          }
-        } else {
-          setSearchResults([])
-        }
-      })
+      // 검색 결과가 있으면 첫 번째 결과로 지도 중심 이동
+      if (registeredResults.length > 0) {
+        const position = new window.kakao.maps.LatLng(registeredResults[0].lat, registeredResults[0].lng)
+        mapInstanceRef.current.setCenter(position)
+
+        // 검색 결과에 마커 표시
+        clearMarkers()
+        registeredResults.forEach((loc) => {
+          addMarker(loc)
+        })
+      }
     }
   }
 
@@ -337,7 +342,7 @@ const KakaoMap = ({
             <input
               type="text"
               className="form-control"
-              placeholder="장소 검색..."
+              placeholder="등록된 장소 검색..."
               value={searchKeyword}
               onChange={(e) => setSearchKeyword(e.target.value)}
               onKeyDown={(e) => {
@@ -358,15 +363,28 @@ const KakaoMap = ({
       {searchResults.length > 0 && !readOnly && (
         <div className="search-results mb-3">
           <ul className="list-group">
-            {searchResults.map((location) => (
+            {searchResults.map((location, index) => (
               <li
-                key={location.id}
-                className="list-group-item list-group-item-action"
+                key={`place-${location.id}`}
+                className="list-group-item list-group-item-action registered-place"
                 onClick={() => selectLocation(location)}
               >
                 <strong>{location.name}</strong>
                 <br />
                 <small>{location.address}</small>
+                {location.category && (
+                  <div className="mt-1">
+                    <span className="badge bg-secondary me-1">{location.category}</span>
+                    {location.rating && (
+                      <small className="text-warning">
+                        {[...Array(Math.floor(location.rating))].map((_, i) => (
+                          <i key={i} className="bi bi-star-fill"></i>
+                        ))}
+                        {location.rating % 1 !== 0 && <i className="bi bi-star-half"></i>}
+                      </small>
+                    )}
+                  </div>
+                )}
               </li>
             ))}
           </ul>

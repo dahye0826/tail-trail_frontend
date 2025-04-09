@@ -7,7 +7,9 @@ function Navbar({ isLoggedIn }) {
 
   // Determine active page based on URL path
   const isPlacesActive = path.includes("/places")
-  const isCommunityActive = path.includes("/community") || path === "/"
+  const isCommunityActive = path.includes("/community")
+  const isMapActive = path === "/map"
+  const isHomeActive = path === "/"
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light mb-4">
@@ -26,13 +28,19 @@ function Navbar({ isLoggedIn }) {
         </button>
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav me-auto">
-            <li className="nav-item">
+            <li className="nav-item mx-2">
               <a className={`nav-link ${isPlacesActive ? "active" : ""}`} href="/places">
                 <i className="bi bi-map me-1"></i>
                 장소
               </a>
             </li>
-            <li className="nav-item">
+            <li className="nav-item mx-2">
+              <a className={`nav-link ${isMapActive ? "active" : ""}`} href="/map">
+                <i className="bi bi-geo-alt me-1"></i>
+                지도
+              </a>
+            </li>
+            <li className="nav-item mx-2">
               <a className={`nav-link ${isCommunityActive ? "active" : ""}`} href="/community">
                 <i className="bi bi-people me-1"></i>
                 커뮤니티
@@ -73,4 +81,3 @@ function Navbar({ isLoggedIn }) {
 }
 
 export default Navbar
-

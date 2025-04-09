@@ -37,9 +37,10 @@ function WritePostPage() {
   // 위치 선택 핸들러
   const handleLocationSelect = (location) => {
     setSelectedLocation(location)
+    console.log("Selected location:", location)
   }
 
-  const handlesubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     const formData = new FormData()
@@ -52,10 +53,8 @@ function WritePostPage() {
 
     // 선택된 위치 정보 추가
     if (selectedLocation) {
-      formData.append("locationName", selectedLocation.name || "")
-      formData.append("locationAddress", selectedLocation.address || "")
-      formData.append("locationLat", selectedLocation.lat || "")
-      formData.append("locationLng", selectedLocation.lng || "")
+      // 등록된 장소인 경우 (Places 엔티티 ID가 있는 경우)
+      formData.append("placeId", selectedLocation.id)
     }
 
     for (const pair of formData.entries()) {
@@ -91,7 +90,7 @@ function WritePostPage() {
                 <h2 className="text-center mb-0">추억 적기</h2>
               </div>
               <div className="card-body">
-                <form onSubmit={handlesubmit}>
+                <form onSubmit={handleSubmit}>
                   <div className="mb-3">
                     <input
                       type="text"
@@ -123,13 +122,20 @@ function WritePostPage() {
                     {/* 선택된 장소 정보 표시 */}
                     {selectedLocation && (
                       <div className="selected-location mb-3">
-                        <div className="alert alert-success">
+                        <div className="alert alert-primary">
                           <div className="d-flex justify-content-between align-items-center">
                             <div>
-                              <strong>선택된 장소:</strong> {selectedLocation.name}
+                              <div>
+                                <strong>{selectedLocation.name}</strong>
+                              </div>
                               <div>
                                 <small>{selectedLocation.address}</small>
                               </div>
+                              {selectedLocation.category && (
+                                <div className="mt-1">
+                                  <span className="badge bg-secondary me-1">{selectedLocation.category}</span>
+                                </div>
+                              )}
                             </div>
                             <button
                               type="button"

@@ -35,6 +35,11 @@ function Footer() {
                 </a>
               </li>
               <li>
+                <a href="/map">
+                  <i className="bi bi-geo-alt me-2"></i>지도로 보기
+                </a>
+              </li>
+              <li>
                 <a href="/mypage">
                   <i className="bi bi-person-circle me-2"></i>마이페이지
                 </a>
@@ -79,4 +84,3 @@ function Footer() {
 }
 
 export default Footer
-
