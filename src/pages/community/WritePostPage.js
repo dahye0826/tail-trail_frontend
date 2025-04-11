@@ -43,6 +43,12 @@ function WritePostPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    if(!title.trim()|| !content.trim()){ //앞뒤 공백 제거했을때 없으면 alert
+      alert("제목과 내용은 필수입니다.")
+     return
+   }
+
+
     const formData = new FormData()
 
     formData.append("postTitle", title)
@@ -103,12 +109,19 @@ function WritePostPage() {
                     />
                   </div>
 
-                  {/* 장소 선택 영역 */}
+                  {/* 장소 선택 영역 - 수정된 부분 */}
                   <div className="mb-3">
-                    <label className="form-label">장소 선택 (선택사항)</label>
-                    <div className="d-flex justify-content-between mb-2">
-                      <button type="button" className="btn btn-outline-primary" onClick={() => setShowMap(!showMap)}>
-                        {showMap ? "지도 닫기" : "지도에서 장소 찾기"}
+                    <div className="input-group mb-2">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="지도에서 장소 찾기 버튼 클릭"
+                        value={selectedLocation ? selectedLocation.name : ""}
+                        readOnly
+                        style={{ height: "38px" }} // 버튼과 높이 맞추기
+                      />
+                      <button type="button" className="btn btn-primary" onClick={() => setShowMap(!showMap)}>
+                        <i className="bi bi-geo-alt me-1"></i> 지도에서 장소 찾기
                       </button>
                     </div>
 
@@ -151,7 +164,6 @@ function WritePostPage() {
                       </div>
                     )}
                   </div>
-
                   <div className="mb-3">
                     <textarea
                       className="form-control"

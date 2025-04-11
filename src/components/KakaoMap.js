@@ -97,7 +97,7 @@ const KakaoMap = ({
     }
   }
 
-  // 지도 초기화
+  // 카카오맵 생성(지도 띄우기)
   useEffect(() => {
     if (kakaoMapLoaded && mapRef.current) {
       initializeMap()
