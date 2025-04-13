@@ -1,3 +1,12 @@
+:root {
+  --primary-color: #4ecdc4;
+  --secondary-color: #a5e1e9;
+  --accent-color: #2a9d8f;
+  --text-color: #2c3e50;
+  --light-bg: #f0f9fa;
+  --border-color: #d1eeef;
+}
+
 .post-detail-container {
   max-width: 800px;
   margin: 0 auto;
@@ -5,6 +14,8 @@
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   padding: 2rem;
+  overflow: visible;
+  position: relative;
 }
 
 .post-title {
@@ -59,20 +70,48 @@
 }
 
 .post-content {
-  line-height: 1.8;
   color: var(--text-color);
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.post-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  margin: 1.5rem auto;
+}
+
+/* 이미지 섹션 스타일 */
+.post-images-section {
+  border-top: 1px solid var(--border-color);
+  padding-top: 1.5rem;
+  margin-top: 1.5rem;
 }
 
 .post-image-container {
-  width: 100%;
-  border-radius: 8px;
-  overflow: hidden;
+  max-height: none;
+  overflow: visible;
+  text-align: center;
+  display: flex;
+  justify-content: center;
 }
 
 .post-image {
-  width: 100%;
+  max-width: 100%;
   height: auto;
-  object-fit: cover;
+  display: block;
+  object-fit: contain;
+  margin-bottom: 1rem;
+}
+
+.post-actions {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  position: relative;
+  clear: both;
 }
 
 .comments-title {

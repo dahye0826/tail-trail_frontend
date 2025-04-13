@@ -37,17 +37,18 @@ function WritePostPage() {
   // 위치 선택 핸들러
   const handleLocationSelect = (location) => {
     setSelectedLocation(location)
+    setShowMap(false)
     console.log("Selected location:", location)
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if(!title.trim()|| !content.trim()){ //앞뒤 공백 제거했을때 없으면 alert
+    if (!title.trim() || !content.trim()) {
+      //앞뒤 공백 제거했을때 없으면 alert
       alert("제목과 내용은 필수입니다.")
-     return
-   }
-
+      return
+    }
 
     const formData = new FormData()
 
@@ -118,57 +119,57 @@ function WritePostPage() {
                         placeholder="지도에서 장소 찾기 버튼 클릭"
                         value={selectedLocation ? selectedLocation.name : ""}
                         readOnly
-                        style={{ height: "38px" }} // 버튼과 높이 맞추기
                       />
                       <button type="button" className="btn btn-primary" onClick={() => setShowMap(!showMap)}>
                         <i className="bi bi-geo-alt me-1"></i> 지도에서 장소 찾기
                       </button>
                     </div>
 
-                    {/* 지도 표시 영역 */}
                     {showMap && (
-                      <div className="map-container mb-3">
-                        <KakaoMap onLocationSelect={handleLocationSelect} height="400px" showSearchBar={true} />
-                      </div>
-                    )}
-
-                    {/* 선택된 장소 정보 표시 */}
-                    {selectedLocation && (
-                      <div className="selected-location mb-3">
-                        <div className="alert alert-primary">
-                          <div className="d-flex justify-content-between align-items-center">
-                            <div>
-                              <div>
-                                <strong>{selectedLocation.name}</strong>
-                              </div>
-                              <div>
-                                <small>{selectedLocation.address}</small>
-                              </div>
-                              {selectedLocation.category && (
-                                <div className="mt-1">
-                                  <span className="badge bg-secondary me-1">{selectedLocation.category}</span>
-                                </div>
-                              )}
-                            </div>
-                            <button
-                              type="button"
-                              className="btn btn-sm btn-outline-danger"
-                              onClick={() => {
-                                setSelectedLocation(null)
-                              }}
-                            >
-                              <i className="bi bi-x"></i>
-                            </button>
-                          </div>
+                      <div className="location-wrapper mb-3">
+                        <div className="map-container">
+                          <KakaoMap onLocationSelect={handleLocationSelect} height="400px" showSearchBar={true} />
                         </div>
+
+                        {selectedLocation && (
+                          <div className="selected-location">
+                            <div className="alert alert-primary">
+                              <div className="d-flex justify-content-between align-items-center">
+                                <div>
+                                  <div>
+                                    <strong>{selectedLocation.name}</strong>
+                                  </div>
+                                  <div>
+                                    <small>{selectedLocation.address}</small>
+                                  </div>
+                                  {selectedLocation.category && (
+                                    <div className="mt-1">
+                                      <span className="badge bg-secondary me-1">{selectedLocation.category}</span>
+                                    </div>
+                                  )}
+                                </div>
+                                <button
+                                  type="button"
+                                  className="btn btn-sm btn-outline-danger"
+                                  onClick={() => {
+                                    setSelectedLocation(null)
+                                  }}
+                                >
+                                  <i className="bi bi-x"></i>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
+
                   <div className="mb-3">
                     <textarea
                       className="form-control"
                       id="postContent"
-                      rows="10"
+                      rows="15"
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
                       placeholder="내용을 입력하세요"
@@ -189,7 +190,6 @@ function WritePostPage() {
 
                   {images.length > 0 && (
                     <div className="mb-3">
-                      <label className="form-label">선택된 이미지</label>
                       <div className="d-flex flex-wrap gap-2">
                         {images.map((image, index) => (
                           <div key={index} className="position-relative">
@@ -198,12 +198,11 @@ function WritePostPage() {
                               alt={`preview-${index}`}
                               width="100"
                               height="100"
-                              style={{ objectFit: "cover", borderRadius: "5px" }}
+                              className="preview-image"
                             />
                             <button
                               type="button"
-                              className="btn btn-sm btn-danger position-absolute top-0 end-0"
-                              style={{ padding: "0.1rem 0.3rem", fontSize: "0.7rem" }}
+                              className="btn btn-sm btn-danger position-absolute top-0 end-0 remove-image-btn"
                               onClick={() => handleRemoveImage(index)}
                             >
                               ✕

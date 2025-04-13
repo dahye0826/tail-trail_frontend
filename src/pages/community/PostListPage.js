@@ -8,7 +8,7 @@ import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 
 function PostListPage() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(true)
   const[loading,setLoading]= useState(true)
   const[currentPage,setCurrentPage]= useState(1)
   const [searchTerm, setSearchTerm] = useState("")

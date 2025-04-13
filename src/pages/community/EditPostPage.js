@@ -17,30 +17,26 @@ function EditPostPage() {
   const [selectedLocation, setSelectedLocation] = useState(null)
   const [showMap, setShowMap] = useState(false)
 
-
   useEffect(() => {
     const fetchPost = async () => {
-
       try {
         const response = await axios.get(`http://localhost:9000/api/community/${id}`)
-        setTitle(response.data.postTitle)
-        setContent(response.data.postContent)
-        setExistingImages(response.data.postImageUrls)
+        console.log("백엔드 응답 데이터:", response.data)
+        setTitle(response.data.title)
+        setContent(response.data.content)
+        setExistingImages(response.data.imageUrls || [])
         if (response.data.place) {
           setSelectedLocation({
             id: response.data.place.id,
             name: response.data.place.name,
             address: response.data.place.address,
-            category: response.data.place.category,
           })
         }
-      }
-      catch (err) {
+      } catch (err) {
         console.error("데이터 불러오기 실패", err)
         alert("데이터를 불러오는데 실패했어요.")
         navigate("/community")
       }
-
     }
     fetchPost()
   }, [id, navigate])
@@ -48,13 +44,13 @@ function EditPostPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-
-    if (!title.trim() || !content.trim()) { //앞뒤 공백 제거했을때 없으면 alert
+    if (!title.trim() || !content.trim()) {
+      //앞뒤 공백 제거했을때 없으면 alert
       alert("제목과 내용은 필수입니다.")
       return
     }
 
-    const formData = new FormData();
+    const formData = new FormData()
     formData.append("postTitle", title)
     formData.append("postContent", content)
     if (selectedLocation) {
@@ -65,10 +61,7 @@ function EditPostPage() {
       formData.append("postImages", image)
     })
 
-
-
     try {
-
       const response = await axios.put(`http://localhost:9000/api/community/${id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -77,21 +70,16 @@ function EditPostPage() {
 
       alert("수정 완료")
       console.log("서버 응답:", response.data)
-
+      navigate(`/community/post/${id}`)
     } catch (err) {
       alert("에러발생")
       console.log("에러 발생:", err)
-
-
-
     }
-
   }
 
   const handleRemoveExistingImage = (index) => {
-    setImages((prevImages) => prevImages.filter((_, i) => i !== index))
+    setExistingImages((prevImages) => prevImages.filter((_, i) => i !== index))
   }
-
 
   //이미지 선택
   const handleImageChange = (e) => {
@@ -106,7 +94,6 @@ function EditPostPage() {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index))
   }
 
-
   return (
     <>
       <Navbar isLoggedIn={true} />
@@ -116,10 +103,13 @@ function EditPostPage() {
           <div className="col-lg-8 mx-auto">
             <div className="card shadow-sm">
               <div className="card-header bg-white">
-                <h2 className="text-center mb-0">게시글 수정</h2>
+                <h2 className="text-center mb-0">추억 적기</h2>
               </div>
               <div className="card-body">
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit}
+                 onKeyDown={(e) => {
+                  if (e.key === "Enter" && e.target.tagName !== "TEXTAREA") {
+                    e.preventDefault()}}}>
                   <div className="mb-3">
                     <input
                       type="text"
@@ -137,7 +127,7 @@ function EditPostPage() {
                         className="form-control"
                         placeholder="지도에서 장소 찾기 버튼 클릭"
                         // 삼항연산자
-                        value={selectedLocation ? selectedLocation.name : ""} 
+                        value={selectedLocation?.name ?? ""}
                         readOnly
                       />
                       <button
@@ -146,37 +136,54 @@ function EditPostPage() {
                         // true/false를 토글(toggle
                         onClick={() => setShowMap((prev) => !prev)}
                       >
-                        지도에서 장소 찾기
+                        <i className="bi bi-geo-alt me-1"></i> 지도에서 장소 찾기
                       </button>
                     </div>
 
-                    {showMap&&(
-                      <div className="mb-3">
-                        <KakaoMap
-                        onLocationSelect={(location)=>{
-                          setSelectedLocation(location)
-                          setShowMap(false)
-                        }}
-                        height="400px"
-                        // 장소검색 입력창
-                        showSearchBar={true}
-                        />
-                      </div>
-                    )}
-
-                    {selectedLocation &&(
-                        <div className="alert alert-primary d-flex justify-content-between align-items-center">
-                        <div>
-                          <strong>{selectedLocation.name}</strong><br />
-                          <small>{selectedLocation.address}</small>
+                    {/* 지도와 선택된 장소 정보를 하나의 컨테이너로 묶음 */}
+                    {showMap && (
+                      <div className="location-wrapper mb-3">
+                        <div className="map-container">
+                          <KakaoMap
+                            onLocationSelect={(location) => {
+                              setSelectedLocation(location)
+                              setShowMap(false)
+                            }}
+                            height="400px"
+                            showSearchBar={true}
+                          />
                         </div>
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-outline-danger"
-                          onClick={() => setSelectedLocation(null)}
-                        >
-                          ✕
-                        </button>
+
+                        {selectedLocation && (
+                          <div className="selected-location">
+                            <div className="alert alert-primary">
+                              <div className="d-flex justify-content-between align-items-center">
+                                <div>
+                                  <div>
+                                    <strong>{selectedLocation.name}</strong>
+                                  </div>
+                                  <div>
+                                    <small>{selectedLocation.address}</small>
+                                  </div>
+                                  {selectedLocation.category && (
+                                    <div className="mt-1">
+                                      <span className="badge bg-secondary me-1">{selectedLocation.category}</span>
+                                    </div>
+                                  )}
+                                </div>
+                                <button
+                                  type="button"
+                                  className="btn btn-sm btn-outline-danger"
+                                  onClick={() => {
+                                    setSelectedLocation(null)
+                                  }}
+                                >
+                                  <i className="bi bi-x"></i>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -185,7 +192,7 @@ function EditPostPage() {
                     <textarea
                       className="form-control"
                       id="postContent"
-                      rows="10"
+                      rows="15"
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
                       placeholder="내용을 입력하세요"
@@ -201,22 +208,21 @@ function EditPostPage() {
                       onChange={handleImageChange}
                     />
                   </div>
-                  {existingImages.length > 0 && (
+                  {existingImages && existingImages.length > 0 && (
                     <div className="mb-3">
                       <div className="d-flex flex-wrap gap-2">
                         {existingImages.map((imageUrl, index) => (
                           <div key={index} className="position-relative">
                             <img
-                              src={imageUrl}
+                              src={imageUrl.startsWith("http") ? imageUrl : `http://localhost:9000${imageUrl}`}
                               alt={`기존 이미지 ${index}`}
                               width="100"
                               height="100"
-                              style={{ objectFit: "cover", borderRadius: "5px" }}
+                              className="preview-image"
                             />
                             <button
                               type="button"
-                              className="btn btn-sm btn-danger position-absolute top-0 end-0"
-                              style={{ padding: "0.1rem 0.3rem", fontSize: "0.7rem" }}
+                              className="btn btn-sm btn-danger position-absolute top-0 end-0 remove-image-btn"
                               onClick={() => handleRemoveExistingImage(index)}
                             >
                               ✕
@@ -226,23 +232,22 @@ function EditPostPage() {
                       </div>
                     </div>
                   )}
+
                   {images.length > 0 && (
                     <div className="mb-3">
-                      <label className="form-label">선택된 이미지</label>
                       <div className="d-flex flex-wrap gap-2">
                         {images.map((image, index) => (
                           <div key={index} className="position-relative">
                             <img
-                              src={URL.createObjectURL(image)}
+                              src={URL.createObjectURL(image) || "/placeholder.svg"}
                               alt={`preview-${index}`}
                               width="100"
                               height="100"
-                              style={{ objectFit: "cover", borderRadius: "5px" }}
+                              className="preview-image"
                             />
                             <button
                               type="button"
-                              className="btn btn-sm btn-danger position-absolute top-0 end-0"
-                              style={{ padding: "0.1rem 0.3rem", fontSize: "0.7rem" }}
+                              className="btn btn-sm btn-danger position-absolute top-0 end-0 remove-image-btn"
                               onClick={() => handleRemoveImage(index)}
                             >
                               ✕
@@ -250,9 +255,7 @@ function EditPostPage() {
                           </div>
                         ))}
                       </div>
-
                     </div>
-
                   )}
 
                   <div className="d-flex justify-content-between mt-4">

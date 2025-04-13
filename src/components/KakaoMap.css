@@ -1,10 +1,17 @@
 .kakao-map-container {
   width: 100%;
-  margin-bottom: 1rem;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 0 !important;
+  font-size: 0 !important;
+  position: relative;
 }
 
 .map-search {
   margin-bottom: 0.5rem;
+  position: relative;
+  line-height: normal;
+  font-size: 1rem;
 }
 
 .search-results {
@@ -13,12 +20,19 @@
   border: 1px solid #dee2e6;
   border-radius: 4px;
   margin-bottom: 0.5rem;
+  background-color: white;
+  position: absolute;
+  z-index: 1000;
+  width: 100%;
 }
 
 .search-results .list-group-item {
   padding: 0.5rem 0.75rem;
   cursor: pointer;
   transition: all 0.2s;
+  border-bottom: 1px solid #dee2e6;
+  line-height: 1.5;
+  font-size: 0.9rem;
 }
 
 .search-results .list-group-item:hover {
@@ -37,6 +51,10 @@
 .map-view {
   border-radius: 4px;
   overflow: hidden;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 0 !important;
+  font-size: 0 !important;
 }
 
 .map-error,
