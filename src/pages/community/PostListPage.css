@@ -10,7 +10,8 @@
 .custom-table {
   background-color: var(--light-bg);
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  /* 그림자 효과 제거 */
+  box-shadow: none;
   padding: 2rem;
   max-width: 900px;
   margin: 0 auto;
@@ -18,7 +19,7 @@
 
 .post-header h2 {
   color: var(--accent-color);
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 1px;
 }
 
@@ -33,28 +34,31 @@
 }
 
 .post-list-item {
-  transition: all 0.2s ease;
-  border-color: var(--border-color) !important;
+  /* transition 효과 제거 */
   background-color: white;
-  border-radius: 8px;
   margin-bottom: 0.5rem;
 }
 
 .post-list-item:hover {
-  background-color: #edfbfb;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  /* transform 효과 제거 */
+  transform: none;
+  /* 그림자 효과 제거 */
+  box-shadow: none;
 }
 
 .btn-primary {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
   color: white;
+  box-shadow: none;
+  transition: background-color 0.2s;
 }
 
 .btn-primary:hover {
   background-color: var(--accent-color);
   border-color: var(--accent-color);
+  transform: none;
+  box-shadow: none;
 }
 
 .btn-outline-secondary {
@@ -65,6 +69,10 @@
 .btn-outline-secondary:hover {
   background-color: var(--border-color);
   color: var(--text-color);
+  /* transform 효과 제거 */
+  transform: none;
+  /* 그림자 효과 제거 */
+  box-shadow: none;
 }
 
 .search-container {
@@ -78,11 +86,6 @@
   background-color: white;
 }
 
-.search-container .form-control:focus {
-  box-shadow: 0 0 0 0.2rem rgba(78, 205, 196, 0.25);
-  border-color: var(--primary-color);
-}
-
 .write-btn {
   border-radius: 4px;
   padding: 0.375rem 1rem;
@@ -92,12 +95,16 @@
   color: var(--text-color);
   border-color: var(--border-color);
   background-color: white;
+  /* 그림자 효과 제거 */
+  box-shadow: none;
 }
 
 .pagination .page-item.active .page-link {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
   color: white;
+  /* 그림자 효과 제거 */
+  box-shadow: none;
 }
 
 .pagination .page-item.disabled .page-link {
@@ -109,10 +116,15 @@
   background-color: var(--light-bg);
   border-color: var(--border-color);
   color: var(--accent-color);
+  /* transform 효과 제거 */
+  transform: none;
+  /* 그림자 효과 제거 */
+  box-shadow: none;
 }
 
 .pagination .page-link:focus {
-  box-shadow: 0 0 0 0.2rem rgba(78, 205, 196, 0.25);
+  /* 그림자 효과 제거 */
+  box-shadow: none;
 }
 
 .admin-controls {
@@ -146,4 +158,3 @@
     width: 100% !important;
   }
 }
-

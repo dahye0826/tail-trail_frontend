@@ -1,9 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { Container, Row, Col, Card, Button, Carousel } from "react-bootstrap"
+import { useState, useEffect } from "react"
+import { Container, Row, Col, Carousel } from "react-bootstrap"
 import { Link } from "react-router-dom"
-import { FaPaw, FaMapMarkedAlt, FaComments, FaStar, FaSearch, FaStore, FaHotel, FaUmbrellaBeach } from "react-icons/fa"
+import axios from "axios"
 import "bootstrap-icons/font/bootstrap-icons.css"
 import "bootstrap/dist/css/bootstrap.min.css"
 import "./HomePage.css"
@@ -13,18 +13,40 @@ import KakaoMap from "../../components/KakaoMap"
 
 const HomePage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [scrollPosition, setScrollPosition] = useState(0)
+  const [communityPosts, setCommunityPosts] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  // 스크롤 위치에 따라 애니메이션 효과를 위한 이벤트 리스너
+  // 커뮤니티 게시글 가져오기
   useEffect(() => {
-    const handleScroll = () => {
-      setScrollPosition(window.scrollY)
+    const fetchCommunityPosts = async () => {
+      try {
+        setLoading(true)
+
+        const response = await axios.get("http://localhost:9000/api/community", {
+          params: {
+            page: 0,
+            size: 4, // 최신 게시글 4개만 가져오기
+          },
+        })
+
+        // 응답 데이터 형식에 맞게 처리
+        const formattedPosts = response.data.content.map((post) => ({
+          id: post.postId,
+          title: post.title,
+          content: post.content,
+          username: post.username,
+          createdAt: post.createdAt.split("T")[0],
+        }))
+
+        setCommunityPosts(formattedPosts)
+        setLoading(false)
+      } catch (error) {
+        console.error("커뮤니티 게시글 로딩 오류:", error)
+        setLoading(false) // 로딩만 false로 전환
+      }
     }
 
-    window.addEventListener("scroll", handleScroll)
-    return () => {
-      window.removeEventListener("scroll", handleScroll)
-    }
+    fetchCommunityPosts()
   }, [])
 
   return (
@@ -32,239 +54,166 @@ const HomePage = () => {
       <Navbar isLoggedIn={isLoggedIn} />
 
       <div className="home-page">
-        {/* 메인 배너 섹션 */}
-        <div
-          className="banner-section"
-          style={{
-            backgroundImage: `url(${process.env.PUBLIC_URL}/images/lawon01.png)`,
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center center",
-            backgroundSize: "auto", // 이미지 원래 크기로 표시
-            height: "600px",
-            width: "100%",
-            margin: "0 auto",
-            borderRadius: "8px", // 모서리 둥글게 유지
-          }}
-        >
-          <div className="banner-overlay" style={{ borderRadius: "8px", background: "none" }}></div>
-          <Container>
-            <Row className="align-items-start h-100">
-              <Col lg={12} className="mb-4 mb-lg-0">
-                <div className="logo-container mb-4" style={{ marginTop: "10px" }}>
-                  <div className="d-flex align-items-center mb-3">
-                    <h1 className="fw-bold animate-text" style={{ color: "white", fontSize: "3.5rem" }}>
-                      이음길
-                    </h1>
+        {/* 메인 배너 섹션 - 둥근 모서리 스타일로 변경 */}
+        <Container className="py-4">
+          <div className="rounded-banner">
+            <Carousel fade interval={5000} indicators={false} className="banner-carousel">
+              {/* 첫 번째 슬라이드 - lawon 이미지 (메인) */}
+              <Carousel.Item>
+                <div
+                  className="banner-image lawon-image"
+                  style={{
+                    backgroundImage: `url(${process.env.PUBLIC_URL}/images/lawon01.png)`,
+                  }}
+                >
+                  <div className="banner-overlay"></div>
+                  <div className="banner-content">
+                    <h1 className="fw-bold">이음길</h1>
+                    <p className="lead">꼬리를 따라 이어지는 여행길</p>
                   </div>
-                  <p className="lead mb-4 animate-text-delay" style={{ color: "white", fontSize: "1.5rem" }}>
-                    꼬리를 따라 이어지는 여행길
-                  </p>
                 </div>
-              </Col>
-              {/* 로그인/회원가입 섹션 제거 */}
-            </Row>
-          </Container>
-        </div>
+              </Carousel.Item>
 
-        {/* 지도 검색 섹션 - 이음길 서비스 섹션 앞으로 이동 및 크기 확대 */}
-        <div className="map-section py-5 mt-4">
+              {/* 두 번째 슬라이드 - ddomi 이미지 */}
+              <Carousel.Item>
+                <div
+                  className="banner-image ddomi-image"
+                  style={{
+                    backgroundImage: `url(${process.env.PUBLIC_URL}/images/ddomi01.jpg)`,
+                  }}
+                >
+                  <div className="banner-overlay"></div>
+                  <div className="banner-content">
+                    <h1 className="fw-bold">이음길</h1>
+                    <p className="lead">꼬리를 따라 이어지는 여행길</p>
+                  </div>
+                </div>
+              </Carousel.Item>
+
+              {/* 세 번째 슬라이드 - 새로 추가한 고양이 이미지 */}
+              <Carousel.Item>
+                <div
+                  className="banner-image cat-image"
+                  style={{
+                    backgroundImage: `url(${process.env.PUBLIC_URL}/images/cat01.jpg)`,
+                  }}
+                >
+                  <div className="banner-overlay"></div>
+                  <div className="banner-content">
+                    <h1 className="fw-bold">이음길</h1>
+                    <p className="lead">꼬리를 따라 이어지는 여행길</p>
+                  </div>
+                </div>
+              </Carousel.Item>
+            </Carousel>
+          </div>
+        </Container>
+
+        {/* 지도 검색 섹션 - 커뮤니티 섹션보다 앞으로 이동 */}
+        <div className="map-section py-4 mt-3">
           <Container>
-            <div className="text-center mb-5">
+            <div className="text-center mb-4">
               <h2 className="fw-bold section-title">지도로 쉽게 찾아보세요</h2>
               <p className="lead text-muted">반려동물과 함께 갈 수 있는 다양한 장소를 지도에서 한눈에 확인하세요</p>
             </div>
 
-            <Row className="align-items-center">
-              <Col lg={7} className="mb-4 mb-lg-0">
-                <div className={`map-image-container ${scrollPosition > 300 ? "animate-slide-in-right" : ""}`}>
-                  {/* 지도 크기 확대 */}
-                  <KakaoMap
-                    readOnly={true}
-                    initialLocation={{
+            <div className="position-relative">
+              <div className="map-image-container mx-auto" style={{ maxWidth: "900px" }}>
+                <KakaoMap
+                  readOnly={true}
+                  initialLocation={{
+                    name: "서울 시청",
+                    address: "서울특별시 중구 세종대로 110",
+                    lat: 37.5666805,
+                    lng: 126.9784147,
+                  }}
+                  markerPositions={[
+                    {
                       name: "서울 시청",
                       address: "서울특별시 중구 세종대로 110",
                       lat: 37.5666805,
                       lng: 126.9784147,
-                    }}
-                    markerPositions={[
-                      {
-                        name: "서울 시청",
-                        address: "서울특별시 중구 세종대로 110",
-                        lat: 37.5666805,
-                        lng: 126.9784147,
-                      },
-                      {
-                        name: "경복궁",
-                        address: "서울특별시 종로구 사직로 161",
-                        lat: 37.579617,
-                        lng: 126.977041,
-                      },
-                      {
-                        name: "남산타워",
-                        address: "서울특별시 용산구 남산공원길 105",
-                        lat: 37.551348,
-                        lng: 126.988123,
-                      },
-                    ]}
-                    height="500px" // 지도 높이 증가
-                    showSearchBar={false}
-                    defaultLevel={9}
-                    showRegisteredPlaces={false}
-                  />
+                    },
+                    {
+                      name: "경복궁",
+                      address: "서울특별시 종로구 사직로 161",
+                      lat: 37.579617,
+                      lng: 126.977041,
+                    },
+                    {
+                      name: "남산타워",
+                      address: "서울특별시 용산구 남산공원길 105",
+                      lat: 37.551348,
+                      lng: 126.988123,
+                    },
+                  ]}
+                  height="500px"
+                  showSearchBar={false}
+                  defaultLevel={9}
+                  showRegisteredPlaces={false}
+                />
+                <div className="position-absolute" style={{ top: "20px", right: "20px", zIndex: 1000 }}>
+                  <Link to="/map" className="simple-icon-link">
+                    <i className="bi bi-map" style={{ fontSize: "2rem", color: "#2c3e50" }}></i>
+                  </Link>
                 </div>
-              </Col>
-              <Col lg={5}>
-                <div className={`ps-lg-4 ${scrollPosition > 300 ? "animate-fade-in" : ""}`}>
-                  <h3 className="fw-bold mb-4">반려동물과 함께하는 모든 장소</h3>
-                  <p className="lead mb-4">
-                    반려동물과 함께 갈 수 있는 다양한 장소를 지도에서 한눈에 확인하세요. 카페, 식당, 숙소, 여행지,
-                    박물관, 미술관 등 다양한 장소 정보를 제공합니다.
-                  </p>
-                  <ul className="feature-list">
-                    <li>
-                      <i className="bi bi-check-circle-fill"></i> 현재 위치 기반 검색
-                    </li>
-                    <li>
-                      <i className="bi bi-check-circle-fill"></i> 카테고리별 필터링
-                    </li>
-                    <li>
-                      <i className="bi bi-check-circle-fill"></i> 상세 정보 및 리뷰 확인
-                    </li>
-                  </ul>
-                  <Button as={Link} to="/map" className="btn-primary mt-3" size="lg">
-                    <FaMapMarkedAlt className="me-2" /> 지도에서 찾기
-                  </Button>
-                </div>
-              </Col>
-            </Row>
+              </div>
+            </div>
           </Container>
         </div>
 
-        {/* 주요 기능 소개 섹션 */}
-        <Container className="py-5 mt-3">
-          <div className="text-center mb-5">
-            <h2 className="fw-bold section-title">이음길 서비스</h2>
-            <p className="lead text-muted">반려동물과 함께 방문할 수 있는 다양한 장소를 찾고 경험을 공유하세요</p>
-          </div>
-
-          <Row className="g-4">
-            {/* 지도 검색 기능 */}
-            <Col md={3}>
-              <Card
-                className={`h-100 border-0 shadow-sm text-center service-card ${scrollPosition > 100 ? "animate-card" : ""}`}
-              >
-                <Card.Body className="p-4">
-                  <div className="icon-circle">
-                    <FaSearch size={30} />
-                  </div>
-                  <Card.Title>지도로 검색</Card.Title>
-                  <Card.Text>지도에서 반려동물과 함께 갈 수 있는 다양한 장소를 쉽게 찾아보세요.</Card.Text>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            {/* 카페 및 식당 */}
-            <Col md={3}>
-              <Card
-                className={`h-100 border-0 shadow-sm text-center service-card ${scrollPosition > 100 ? "animate-card" : ""}`}
-                style={{ animationDelay: "0.2s" }}
-              >
-                <Card.Body className="p-4">
-                  <div className="icon-circle">
-                    <FaStore size={30} />
-                  </div>
-                  <Card.Title>카페 및 식당</Card.Title>
-                  <Card.Text>반려동물과 함께 방문할 수 있는 카페와 식당 정보를 확인하세요.</Card.Text>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            {/* 숙박 및 여행지 */}
-            <Col md={3}>
-              <Card
-                className={`h-100 border-0 shadow-sm text-center service-card ${scrollPosition > 100 ? "animate-card" : ""}`}
-                style={{ animationDelay: "0.4s" }}
-              >
-                <Card.Body className="p-4">
-                  <div className="icon-circle">
-                    <FaHotel size={30} />
-                  </div>
-                  <Card.Title>숙박 및 여행지</Card.Title>
-                  <Card.Text>반려동물 동반 가능한 숙소와 여행지를 찾아 특별한 여행을 계획하세요.</Card.Text>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            {/* 박물관 및 문화시설 */}
-            <Col md={3}>
-              <Card
-                className={`h-100 border-0 shadow-sm text-center service-card ${scrollPosition > 100 ? "animate-card" : ""}`}
-                style={{ animationDelay: "0.6s" }}
-              >
-                <Card.Body className="p-4">
-                  <div className="icon-circle">
-                    <FaUmbrellaBeach size={30} />
-                  </div>
-                  <Card.Title>문화 및 레저</Card.Title>
-                  <Card.Text>반려동물과 함께 즐길 수 있는 박물관, 미술관, 레저시설을 찾아보세요.</Card.Text>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
-        </Container>
-
-        {/* 커뮤니티 섹션 */}
+        {/* 커뮤니티 섹션 - 지도 섹션 다음으로 이동 */}
         <div className="community-section py-5">
           <Container>
-            <Row className="align-items-center">
-              <Col lg={6} className="mb-4 mb-lg-0">
-                <div className={`community-image-container ${scrollPosition > 400 ? "animate-slide-in" : ""}`}>
-                  <img
-                    src="/placeholder.svg?height=400&width=600"
-                    alt="커뮤니티"
-                    className="img-fluid rounded shadow-lg"
-                  />
-                  <div className="floating-paws">
-                    <FaPaw className="floating-paw paw-1" />
-                    <FaPaw className="floating-paw paw-2" />
-                    <FaPaw className="floating-paw paw-3" />
-                  </div>
+            <div className="text-center mb-4 d-flex justify-content-between align-items-center">
+              <div>
+                <h2 className="fw-bold section-title">커뮤니티</h2>
+                <p className="lead text-muted mb-0">우리의 반려 이야기, 함께 나눠요.</p>
+              </div>
+              <Link to="/community" className="plus-btn">
+                <i className="bi bi-plus-circle"></i>
+              </Link>
+            </div>
+
+            {/* 카드 형식의 커뮤니티 게시글 */}
+            {loading ? (
+              <div className="text-center py-4">
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Loading...</span>
                 </div>
-              </Col>
-              <Col lg={6}>
-                <div className={`ps-lg-4 ${scrollPosition > 400 ? "animate-fade-in" : ""}`}>
-                  <h2 className="fw-bold section-title mb-4">반려인들과 소통하세요</h2>
-                  <p className="lead mb-4">
-                    다양한 반려인들과 경험을 공유하고, 유용한 정보를 얻어보세요. 반려동물과의 특별한 순간을 커뮤니티에
-                    기록하고 공유할 수 있습니다.
-                  </p>
-                  <ul className="feature-list">
-                    <li>
-                      <i className="bi bi-check-circle-fill"></i> 여행 후기 공유
-                    </li>
-                    <li>
-                      <i className="bi bi-check-circle-fill"></i> 장소 추천 및 평가
-                    </li>
-                    <li>
-                      <i className="bi bi-check-circle-fill"></i> 반려동물 동반 팁
-                    </li>
-                    <li>
-                      <i className="bi bi-check-circle-fill"></i> 반려인들과의 소통
-                    </li>
-                  </ul>
-                  <Button as={Link} to="/community" className="btn-primary mt-3" size="lg">
-                    <FaComments className="me-2" /> 커뮤니티 방문하기
-                  </Button>
-                </div>
-              </Col>
-            </Row>
+              </div>
+            ) : (
+              <Row className="community-cards mb-4">
+                {communityPosts.map((post) => (
+                  <Col md={6} lg={3} className="mb-4" key={post.id}>
+                    <Link to={`/community/post/${post.id}`} className="text-decoration-none">
+                      <div className="community-card">
+                        <div className="card-body">
+                          <h5 className="card-title">{post.title}</h5>
+                          <p className="card-text">
+                            {post.content &&
+                              (post.content.length > 100 ? post.content.slice(0, 100) + "..." : post.content)}
+                          </p>
+                          <div className="card-meta">
+                            <span className="author">
+                              <i className="bi bi-person-circle me-1"></i> {post.username}
+                            </span>
+                            <span className="date">{post.createdAt}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  </Col>
+                ))}
+              </Row>
+            )}
           </Container>
         </div>
 
-        {/* 최근 리뷰 섹션 - 배경색 흰색으로 변경 */}
-        <div className="review-section py-5" style={{ backgroundColor: "white" }}>
+        {/* 최근 리뷰 섹션 */}
+        <div className="review-section py-4" style={{ backgroundColor: "white" }}>
           <Container>
-            <div className="text-center mb-5">
+            <div className="text-center mb-4">
               <h2 className="fw-bold section-title">최근 리뷰</h2>
               <p className="lead text-muted">반려인들이 남긴 생생한 장소 리뷰를 확인해보세요</p>
             </div>
@@ -284,7 +233,7 @@ const HomePage = () => {
                     <Col md={8}>
                       <div className="mb-2 rating">
                         {[...Array(5)].map((_, i) => (
-                          <FaStar key={i} />
+                          <i key={i} className="bi bi-star-fill text-warning"></i>
                         ))}
                       </div>
                       <h4 className="review-title">멍멍 애견카페</h4>
@@ -315,9 +264,9 @@ const HomePage = () => {
                     <Col md={8}>
                       <div className="mb-2 rating">
                         {[...Array(4)].map((_, i) => (
-                          <FaStar key={i} />
+                          <i key={i} className="bi bi-star-fill text-warning"></i>
                         ))}
-                        <FaStar key="half-star" className="half-star" />
+                        <i className="bi bi-star-half text-warning"></i>
                       </div>
                       <h4 className="review-title">해운대 반려견 비치파크</h4>
                       <p className="review-location mb-3">부산광역시 해운대구 우동</p>

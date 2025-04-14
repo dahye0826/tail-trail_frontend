@@ -4,11 +4,13 @@ import { useState, useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
+import CommentSection from "./CommentSection"
 import "./PostDetailPage.css"
 
 function PostDetailPage() {
   const [post, setPost] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [isLoggedIn, setIsLoggedIn] = useState(true) // 실제 로그인 상태로 변경 필요
   const { id } = useParams()
   const navigate = useNavigate()
   const hasFetched = useRef(false)
@@ -18,8 +20,7 @@ function PostDetailPage() {
     const fetchPostDetail = async () => {
       try {
         if (hasFetched.current) return // 이미 실행했으면 중단
-        hasFetched.current = true      // 처음 실행일 경우 true로 변경
-      
+        hasFetched.current = true // 처음 실행일 경우 true로 변경
 
         const response = await axios.get(`http://localhost:9000/api/community/${id}`)
         console.log("응답 데이터:", response.data)
@@ -48,7 +49,6 @@ function PostDetailPage() {
 
   const handleEditClick = () => {
     navigate(`/community/edit/${id}`)
-    
   }
 
   const handleDeleteClick = async () => {
@@ -68,7 +68,7 @@ function PostDetailPage() {
   if (loading) {
     return (
       <>
-        <Navbar isLoggedIn={true} />
+        <Navbar isLoggedIn={isLoggedIn} />
         <div className="container mt-5 text-center">
           <div className="spinner-border text-primary" role="status">
             <span className="visually-hidden">Loading...</span>
@@ -93,7 +93,7 @@ function PostDetailPage() {
 
   return (
     <>
-      <Navbar isLoggedIn={true} />
+      <Navbar isLoggedIn={isLoggedIn} />
       <div className="container mt-4 mb-5">
         <div className="post-detail-container">
           <div className="post-header">
@@ -158,15 +158,18 @@ function PostDetailPage() {
           {/* {post?.username === currentUser && ( */}
           <div className="post-actions mt-4 d-flex justify-content-between">
             <div>
-              <button className="btn btn-outline-secondary me-2" onClick={handleEditClick}>
+              <button className="btn btn-outline-secondary me-2 edit-btn" onClick={handleEditClick}>
                 <i className="bi bi-pencil-square me-1"></i> 수정
               </button>
-              <button className="btn btn-outline-danger" onClick={handleDeleteClick}>
+              <button className="btn btn-outline-danger delete-btn" onClick={handleDeleteClick}>
                 <i className="bi bi-trash me-1"></i> 삭제
               </button>
             </div>
           </div>
           {/* )} */}
+
+          {/* 댓글 섹션 추가 */}
+          <CommentSection postId={id} isLoggedIn={isLoggedIn} />
         </div>
       </div>
 

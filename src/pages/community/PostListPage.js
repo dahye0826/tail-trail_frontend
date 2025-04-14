@@ -32,7 +32,7 @@ function PostListPage() {
       const response = await axios.get("http://localhost:9000/api/community",{
         params:{
           search:searchTerm,
-          page:1,
+          page:currentPage - 1, 
           size:10,
         },
       })
@@ -137,7 +137,7 @@ function PostListPage() {
 <div className="container mt-4 custom-table">
   <div className="post-header text-center">
     <h2 className="mb-4">우리의 발자국 이야기</h2>
-    <p className="subtitle mb-5">반려동물과 함께 떠난 소중한 시간을 남겨보세요.</p>
+    <p className="subtitle mb-5">함께한 발걸음이 추억이 되는 곳</p>
   </div>
 
 
@@ -189,7 +189,8 @@ function PostListPage() {
 
           <div className="d-flex justify-content-between text-muted small">
             <div className="d-flex">
-              <span className="me-2">{post.name}</span>
+ 
+              <span className="me-2">{post.username} </span>
               <span className="me-3">{post.createdAt}</span>
               <span>
                 <i className="bi bi-chat-left-text me-1"></i> {post.commentCount}

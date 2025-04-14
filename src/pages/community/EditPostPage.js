@@ -125,7 +125,7 @@ function EditPostPage() {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="지도에서 장소 찾기 버튼 클릭"
+                        placeholder="장소를 선택하세요(선택사항)"
                         // 삼항연산자
                         value={selectedLocation?.name ?? ""}
                         readOnly
@@ -136,7 +136,7 @@ function EditPostPage() {
                         // true/false를 토글(toggle
                         onClick={() => setShowMap((prev) => !prev)}
                       >
-                        <i className="bi bi-geo-alt me-1"></i> 지도에서 장소 찾기
+                        <i className="bi bi-geo-alt me-1"></i>
                       </button>
                     </div>
 

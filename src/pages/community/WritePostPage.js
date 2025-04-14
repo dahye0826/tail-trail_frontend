@@ -105,7 +105,7 @@ function WritePostPage() {
                       id="posttitle"
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
-                      placeholder="제목을 입력해주세요"
+                      placeholder="제목을 입력하세요"
                       required
                     />
                   </div>
@@ -116,12 +116,12 @@ function WritePostPage() {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="지도에서 장소 찾기 버튼 클릭"
+                        placeholder="장소를 선택하세요(선택사항)"
                         value={selectedLocation ? selectedLocation.name : ""}
                         readOnly
                       />
                       <button type="button" className="btn btn-primary" onClick={() => setShowMap(!showMap)}>
-                        <i className="bi bi-geo-alt me-1"></i> 지도에서 장소 찾기
+                        <i className="bi bi-geo-alt me-1"></i> 
                       </button>
                     </div>
 

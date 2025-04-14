@@ -30,14 +30,13 @@ function Navbar({ isLoggedIn }) {
           <ul className="navbar-nav me-auto">
             <li className="nav-item mx-2">
               <a className={`nav-link ${isPlacesActive ? "active" : ""}`} href="/places">
-                <i className="bi bi-map me-1"></i>
+                <i className="bi bi-geo-alt me-1"></i>
                 장소
               </a>
             </li>
             <li className="nav-item mx-2">
               <a className={`nav-link ${isMapActive ? "active" : ""}`} href="/map">
-                <i className="bi bi-geo-alt me-1"></i>
-                지도
+                <i className="bi bi-map me-1"></i> 지도
               </a>
             </li>
             <li className="nav-item mx-2">

@@ -30,7 +30,6 @@
   justify-content: space-between;
   align-items: center;
   padding-bottom: 1rem;
-  border-bottom: 1px solid var(--border-color);
 }
 
 .author-avatar {
@@ -109,9 +108,36 @@
 .post-actions {
   margin-top: 2rem;
   padding-top: 1rem;
-  border-top: 1px solid var(--border-color);
   position: relative;
   clear: both;
+}
+
+/* 수정 버튼 스타일 */
+.post-actions .edit-btn {
+  background-color: white;
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+.post-actions .edit-btn:hover {
+  /* 호버 시 색상 변경 방지 */
+  background-color: white;
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+/* 삭제 버튼 스타일 */
+.post-actions .delete-btn {
+  background-color: white;
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.post-actions .delete-btn:hover {
+  /* 호버 시 색상 변경 방지 */
+  background-color: white;
+  color: #dc3545;
+  border-color: #dc3545;
 }
 
 .comments-title {

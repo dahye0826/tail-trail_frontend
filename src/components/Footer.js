@@ -16,10 +16,8 @@ function Footer() {
               이음길
             </h5>
             <p className="footer-description mt-3">
-              반려동물의 시간은 우리와 달라 더 소중합니다.
-              이곳은 그 특별한 순간들을 담아두는 공간입니다.
-              함께한 추억을 기록하고, 누군가와 나눠주세요.
-              그 기억들이 또 다른 따뜻함이 되어 퍼져나갈 거예요.
+              반려동물의 시간은 우리와 달라 더 소중합니다. 이곳은 그 특별한 순간들을 담아두는 공간입니다. 함께한 추억을
+              기록하고, 누군가와 나눠주세요. 그 기억들이 또 다른 따뜻함이 되어 퍼져나갈 거예요.
             </p>
           </div>
 
@@ -28,12 +26,12 @@ function Footer() {
             <ul className="footer-links">
               <li>
                 <a href="/places">
-                  <i className="bi bi-map me-2"></i>장소
+                  <i className="bi bi-geo-alt me-2"></i>장소
                 </a>
               </li>
               <li>
                 <a href="/map">
-                  <i className="bi bi-geo-alt me-2"></i>지도
+                  <i className="bi bi-map me-2"></i> 지도
                 </a>
               </li>
               <li>
