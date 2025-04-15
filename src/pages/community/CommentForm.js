@@ -8,37 +8,36 @@ function CommentForm({ postId, onCommentAdded, isLoggedIn }) {
   const [content, setContent] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // 댓글 작성 처리
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+const handleSubmit = async (e) =>{
 
-    if (!isLoggedIn) {
-      alert("댓글을 작성하려면 로그인이 필요합니다.")
-      return
-    }
-
-    if (!content.trim()) {
-      alert("댓글 내용을 입력해주세요.")
-      return
-    }
-
-    try {
-      setIsSubmitting(true)
-      const response = await axios.post("http://localhost:9000/api/comments", {
-        postId,
-        content,
-      })
-
-      onCommentAdded(response.data)
-      setContent("")
-    } catch (error) {
-      console.error("댓글 작성 오류:", error)
-      alert("댓글 작성에 실패했습니다.")
-    } finally {
-      setIsSubmitting(false)
-    }
+  if(!isLoggedIn){
+    alert("로그인이 필요합니다")
+    return
   }
 
+  if(!content.trim()){
+    alert("댓글을 입력하세요")
+    return
+  }
+
+ try{
+  setIsSubmitting(true)
+
+  const response= await axios.post('http://localhost:9000/api/comments',
+  {
+    postId,
+    content
+  })
+  onCommentAdded(response.data)
+  setContent("")
+ }catch(err){
+  console.log('댓글 작성 오류:', err)
+  alert("댓글 작성에 실패하였습니다.")
+  
+ }finally{
+  setIsSubmitting(false)
+ }
+}
   return (
     <div className="comment-form-container">
       <form onSubmit={handleSubmit}>

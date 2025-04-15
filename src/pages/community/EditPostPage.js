@@ -1,11 +1,10 @@
-"use client"
-
 import { useNavigate, useParams } from "react-router-dom"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 import { useEffect, useState } from "react"
 import axios from "axios"
 import KakaoMap from "../../components/KakaoMap"
+import "./WritePostPage.css"
 
 function EditPostPage() {
   const { id } = useParams()

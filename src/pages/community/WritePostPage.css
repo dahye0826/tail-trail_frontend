@@ -2,7 +2,7 @@
   --primary-color: #4ecdc4;
   --secondary-color: #a5e1e9;
   --accent-color: #2a9d8f;
-  --text-color: #2c3e50;
+  --text-color: #000000;
   --light-bg: #f0f9fa;
   --border-color: #d1eeef;
 }
@@ -17,10 +17,11 @@
   border: none;
 }
 
+
 .card-header {
   border-bottom: 1px solid var(--border-color);
   padding: 1.5rem;
-  border-radius: 10px 10px 0 0 !important;
+  border-radius: 10px 10px 0 0 !important; /*상단만 둥글게 */
 }
 
 .card-header h2 {
@@ -103,7 +104,7 @@
   background-color: var(--light-bg);
 }
 
-/* 지도 컨테이너 스타일 개선 */
+
 .map-container {
   border: 1px solid var(--border-color);
   border-radius: 8px;

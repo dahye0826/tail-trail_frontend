@@ -30,6 +30,7 @@ function WritePostPage() {
   }
 
   // 이미지 제거 함수 수정
+  //index=클릭한 이미지 _: 요소 i: 요소 인덱스?
   const handleRemoveImage = (index) => {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index))
   }
@@ -93,7 +94,7 @@ function WritePostPage() {
         <div className="row">
           <div className="col-lg-8 mx-auto">
             <div className="card shadow-sm">
-              <div className="card-header bg-white">
+              <div className="card-header  bg-white">
                 <h2 className="text-center mb-0">추억 적기</h2>
               </div>
               <div className="card-body">
@@ -223,7 +224,6 @@ function WritePostPage() {
                           <span
                             className="spinner-border spinner-border-sm me-2"
                             role="status"
-                            aria-hidden="true"
                           ></span>
                           등록 중...
                         </>

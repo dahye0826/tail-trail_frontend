@@ -80,7 +80,7 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
             <div className="comment-date">{formatDate(comment.createdAt)}</div>
           </div>
         </div>
-        {isAuthor && !isEditing && (
+        {/* {isAuthor && !isEditing && ( */}
           <div className="comment-actions">
             <button className="btn btn-sm btn-link" onClick={() => setIsEditing(true)}>
               수정
@@ -89,7 +89,7 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
               {isDeleting ? "삭제 중..." : "삭제"}
             </button>
           </div>
-        )}
+        {/* )} */}
       </div>
 
       {isEditing ? (

@@ -10,8 +10,6 @@
 .custom-table {
   background-color: var(--light-bg);
   border-radius: 12px;
-  /* 그림자 효과 제거 */
-  box-shadow: none;
   padding: 2rem;
   max-width: 900px;
   margin: 0 auto;

@@ -15,6 +15,7 @@ import HomePage from "./pages/home/HomePage"
 import MapViewPage from "./pages/map/MapViewPage"
 
 
+
 function AppRouter() {
   return (
     <BrowserRouter>
@@ -33,6 +34,7 @@ function AppRouter() {
         <Route path="/mypage/rated" element={<RatedPlacesPage />} />
         <Route path="/mypage/edit-profile" element={<ProfileEditPage />} />
         <Route path="/map" element={<MapViewPage />} />
+
         
         
       </Routes>
