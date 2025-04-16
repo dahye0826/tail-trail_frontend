@@ -15,105 +15,98 @@ function PostDetailPage() {
   const hasFetched = useRef(false)
   const currentUser = localStorage.getItem("username")
 
+  useEffect(() => {
+    const fetchPostDetail = async () => {
+
+      try {
+        const response = await axios.get(`http://localhost:9000/api/community/${id}`)
+        console.log(response.data)
+        setPost(response.data)
+      } catch (err) {
+        console.error("게시물 로딩 오류:", err)
+      }
+    }
+    fetchPostDetail()
+  }, [id])
+
+  const handleGoBack = () => {
+    navigate('/community')
+  }
+
+
   const handleEditClick = () => {
     navigate(`/community/edit/${id}`)
   }
-  const handleDeleteClick = async() =>
-    {if (!window.confirm("정말 삭제하시겠습니까?")) return
-      try{
-        await axios.delete(`http://localhost:9000/api/community/${id}`)
-        alert("게시글이 삭제되었습니다.")
-        navigate("/community")
-      } catch (err) {
-        console.error("삭제 오류:", err)
-        alert("게시글 삭제 실패")
-      }
-      }
 
+  const handleDeleteClick = async () => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) return
 
-
+    try {
+      await axios.delete(`http://localhost:9000/api/community/${id}`)
+      alert("게시글이 삭제되었습니다.")
+      navigate("/community")
+    } catch (err) {
+      console.error("삭제 오류:", err)
+      alert("게시글 삭제 실패")
+    }
   }
+
+
+
+
   return (
     <>
-      <Navbar isLoggedIn={isLoggedIn}  />
-      <div className="container mt-4 write-post-container">
-        <div className="row">
-          <div className="col-llg 8 mx-auto">
-            <div className="card">
-              <div className="card-header bg-white">
-                <h2>추억 적기</h2>
+      <Navbar isLoggedIn={isLoggedIn} />
+      <div className="container mt-4 detail-post-container">
+        <div className="post-header">
+          <button
+            className="btn btn-sm mb-3 custom-back-btn"
+            onClick={handleGoBack}
+            style={{ marginTop: '10px' }}>
+            <i className="bi bi-arrow-left me-1"></i> 목록으로
+          </button>
+        </div>
+        <div style={{ marginTop: '20px' }}></div>
+        <h1 className="post-title">{post?.title}</h1>
+        <div className="post-meta">
+          <span className="user-name">{post?.username} 유다혜</span>
+          <span className="post-date ms-2">
+            {post?.createdAt}
+            {post?.updatedAt !== post?.createdAt && <span className="ms-2">(수정됨)</span>}
+          </span>
+        </div> 
+        <div className="post-content mt-4">
+          <div dangerouslySetInnerHTML={{ __html: post?.content }}></div>
+        </div>
+        {post?.imageUrls && post?.imageUrls.length > 0 && (
+          <div className="post-images-section mt-4 mb-4">
+            {post.imageUrls.map((image, index) => (
+              <div key={index} className="post-image-container mb-3">
+                <img
+                  src={image.startsWith("http") ? image : `http://localhost:9000${image}`}
+                  alt={`게시글 이미지 ${index + 1}`}
+                  className="post-image"
+                />
               </div>
-              <div className="card-body">
-
-                  <div className="mb-3">
-                    <input type="text"
-                      className="form-control"
-                      id="postTitle"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      placeholder="제목을 입력해주세요"
-                      required />
-                  </div>
-                  <div className="mb-3">
-                    <textarea
-                      className="form-control"
-                      id="postContent"
-                      rows="15"
-                      value={content}
-                      onChange={(e) => setContent(e.target.value)}
-                      placeholder="내용을 입력하세요"
-                      required
-                    ></textarea>
-                  </div>
-
-                  <div className="mb-3" >
-                    <input
-                      type="file"
-                      className="form-control"
-                      id="postImages"
-                      //  모든 이미지
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      multiple
-                    />
-                    {images.length > 0 && (
-                      images.map((image, index) => (
-                        <div key={index} className="image-preview-wrapper" >
-                          <img
-                            src={URL.createObjectURL(image)}
-                            alt={`이미지:${index}`}
-                            width="150"
-                            height="150"
-                            style={{ objectFit: "cover" }}
-                          />
-                          <button type="button" className="image-remove-btn"
-                            onClick={() => handleRemoveImage(index)}>X</button>
-                        </div>
-                      ))
-                    )}
-
-                  </div>
-                  {/* {post?.username === currentUser && ( */}
-                  <div className="d-flex justify-content-end gap-2 mt-4">
-                    <button
-                      type="button"
-                      className="btn btn-outline-secondary"
-                      onClick={handleEditClick}
-                    >
-                      <i className="bi bi-pencil-square me-1"></i>수정
-                    </button>
-                    <button type="submit" 
-                    className="btn btn-outline-danger"
-                    onClick={handleDeleteClick}
-                    >
-                    <i className="bi bi-trash me-1"></i> 삭제
-                    </button>
-                  </div>
-
-              </div>
-
-            </div>
+            ))}
           </div>
+        )}
+
+        {/* {post?.username === currentUser && ( */}
+        <div className="d-flex justify-content-end gap-2 mt-4">
+          <button
+            type="button"
+            className="btn btn-outline-secondary"
+            onClick={handleEditClick}
+          >
+            <i className="bi bi-pencil-square me-1"></i>수정
+          </button>
+          <button type="submit"
+            className="btn btn-outline-danger"
+            onClick={handleDeleteClick}
+          >
+            <i className="bi bi-trash me-1"></i> 삭제
+          </button>
         </div>
       </div>
 

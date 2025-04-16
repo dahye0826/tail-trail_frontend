@@ -43,7 +43,7 @@ function EditPostPage() {
     }
 
   }
-//이미지 제거거
+//이미지 제거
   const handleRemoveImage = (index) => {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index))
   }
