@@ -52,3 +52,17 @@
   font-size: 14px;
   line-height: 1;
 }
+
+@media (max-width: 768px) {
+  .card-header {
+    padding: 1rem;
+  }
+
+  .card-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .map-view {
+    height: 300px;
+  }
+}

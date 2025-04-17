@@ -24,16 +24,24 @@ function EditPostPage() {
         setTitle(response.data.title)
         setContent(response.data.content)
         setExistingImages(response.data.imageUrls || [])
+        if (response.data.place) {
+          setSelectedLocation({
+            placeName: response.data.placeName,  // 백엔드 DTO에서 오는 값
+            placeId: response.data.placeId,      // null일 수도 있음
+          });
+        }
 
-      } catch (err) {
-        console.error("데이터 불러오기 실패", err)
-        alert("데이터를 불러오는데 실패했어요.")
-        navigate("/community")
 
+
+        } catch (err) {
+          console.error("데이터 불러오기 실패", err)
+          alert("데이터를 불러오는데 실패했어요.")
+          navigate("/community")
+
+        }
       }
-    }
     fetchPost()
-  }, [id], navigate)
+    }, [id], navigate)
 
   //이미지 선택
   const handleImageChange = (e) => {
@@ -43,7 +51,7 @@ function EditPostPage() {
     }
 
   }
-//이미지 제거
+  //이미지 제거
   const handleRemoveImage = (index) => {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index))
   }
@@ -63,6 +71,10 @@ function EditPostPage() {
     formData.append("postTitle", title)
     formData.append("postContent", content)
     formData.append("remainImages", JSON.stringify(existingImages))
+    formData.append("placeName", selectedLocation.placeName);
+
+    
+
 
     for (let i = 0; i < images.length; i++) {
       formData.append("postImages", images[i])
@@ -106,6 +118,75 @@ function EditPostPage() {
                       required />
                   </div>
                   <div className="mb-3">
+                    <div className="input-group mb-2">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="장소를 선택하세요(선택사항)"
+                        // 삼항연산자
+                        value={selectedLocation?.name ?? ""}
+                        readOnly
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        // true/false를 토글(toggle
+                        onClick={() => setShowMap((prev) => !prev)}
+                      >
+                        <i className="bi bi-geo-alt me-1"></i>
+                      </button>
+                    </div>
+
+                    {/* 지도와 선택된 장소 정보를 하나의 컨테이너로 묶음 */}
+                    {showMap && (
+                      <div className="location-wrapper mb-3">
+                        <div className="map-container">
+                          <KakaoMap
+                            onLocationSelect={(location) => {
+                              setSelectedLocation(location)
+                              setShowMap(false)
+                            }}
+                            height="400px"
+                            showSearchBar={true}
+                          />
+                        </div>
+
+                        {selectedLocation && (
+                          <div className="selected-location">
+                            <div className="alert alert-primary">
+                              <div className="d-flex justify-content-between align-items-center">
+                                <div>
+                                  <div>
+                                    <strong>{selectedLocation.name}</strong>
+                                  </div>
+                                  <div>
+                                    <small>{selectedLocation.address}</small>
+                                  </div>
+                                  {selectedLocation.category && (
+                                    <div className="mt-1">
+                                      <span className="badge bg-secondary me-1">{selectedLocation.category}</span>
+                                    </div>
+                                  )}
+                                </div>
+                                <button
+                                  type="button"
+                                  className="btn btn-sm btn-outline-danger"
+                                  onClick={() => {
+                                    setSelectedLocation(null)
+                                  }}
+                                >
+                                  <i className="bi bi-x"></i>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+
+                  <div className="mb-3">
                     <textarea
                       className="form-control"
                       id="postContent"
@@ -128,7 +209,7 @@ function EditPostPage() {
                       multiple
                     />
                     {existingImages && existingImages.length > 0 && (
-                      existingImages.map((imageUrl, index)  => (
+                      existingImages.map((imageUrl, index) => (
                         <div key={index} className="image-preview-wrapper" >
                           <img
                             src={imageUrl.startsWith("http") ? imageUrl : `http://localhost:9000${imageUrl}`}

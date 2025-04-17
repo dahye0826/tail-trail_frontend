@@ -1,5 +1,5 @@
-"use client"
 
+import axios from "axios";
 import { useEffect, useRef, useState } from "react"
 import "./KakaoMap.css"
 
@@ -87,6 +87,7 @@ const KakaoMap = ({
     places.keywordSearch(keyword, (data, status) => {
       if (status === window.kakao.maps.services.Status.OK) {
         setSearchResults(data)
+        console.log(data)
       } else {
         setError("No places found for the given keyword.")
         setSearchResults([])
@@ -99,20 +100,35 @@ const KakaoMap = ({
     searchPlaces(searchKeyword)
   }
 
-  const handleLocationSelect = (result) => {
+  const handleLocationSelect = async (result) => {
     const location = {
-      name: result.place_name,
-      address: result.address_name,
-      lat: result.y,
-      lng: result.x,
+      placeName: result.place_name,
+      roadAddress: result.road_address_name || result.address_name,
+      latitude: result.y,
+      longitude: result.x,
     }
-    if (map) {
-      const newLatLng = new window.kakao.maps.LatLng(location.lat, location.lng)
-      map.panTo(newLatLng)
+  
+    try {
+      const response = await axios.get(`http://localhost:9000/api/places/find?placeName=${location.placeName}`);
+      // 🔹 등록된 장소면 placeId 추가
+      const selectedLocation = {
+        ...location,
+        placeId: response.data.placeId
+      };
+      console.log(selectedLocation)
+      onLocationSelect(selectedLocation);
+    } catch (err) {
+      console.warn("⚠ 등록된 장소는 아니지만 선택 허용됨");
+  
+      //등록되지 않은 장소도 선택 허용 (placeId는 없음)
+      onLocationSelect({
+        ...location,
+        placeId: null,
+      });
     }
-    setSearchResults([])
-    setSearchKeyword("")
-    onLocationSelect(location)
+  
+    setSearchResults([]);
+    setSearchKeyword("");
   }
 
   return (

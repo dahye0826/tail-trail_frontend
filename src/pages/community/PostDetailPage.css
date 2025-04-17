@@ -58,10 +58,67 @@
 }
 
 .post-image-container {
-  width: 300px;
-  height: 200px;
+  width: 400px;       /* 너비 지정 */
+  height: 300px;      /* 높이 지정 */
+  overflow: hidden;   /* 넘치는 이미지 잘라냄 */
+  text-align: center;
   display: flex;
   justify-content: center;
+  align-items: center; /* 수직 중앙 정렬 */
+}
+
+.post-image {
+  width: 100%;        /* 컨테이너 너비에 맞춤 */
+  height: 100%;       /* 컨테이너 높이에 맞춤 */
+  object-fit: cover;  /* 비율 유지하며 잘 채움 (또는 contain) */
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.post-location {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  background-color: var(--light-bg);
+  border-radius: 20px;
+  font-size: 0.9rem;
+  color: var(--accent-color);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.post-location:hover {
+  background-color: var(--border-color);
+}
+
+@media (max-width: 768px) {
+  .post-detail-container {
+    padding: 1.5rem;
+  }
+
+  .post-title {
+    font-size: 1.5rem;
+  }
+
+  .post-meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .post-stats {
+    margin-top: 0.5rem;
+  }
+
+  .post-actions {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .post-actions > div {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
 }
 
 
