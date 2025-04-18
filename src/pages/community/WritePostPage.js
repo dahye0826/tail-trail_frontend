@@ -24,23 +24,7 @@ function WritePostPage() {
 
   const navigate = useNavigate()
 
-  // 컴포넌트 마운트 시 모든 장소 데이터 가져오기
-  useEffect(() => {
-    const fetchAllPlaces = async () => {
-      try {
-        setLoading(true)
-        const response = await axios.get("http://localhost:9000/api/places")
-        setAllPlaces(response.data)
-        setLoading(false)
-      } catch (error) {
-        console.error("장소 데이터 불러오기 오류:", error)
-        setLoading(false)
-      }
-    }
-
-    fetchAllPlaces()
-  }, [])
-
+  
   //이미지 선택
   const handleImageChange = (e) => {
     const selectedFiles = Array.from(e.target.files)
@@ -55,24 +39,27 @@ function WritePostPage() {
   }
 
   // 장소 검색 함수
-  const searchPlaces = () => {
+  const searchPlaces = async () => {
     if (!searchTerm.trim()) {
       setSearchResults([])
       return
     }
-
+  
     setIsSearching(true)
-
-    // 데이터베이스에서 가져온 장소 중 검색어와 일치하는 장소 필터링
-    const filteredPlaces = allPlaces.filter(
-      (place) =>
-        place.placeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (place.roadAddress && place.roadAddress.toLowerCase().includes(searchTerm.toLowerCase())),
-    )
-
-    setSearchResults(filteredPlaces)
-    setIsSearching(false)
+  
+    try {
+      const response = await axios.get(
+        `http://localhost:9000/api/places/search?keyword=${encodeURIComponent(searchTerm)}`
+      )
+      setSearchResults(response.data)
+    } catch (error) {
+      console.error("장소 검색 실패:", error)
+      setSearchResults([])
+    } finally {
+      setIsSearching(false)
+    }
   }
+
 
   // 검색어 변경 핸들러
   const handleSearchChange = (e) => {

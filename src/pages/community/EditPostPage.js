@@ -25,67 +25,67 @@ function EditPostPage() {
       try {
         setLoading(true)
         const response = await axios.get(`http://localhost:9000/api/community/${id}`)
-        console.log("Fetched post data:", response.data) // 디버깅용 로그 추가
-
+        console.log("Fetched post data:", response.data)
+  
         setTitle(response.data.title || "")
         setContent(response.data.content || "")
-
-        // 이미지 URL 처리 - API 응답 구조에 따라 조정
-        const imageUrls = response.data.imageUrls || []
-        setExistingImages(imageUrls)
-
-        // 장소 정보 처리
-        if (response.data.place) {
+  
+        // 기존 이미지 설정
+        setExistingImages(response.data.imageUrls || [])
+  
+        // 장소 정보 설정
+        if (response.data.placeId && response.data.placeName) {
           setSelectedLocation({
-            id: response.data.place.placeId,
-            name: response.data.place.placeName,
-            address: response.data.place.roadAddress,
+            id: response.data.placeId,
+            name: response.data.placeName,
+            address: "", // 상세 주소는 필요 시 백엔드에서 추가
           })
         }
-
-        // 모든 장소 데이터 가져오기
-        const placesResponse = await axios.get("http://localhost:9000/api/places")
-        setAllPlaces(placesResponse.data)
-
+  
         setLoading(false)
       } catch (err) {
-        console.error("데이터 불러오기 실패", err)
-        alert("데이터를 불러오는데 실패했어요.")
+        console.error("데이터 로딩 실패:", err)
+        alert("게시글 데이터를 불러오는 데 실패했습니다.")
         navigate("/community")
       }
     }
+  
     fetchPost()
   }, [id, navigate])
 
   // 장소 검색 함수
-  const searchPlaces = () => {
+  const searchPlaces = async () => {
     if (!searchTerm.trim()) {
       setSearchResults([])
       return
     }
-
+  
     setIsSearching(true)
-
-    // 데이터베이스에서 가져온 장소 중 검색어와 일치하는 장소 필터링
-    const filteredPlaces = allPlaces.filter(
-      (place) =>
-        place.placeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (place.roadAddress && place.roadAddress.toLowerCase().includes(searchTerm.toLowerCase())),
-    )
-
-    setSearchResults(filteredPlaces)
-    setIsSearching(false)
+  
+    try {
+      const response = await axios.get(
+        `http://localhost:9000/api/places/search?keyword=${encodeURIComponent(searchTerm)}`
+      )
+      setSearchResults(response.data)
+    } catch (error) {
+      console.error("장소 검색 실패:", error)
+      setSearchResults([])
+    } finally {
+      setIsSearching(false)
+    }
   }
 
-  // 검색어 변경 핸들러
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value)
-    // 검색어가 변경될 때마다 검색 실행
-    if (e.target.value.trim()) {
+  useEffect(() => {
+    if (searchTerm.trim()) {
       searchPlaces()
     } else {
       setSearchResults([])
     }
+  }, [searchTerm])
+  
+  // 검색어 변경 핸들러
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value)
   }
 
   // 엔터키 검색 핸들러
@@ -133,11 +133,11 @@ function EditPostPage() {
     })
 
     try {
-      const response = await axios.put(`http://localhost:9000/api/community/${id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
+      const { data } = await axios.post(
+        `http://localhost:9000/api/community/${id}/update`,
+        formData
+      );
+    console.log(data)
 
       alert("수정 완료")
       navigate(`/community/post/${id}`)

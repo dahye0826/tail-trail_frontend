@@ -1,5 +1,6 @@
 "use client"
 
+import axios from "axios"
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import "bootstrap-icons/font/bootstrap-icons.css"
@@ -20,24 +21,22 @@ function MapViewPage() {
   const [categoryFilter, setCategoryFilter] = useState("")
   const navigate = useNavigate()
 
-  useEffect(() => {
-    // 장소 데이터 불러오기
-    const fetchPlaces = async () => {
-      try {
+  useEffect(()=>{
+    const fetchPlaces = async () => 
+      {try{
         setLoading(true)
-        // 실제 구현에서는 API 호출로 대체
-        setTimeout(() => {
-          setPlaces(mockPlaces)
-          setLoading(false)
-        }, 500)
-      } catch (error) {
-        console.error("Error fetching places:", error)
+        const response = await axios.get("http://localhost:9000/api/places/all")
+        setPlaces(response.data)
+
+      }catch(err){
+        console.error("장소를 불러오기 실패:",err)
+      }finally{
         setLoading(false)
       }
     }
 
     fetchPlaces()
-  }, [])
+  },[])
 
   // 필터링된 장소 목록
   const filteredPlaces = places.filter((place) => {
@@ -76,19 +75,19 @@ function MapViewPage() {
   }
 
   // 별점 렌더링 함수
-  const renderStars = (rating) => {
-    return (
-      <>
-        {[...Array(Math.floor(rating))].map((_, i) => (
-          <i key={i} className="bi bi-star-fill text-warning"></i>
-        ))}
-        {rating % 1 !== 0 && <i className="bi bi-star-half text-warning"></i>}
-        {[...Array(5 - Math.ceil(rating))].map((_, i) => (
-          <i key={i} className="bi bi-star text-warning"></i>
-        ))}
-      </>
-    )
-  }
+  // const renderStars = (rating) => {
+  //   return (
+  //     <>
+  //       {[...Array(Math.floor(rating))].map((_, i) => (
+  //         <i key={i} className="bi bi-star-fill text-warning"></i>
+  //       ))}
+  //       {rating % 1 !== 0 && <i className="bi bi-star-half text-warning"></i>}
+  //       {[...Array(5 - Math.ceil(rating))].map((_, i) => (
+  //         <i key={i} className="bi bi-star text-warning"></i>
+  //       ))}
+  //     </>
+  //   )
+  // }
 
   return (
     <>
@@ -176,22 +175,27 @@ function MapViewPage() {
                     <div className="places-list-items">
                       {filteredPlaces.map((place) => (
                         <div
-                          key={place.id}
+                          key={place.placeId}
                           className={`place-list-item ${selectedPlace?.id === place.id ? "active" : ""}`}
-                          onClick={() => handlePlaceSelect(place)}
+                          onClick={() => setSelectedPlace({
+                            lat: Number(place.latitude),
+                            lng: Number(place.longitude),
+                            name: place.placeName,
+                            address: place.roadAddress
+                          })}
                         >
-                          <h5 className="place-name">{place.name}</h5>
+                          <h5 className="place-name">{place.placeName || "이름 없음"}</h5>
                           <p className="place-address">
                             <i className="bi bi-geo-alt me-1"></i>
-                            {place.address}
+                            {place.roadAddress || "주소 없음"}
                           </p>
-                          <div className="place-info">
+                          {/* <div className="place-info">
                             <span className="badge category-badge me-2">{place.category}</span>
                             <span className="rating">
                               {renderStars(place.rating)}
                               <span className="rating-value ms-1">{place.rating}</span>
                             </span>
-                          </div>
+                          </div> */}
                         </div>
                       ))}
                     </div>
@@ -213,30 +217,21 @@ function MapViewPage() {
                 ) : (
                   <KakaoMap
                     readOnly={false}
-                    initialLocation={
-                      selectedPlace
-                        ? {
-                            id: selectedPlace.id,
-                            name: selectedPlace.name,
-                            address: selectedPlace.address,
-                            lat: selectedPlace.lat || 37.5665,
-                            lng: selectedPlace.lng || 126.978,
-                            isRegisteredPlace: true,
-                            category: selectedPlace.category,
-                            rating: selectedPlace.rating,
-                          }
-                        : { lat: 37.5665, lng: 126.978, name: "서울시청", address: "서울특별시 중구 세종대로 110" }
-                    }
+                    initialLocation={ 
+                           { lat: 37.5665,
+                            lng: 126.978,
+                            name: "서울시청",
+                            address: "서울특별시 중구 세종대로 110" 
+                            }}
                     markerPositions={filteredPlaces.map((place) => ({
-                      id: place.id,
-                      name: place.name,
-                      address: place.address,
-                      lat: place.lat || 37.5665,
-                      lng: place.lng || 126.978,
-                      isRegisteredPlace: true,
-                      category: place.category,
-                      rating: place.rating,
+                    
+                      lat:  place.latitude,
+                      lng: place.longitude,
+                      name: place.placeName,
+                      address: place.roadAddress,
+                      category: place.industrySub
                     }))}
+                    selectedPlace={selectedPlace}
                     height="calc(100vh - 150px)"
                     showSearchBar={false}
                     defaultLevel={selectedPlace ? 3 : 7}
@@ -253,13 +248,13 @@ function MapViewPage() {
                           <i className="bi bi-geo-alt me-1"></i>
                           {selectedPlace.address}
                         </p>
-                        <div className="mb-2">
+                        {/* <div className="mb-2">
                           <span className="badge category-badge me-2">{selectedPlace.category}</span>
                           <span className="rating">
                             {renderStars(selectedPlace.rating)}
                             <span className="rating-value ms-1">{selectedPlace.rating}</span>
                           </span>
-                        </div>
+                        </div> */}
                         <p className="place-description">{selectedPlace.description}</p>
                       </div>
                       <button className="btn btn-primary btn-sm" onClick={() => handleViewDetail(selectedPlace.id)}>

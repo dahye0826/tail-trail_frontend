@@ -1,17 +1,17 @@
 "use client"
 import { useEffect, useRef, useState } from "react"
-import axios from "axios"
 import "./KakaoMap.css"
 
 const KakaoMap = ({
   initialLocation,
-  markerPositions,
-  height,
-  showSearchBar,
+  markerPositions = [],
+  height = "400px",
+  showSearchBar = false,
   onLocationSelect,
-  defaultLevel,
-  readOnly,
-  showRegisteredPlaces,
+  defaultLevel = 3,
+  readOnly = false,
+  showRegisteredPlaces = true,
+  selectedPlace,
 }) => {
   const mapRef = useRef(null)
   const [map, setMap] = useState(null)
@@ -46,39 +46,79 @@ const KakaoMap = ({
             position: new window.kakao.maps.LatLng(initialLocation.lat, initialLocation.lng),
           })
 
-          const infowindow = new window.kakao.maps.InfoWindow({
-            content: `<div style="padding:5px;text-align:center;width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${initialLocation.name || "선택한 위치"}</div>`,
+          // 심플한 스타일의 인포윈도우 생성
+          const customOverlay = new window.kakao.maps.CustomOverlay({
+            position: new window.kakao.maps.LatLng(initialLocation.lat, initialLocation.lng),
+            content: `<div style="padding: 8px 12px; background: white; border-radius: 4px; border: 1px solid #ddd; font-size: 14px; font-weight: 500; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">${initialLocation.name || "위치 정보 없음"}</div>`,
+            map: kakaoMap,
+            yAnchor: 2.5,
           })
 
-          infowindow.open(kakaoMap, marker)
-          setSelectedMarker({ marker, infowindow })
+          setSelectedMarker({ marker, overlay: customOverlay })
         }
         // 여러 마커 표시
         else if (markerPositions && markerPositions.length > 0) {
+          // 모든 마커를 포함하는 영역 계산
+          const bounds = new window.kakao.maps.LatLngBounds()
+          const markers = []
+          const overlays = []
+
           markerPositions.forEach((position) => {
+            const markerPosition = new window.kakao.maps.LatLng(position.lat, position.lng)
+            bounds.extend(markerPosition)
+
             const marker = new window.kakao.maps.Marker({
               map: kakaoMap,
-              position: new window.kakao.maps.LatLng(position.lat, position.lng),
+              position: markerPosition,
             })
 
-            const infowindow = new window.kakao.maps.InfoWindow({
-              content: `<div style="padding:5px;text-align:center;width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${position.name}</div>`,
+            // 심플한 스타일의 커스텀 오버레이 생성
+            const customOverlay = new window.kakao.maps.CustomOverlay({
+              position: markerPosition,
+              content: `<div style="padding: 8px 12px; background: white; border-radius: 4px; border: 1px solid #ddd; font-size: 14px; font-weight: 500; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">${position.name}</div>`,
+              yAnchor: 2.5,
             })
 
+            markers.push(marker)
+            overlays.push(customOverlay)
+
+            // 마커에 마우스오버 이벤트 등록
             window.kakao.maps.event.addListener(marker, "mouseover", () => {
-              infowindow.open(kakaoMap, marker)
+              // 다른 모든 오버레이 숨기기
+              overlays.forEach((overlay) => overlay.setMap(null))
+
+              // 현재 마커의 오버레이 표시
+              customOverlay.setMap(kakaoMap)
             })
 
+            // 마커에 마우스아웃 이벤트 등록
             window.kakao.maps.event.addListener(marker, "mouseout", () => {
-              infowindow.close()
+              // 마우스아웃 시 오버레이 숨기기
+              customOverlay.setMap(null)
             })
 
+            // 마커 클릭 이벤트 등록
             if (onLocationSelect) {
               window.kakao.maps.event.addListener(marker, "click", () => {
+                // 모든 오버레이 숨기기
+                overlays.forEach((overlay) => overlay.setMap(null))
+
+                // 현재 마커의 오버레이 표시
+                customOverlay.setMap(kakaoMap)
+
+                // 선택한 마커 정보 저장
+                setSelectedMarker({ marker, overlay: customOverlay })
+
+                // 선택한 장소 정보 전달
                 onLocationSelect(position)
               })
             }
           })
+
+          // 모든 마커가 보이도록 지도 영역 설정
+          if (markerPositions.length > 1) {
+            kakaoMap.setBounds(bounds)
+          }
         }
       })
     }
@@ -88,13 +128,47 @@ const KakaoMap = ({
     }
 
     return () => {
-      // 컴포넌트 언마운트 시 마커와 인포윈도우 제거
+      // 컴포넌트 언마운트 시 마커와 오버레이 제거
       if (selectedMarker) {
         selectedMarker.marker.setMap(null)
-        selectedMarker.infowindow.close()
+        if (selectedMarker.overlay) {
+          selectedMarker.overlay.setMap(null)
+        }
       }
     }
   }, [initialLocation, markerPositions, defaultLevel, onLocationSelect])
+
+  useEffect(() => {
+    if (!map || !selectedPlace) {
+      return
+    }
+    const { lat, lng, name } = selectedPlace
+
+    const position = new window.kakao.maps.LatLng(lat, lng)
+
+    if (selectedMarker) {
+      selectedMarker.marker.setMap(null)
+      if (selectedMarker.overlay) {
+        selectedMarker.overlay.setMap(null)
+      }
+    }
+
+    const marker = new window.kakao.maps.Marker({
+      map,
+      position,
+    })
+
+    // 심플한 스타일의 커스텀 오버레이 생성
+    const customOverlay = new window.kakao.maps.CustomOverlay({
+      position: position,
+      content: `<div style="padding: 8px 12px; background: white; border-radius: 4px; border: 1px solid #ddd; font-size: 14px; font-weight: 500; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">${name}</div>`,
+      map: map,
+      yAnchor: 2.5,
+    })
+
+    map.setCenter(position)
+    setSelectedMarker({ marker, overlay: customOverlay })
+  }, [selectedPlace, map])
 
   const searchPlaces = (keyword) => {
     if (!keyword.trim()) return
@@ -129,31 +203,13 @@ const KakaoMap = ({
     searchPlaces(searchKeyword)
   }
 
-  // 데이터베이스에서 근처 장소 찾기
-  const findNearbyPlaceInDatabase = async (lat, lng) => {
-    try {
-      setLoading(true)
-      // 반경 100m 내의 장소 검색 (필요에 따라 조정 가능)
-      const response = await axios.get(`http://localhost:9000/api/places/nearby?lat=${lat}&lng=${lng}&radius=100`)
-      setLoading(false)
-
-      if (response.data && response.data.length > 0) {
-        // 가장 가까운 장소 반환 (API가 거리순으로 정렬해서 반환)
-        return response.data[0]
-      }
-      return null
-    } catch (error) {
-      console.error("근처 장소 검색 오류:", error)
-      setLoading(false)
-      return null
-    }
-  }
-
   const handleLocationSelect = async (result) => {
     // 기존 마커가 있으면 제거
     if (selectedMarker) {
       selectedMarker.marker.setMap(null)
-      selectedMarker.infowindow.close()
+      if (selectedMarker.overlay) {
+        selectedMarker.overlay.setMap(null)
+      }
     }
 
     // 새 마커 생성
@@ -163,44 +219,34 @@ const KakaoMap = ({
       position: position,
     })
 
-    const infowindow = new window.kakao.maps.InfoWindow({
-      content: `<div style="padding:5px;text-align:center;width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${result.place_name}</div>`,
+    // 심플한 스타일의 커스텀 오버레이 생성
+    const customOverlay = new window.kakao.maps.CustomOverlay({
+      position: position,
+      content: `<div style="padding: 8px 12px; background: white; border-radius: 4px; border: 1px solid #ddd; font-size: 14px; font-weight: 500; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">${result.place_name}</div>`,
+      map: map,
+      yAnchor: 2.5,
     })
 
-    infowindow.open(map, marker)
-    setSelectedMarker({ marker, infowindow })
+    setSelectedMarker({ marker, overlay: customOverlay })
 
     // 지도 중심 이동
     map.setCenter(position)
 
-    // 데이터베이스에서 근처 장소 찾기
-    const nearbyPlace = await findNearbyPlaceInDatabase(result.y, result.x)
-
     // 선택한 장소 정보 전달
     if (onLocationSelect) {
-      if (nearbyPlace) {
-        // 데이터베이스에 있는 장소 정보 사용
-        console.log("데이터베이스에서 찾은 장소:", nearbyPlace)
-        onLocationSelect({
-          id: nearbyPlace.placeId,
-          name: nearbyPlace.placeName,
-          address: nearbyPlace.roadAddress,
-          lat: nearbyPlace.latitude,
-          lng: nearbyPlace.longitude,
-          category: nearbyPlace.industrySub,
-        })
-      } else {
-        // 카카오맵에서 선택한 장소 정보 사용
-        console.log("카카오맵에서 선택한 장소:", result)
-        // 카카오맵 API 결과를 우리 필드명에 맞게 변환
-        onLocationSelect({
-          name: result.place_name,
-          address: result.road_address_name || result.address_name,
-          lat: result.y,
-          lng: result.x,
-          category: result.category_name || "",
-        })
-      }
+      // 카카오맵에서 선택한 장소 정보를 원하는 필드명으로 변환
+      onLocationSelect({
+        name: result.place_name,
+        placeName: result.place_name,
+        address: result.road_address_name || result.address_name,
+        roadAddress: result.road_address_name || result.address_name,
+        lat: result.y,
+        latitude: result.y,
+        lng: result.x,
+        longitude: result.x,
+        category: result.category_group_name || result.category_name || "",
+        industrySub: result.category_group_name || result.category_name || "",
+      })
     }
 
     // 검색 결과 초기화

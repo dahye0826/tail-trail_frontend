@@ -84,9 +84,6 @@ function PostDetailPage() {
           id: post.place.id,
           name: post.place.placeName || "이름 없음",
           address: post.place.address || "주소 없음",
-          lat: post.place.lat,
-          lng: post.place.lng,
-          isRegisteredPlace: true,
         }
       : null
 
@@ -110,6 +107,12 @@ function PostDetailPage() {
                   <div className="post-date">
                     {post.createdAt}
                     {post.updatedAt !== post.createdAt && <span className="ms-2">(수정됨)</span>}
+                    {post && post.placeName && (
+                      <span className="ms-2 place-badge">
+                        <i className="bi bi-geo-alt-fill me-1"></i>
+                        {post.placeName}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

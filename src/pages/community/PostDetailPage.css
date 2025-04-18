@@ -81,6 +81,22 @@
   color: white;
 }
 
+/* 장소 배지 스타일을 추가합니다. */
+.place-badge {
+  display: inline-block;
+  background-color: var(--light-bg);
+  color: var(--accent-color);
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-left: 0.5rem;
+}
+
+.place-badge i {
+  font-size: 0.7rem;
+}
+
 .post-content {
   color: var(--text-color);
   height: auto !important;
