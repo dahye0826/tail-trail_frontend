@@ -1,6 +1,6 @@
-
-import axios from "axios";
+"use client"
 import { useEffect, useRef, useState } from "react"
+import axios from "axios"
 import "./KakaoMap.css"
 
 const KakaoMap = ({
@@ -19,6 +19,7 @@ const KakaoMap = ({
   const [searchResults, setSearchResults] = useState([])
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [selectedMarker, setSelectedMarker] = useState(null)
 
   useEffect(() => {
     const script = document.createElement("script")
@@ -38,7 +39,22 @@ const KakaoMap = ({
         const kakaoMap = new window.kakao.maps.Map(container, options)
         setMap(kakaoMap)
 
-        if (markerPositions && markerPositions.length > 0) {
+        // 초기 위치에 마커 표시
+        if (initialLocation && initialLocation.lat && initialLocation.lng) {
+          const marker = new window.kakao.maps.Marker({
+            map: kakaoMap,
+            position: new window.kakao.maps.LatLng(initialLocation.lat, initialLocation.lng),
+          })
+
+          const infowindow = new window.kakao.maps.InfoWindow({
+            content: `<div style="padding:5px;text-align:center;width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${initialLocation.name || "선택한 위치"}</div>`,
+          })
+
+          infowindow.open(kakaoMap, marker)
+          setSelectedMarker({ marker, infowindow })
+        }
+        // 여러 마커 표시
+        else if (markerPositions && markerPositions.length > 0) {
           markerPositions.forEach((position) => {
             const marker = new window.kakao.maps.Marker({
               map: kakaoMap,
@@ -46,7 +62,7 @@ const KakaoMap = ({
             })
 
             const infowindow = new window.kakao.maps.InfoWindow({
-              content: `<div style="padding:5px;text-align:center;">${position.name}</div>`,
+              content: `<div style="padding:5px;text-align:center;width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${position.name}</div>`,
             })
 
             window.kakao.maps.event.addListener(marker, "mouseover", () => {
@@ -63,18 +79,20 @@ const KakaoMap = ({
               })
             }
           })
-        } else {
-          const marker = new window.kakao.maps.Marker({
-            map: kakaoMap,
-            position: new window.kakao.maps.LatLng(initialLocation?.lat || 37.5665, initialLocation?.lng || 126.978),
-          })
-          marker.setMap(kakaoMap)
         }
       })
     }
 
     script.onerror = () => {
-      setError("Failed to load Kakao Maps API")
+      setError("카카오맵 API 로딩에 실패했습니다")
+    }
+
+    return () => {
+      // 컴포넌트 언마운트 시 마커와 인포윈도우 제거
+      if (selectedMarker) {
+        selectedMarker.marker.setMap(null)
+        selectedMarker.infowindow.close()
+      }
     }
   }, [initialLocation, markerPositions, defaultLevel, onLocationSelect])
 
@@ -87,9 +105,20 @@ const KakaoMap = ({
     places.keywordSearch(keyword, (data, status) => {
       if (status === window.kakao.maps.services.Status.OK) {
         setSearchResults(data)
-        console.log(data)
+        console.log("검색 결과:", data)
+
+        // 검색 결과가 있으면 첫 번째 결과로 지도 중심 이동
+        if (data.length > 0) {
+          const bounds = new window.kakao.maps.LatLngBounds()
+
+          data.forEach((place) => {
+            bounds.extend(new window.kakao.maps.LatLng(place.y, place.x))
+          })
+
+          map.setBounds(bounds)
+        }
       } else {
-        setError("No places found for the given keyword.")
+        setError("검색 결과가 없습니다")
         setSearchResults([])
       }
       setLoading(false)
@@ -100,41 +129,88 @@ const KakaoMap = ({
     searchPlaces(searchKeyword)
   }
 
-  const handleLocationSelect = async (result) => {
-    const location = {
-      placeName: result.place_name,
-      roadAddress: result.road_address_name || result.address_name,
-      latitude: result.y,
-      longitude: result.x,
-    }
-  
+  // 데이터베이스에서 근처 장소 찾기
+  const findNearbyPlaceInDatabase = async (lat, lng) => {
     try {
-      const response = await axios.get(`http://localhost:9000/api/places/find?placeName=${location.placeName}`);
-      // 🔹 등록된 장소면 placeId 추가
-      const selectedLocation = {
-        ...location,
-        placeId: response.data.placeId
-      };
-      console.log(selectedLocation)
-      onLocationSelect(selectedLocation);
-    } catch (err) {
-      console.warn("⚠ 등록된 장소는 아니지만 선택 허용됨");
-  
-      //등록되지 않은 장소도 선택 허용 (placeId는 없음)
-      onLocationSelect({
-        ...location,
-        placeId: null,
-      });
+      setLoading(true)
+      // 반경 100m 내의 장소 검색 (필요에 따라 조정 가능)
+      const response = await axios.get(`http://localhost:9000/api/places/nearby?lat=${lat}&lng=${lng}&radius=100`)
+      setLoading(false)
+
+      if (response.data && response.data.length > 0) {
+        // 가장 가까운 장소 반환 (API가 거리순으로 정렬해서 반환)
+        return response.data[0]
+      }
+      return null
+    } catch (error) {
+      console.error("근처 장소 검색 오류:", error)
+      setLoading(false)
+      return null
     }
-  
-    setSearchResults([]);
-    setSearchKeyword("");
+  }
+
+  const handleLocationSelect = async (result) => {
+    // 기존 마커가 있으면 제거
+    if (selectedMarker) {
+      selectedMarker.marker.setMap(null)
+      selectedMarker.infowindow.close()
+    }
+
+    // 새 마커 생성
+    const position = new window.kakao.maps.LatLng(result.y, result.x)
+    const marker = new window.kakao.maps.Marker({
+      map: map,
+      position: position,
+    })
+
+    const infowindow = new window.kakao.maps.InfoWindow({
+      content: `<div style="padding:5px;text-align:center;width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${result.place_name}</div>`,
+    })
+
+    infowindow.open(map, marker)
+    setSelectedMarker({ marker, infowindow })
+
+    // 지도 중심 이동
+    map.setCenter(position)
+
+    // 데이터베이스에서 근처 장소 찾기
+    const nearbyPlace = await findNearbyPlaceInDatabase(result.y, result.x)
+
+    // 선택한 장소 정보 전달
+    if (onLocationSelect) {
+      if (nearbyPlace) {
+        // 데이터베이스에 있는 장소 정보 사용
+        console.log("데이터베이스에서 찾은 장소:", nearbyPlace)
+        onLocationSelect({
+          id: nearbyPlace.placeId,
+          name: nearbyPlace.placeName,
+          address: nearbyPlace.roadAddress,
+          lat: nearbyPlace.latitude,
+          lng: nearbyPlace.longitude,
+          category: nearbyPlace.industrySub,
+        })
+      } else {
+        // 카카오맵에서 선택한 장소 정보 사용
+        console.log("카카오맵에서 선택한 장소:", result)
+        // 카카오맵 API 결과를 우리 필드명에 맞게 변환
+        onLocationSelect({
+          name: result.place_name,
+          address: result.road_address_name || result.address_name,
+          lat: result.y,
+          lng: result.x,
+          category: result.category_name || "",
+        })
+      }
+    }
+
+    // 검색 결과 초기화
+    setSearchResults([])
   }
 
   return (
-    <div className="kakao-map-container" style={{ marginBottom: 0, paddingBottom: 0 }}>
+    <div className="kakao-map-container">
       {showSearchBar && (
-        <div className="map-search">
+        <div className="map-search-container">
           <div className="input-group">
             <input
               type="text"
@@ -144,38 +220,51 @@ const KakaoMap = ({
               onChange={(e) => setSearchKeyword(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             />
-            <button className="btn btn-primary" type="button" onClick={handleSearch}>
-              검색
+            <button className="btn btn-primary search-btn" type="button" onClick={handleSearch}>
+              <i className="bi bi-search me-1"></i> 검색
             </button>
           </div>
-          {loading && <div className="map-loading">Loading...</div>}
-          {error && <div className="map-error">{error}</div>}
+
+          {loading && (
+            <div className="search-loading">
+              <div className="spinner-border spinner-border-sm text-primary me-2" role="status">
+                <span className="visually-hidden">검색 중...</span>
+              </div>
+              <span>검색 중...</span>
+            </div>
+          )}
+
+          {error && <div className="search-error alert alert-danger py-2 mt-2">{error}</div>}
+
           {searchResults.length > 0 && (
-            <ul className="list-group search-results">
-              {searchResults.map((result) => (
-                <li
-                  key={result.id}
-                  className={`list-group-item ${result.isRegisteredPlace ? "registered-place" : ""}`}
-                  onClick={() => handleLocationSelect(result)}
-                  style={{ cursor: "pointer" }}
-                >
-                  <strong>{result.place_name}</strong>
-                  <br />
-                  <small>{result.address_name}</small>
-                </li>
-              ))}
-            </ul>
+            <div className="search-results-container">
+              <div className="search-results-header">
+                <small className="text-muted">검색 결과 ({searchResults.length})</small>
+              </div>
+              <ul className="list-group search-results">
+                {searchResults.map((result) => (
+                  <li
+                    key={result.id}
+                    className="list-group-item search-result-item"
+                    onClick={() => handleLocationSelect(result)}
+                  >
+                    <div className="search-result-name">{result.place_name}</div>
+                    <div className="search-result-address">{result.address_name}</div>
+                    {result.category_name && <div className="search-result-category">{result.category_name}</div>}
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
         </div>
       )}
+
       <div
         id="kakao-map"
         ref={mapRef}
         style={{
           width: "100%",
           height: height || "400px",
-          marginBottom: 0,
-          paddingBottom: 0,
           border: "1px solid #dee2e6",
           borderRadius: "4px",
         }}

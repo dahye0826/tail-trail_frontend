@@ -1,64 +1,102 @@
 .kakao-map-container {
   width: 100%;
-  margin: 0 !important;
-  padding: 0 !important;
-  line-height: 0 !important;
-  font-size: 0 !important;
   position: relative;
+  margin-bottom: 1rem;
 }
 
-.map-search {
-  margin-bottom: 0.5rem;
+.map-search-container {
+  margin-bottom: 0.75rem;
   position: relative;
   line-height: normal;
   font-size: 1rem;
 }
 
-.search-results {
-  max-height: 200px;
-  overflow-y: auto;
-  border: 1px solid #dee2e6;
-  border-radius: 4px;
-  margin-bottom: 0.5rem;
-  background-color: white;
+/* 검색 버튼 스타일 개선 */
+.search-btn {
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+}
+
+/* 검색 중 로딩 표시 */
+.search-loading {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+/* 검색 결과 컨테이너 */
+.search-results-container {
   position: absolute;
   z-index: 1000;
   width: 100%;
+  margin-top: 0.5rem;
+  background-color: white;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.search-results .list-group-item {
+.search-results-header {
   padding: 0.5rem 0.75rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.search-results {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 0;
+  border: none;
+}
+
+.search-result-item {
+  padding: 0.75rem;
   cursor: pointer;
   transition: all 0.2s;
-  border-bottom: 1px solid #dee2e6;
-  line-height: 1.5;
-  font-size: 0.9rem;
+  border-left: none;
+  border-right: none;
+  border-top: none;
 }
 
-.search-results .list-group-item:hover {
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.search-result-item:hover {
   background-color: #f0f9fa;
 }
 
-.search-results .registered-place {
-  background-color: rgba(78, 205, 196, 0.1);
-  border-left: 3px solid #4ecdc4;
+.search-result-name {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.25rem;
 }
 
-.search-results .registered-place:hover {
-  background-color: rgba(78, 205, 196, 0.2);
+.search-result-address {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin-bottom: 0.25rem;
+}
+
+.search-result-category {
+  font-size: 0.8rem;
+  color: #4ecdc4;
+  background-color: rgba(78, 205, 196, 0.1);
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 12px;
+}
+
+.search-error {
+  margin-bottom: 0;
+  font-size: 0.9rem;
 }
 
 .map-view {
   border-radius: 4px;
   overflow: hidden;
-  margin: 0 !important;
-  padding: 0 !important;
   line-height: 0 !important;
   font-size: 0 !important;
-}
-
-.map-error,
-.map-loading {
-  border-radius: 4px;
-  border: 1px solid #dee2e6;
 }

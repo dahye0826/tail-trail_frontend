@@ -2,93 +2,165 @@
   --primary-color: #4ecdc4;
   --secondary-color: #a5e1e9;
   --accent-color: #2a9d8f;
-  --text-color: #000000;
+  --text-color: #2c3e50;
   --light-bg: #f0f9fa;
   --border-color: #d1eeef;
 }
 
-.detail-post-container {
-  max-width: 900px;
-  margin-bottom: 3rem;
-  border: 1px solid rgba(78, 205, 196, 0.3); 
+.post-detail-container {
+  max-width: 800px;
   margin: 0 auto;
   background-color: white;
   border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   padding: 2rem;
   overflow: visible;
   position: relative;
 }
 
-.custom-back-btn {
-  background-color:var(--primary-color);
-  color: white;
-  border: var(--primary-color);
-}
-.custom-back-btn:hover {
-  background-color:var(--secondary-color) ;  
-  color: white;
-}
-
-.post-title{
+.post-title {
   color: var(--text-color);
   font-size: 1.8rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
-  
-
+  margin-bottom: 1rem;
 }
 
 .post-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
   border-bottom: 1px solid var(--border-color);
-  padding-bottom: 1.5rem ; 
 }
 
-.post-meta span {
-  display: inline-block;
+.author-avatar {
+  font-size: 2rem;
+  color: var(--accent-color);
 }
 
-.user-name {
+.author-name {
   font-weight: 600;
   color: var(--text-color);
 }
 
 .post-date {
-  font-size: 1rem;
+  font-size: 0.85rem;
   color: #6c757d;
 }
 
+.post-stats {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+/* 장소 정보 카드 스타일 */
+.place-info-card .card {
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  background-color: var(--light-bg);
+}
+
+.place-name {
+  color: var(--accent-color);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.place-address {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.view-place-btn {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.view-place-btn:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.post-content {
+  color: var(--text-color);
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.post-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  margin: 1.5rem auto;
+}
+
+/* 이미지 섹션 스타일 */
+.post-images-section {
+  border-top: 1px solid var(--border-color);
+  padding-top: 1.5rem;
+  margin-top: 1.5rem;
+}
+
 .post-image-container {
-  width: 400px;       /* 너비 지정 */
-  height: 300px;      /* 높이 지정 */
-  overflow: hidden;   /* 넘치는 이미지 잘라냄 */
+  max-height: none;
+  overflow: visible;
   text-align: center;
   display: flex;
   justify-content: center;
-  align-items: center; /* 수직 중앙 정렬 */
 }
 
 .post-image {
-  width: 100%;        /* 컨테이너 너비에 맞춤 */
-  height: 100%;       /* 컨테이너 높이에 맞춤 */
-  object-fit: cover;  /* 비율 유지하며 잘 채움 (또는 contain) */
+  max-width: 100%;
+  height: auto;
   display: block;
+  object-fit: contain;
   margin-bottom: 1rem;
 }
 
-.post-location {
-  display: inline-block;
-  margin-top: 0.5rem;
-  padding: 0.25rem 0.75rem;
-  background-color: var(--light-bg);
-  border-radius: 20px;
-  font-size: 0.9rem;
-  color: var(--accent-color);
-  cursor: pointer;
-  transition: all 0.2s;
+.post-actions {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  position: relative;
+  clear: both;
 }
 
-.post-location:hover {
-  background-color: var(--border-color);
+/* 수정/삭제 버튼 스타일 수정 */
+.post-actions .btn {
+  /* 여기서 transform, box-shadow, transition 관련 코드 삭제 */
+}
+
+.post-actions .btn:hover {
+  /* 여기서 transform, box-shadow 관련 코드 삭제 */
+}
+
+/* 수정 버튼 스타일 */
+.post-actions .edit-btn {
+  background-color: white;
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+.post-actions .edit-btn:hover {
+  /* 호버 시 색상 변경 방지 */
+  background-color: white;
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+/* 삭제 버튼 스타일 */
+.post-actions .delete-btn {
+  background-color: white;
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.post-actions .delete-btn:hover {
+  /* 호버 시 색상 변경 방지 */
+  background-color: white;
+  color: #dc3545;
+  border-color: #dc3545;
 }
 
 @media (max-width: 768px) {
@@ -120,5 +192,3 @@
     justify-content: space-between;
   }
 }
-
-
