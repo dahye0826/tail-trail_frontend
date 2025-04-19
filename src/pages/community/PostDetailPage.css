@@ -64,6 +64,12 @@
   color: var(--accent-color);
   font-weight: 600;
   font-size: 1.1rem;
+  transition: color 0.2s ease;
+}
+
+.place-name:hover {
+  color: var(--primary-color);
+  text-decoration: underline;
 }
 
 .place-address {
@@ -142,15 +148,6 @@
   clear: both;
 }
 
-/* 수정/삭제 버튼 스타일 수정 */
-.post-actions .btn {
-  /* 여기서 transform, box-shadow, transition 관련 코드 삭제 */
-}
-
-.post-actions .btn:hover {
-  /* 여기서 transform, box-shadow 관련 코드 삭제 */
-}
-
 /* 수정 버튼 스타일 */
 .post-actions .edit-btn {
   background-color: white;
@@ -159,10 +156,9 @@
 }
 
 .post-actions .edit-btn:hover {
-  /* 호버 시 색상 변경 방지 */
-  background-color: white;
-  color: var(--text-color);
-  border-color: var(--border-color);
+  background-color:var(--secondary-color);
+  color:  white;
+  border-color:  white;
 }
 
 /* 삭제 버튼 스타일 */
@@ -173,10 +169,9 @@
 }
 
 .post-actions .delete-btn:hover {
-  /* 호버 시 색상 변경 방지 */
-  background-color: white;
-  color: #dc3545;
-  border-color: #dc3545;
+  background-color: #dc3545;
+  color:  white;
+  border-color:  white;
 }
 
 @media (max-width: 768px) {

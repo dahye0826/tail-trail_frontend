@@ -1,47 +1,45 @@
-"use client"
-
+// 게시글 수정 페이지
 import { useNavigate, useParams } from "react-router-dom"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import axios from "axios"
 
 function EditPostPage() {
-  const { id } = useParams()
+  const { id } = useParams() // URL 파라미터에서 게시글 ID 추출
   const navigate = useNavigate()
+
+  // 게시글 상태 값들
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
-  const [images, setImages] = useState([])
-  const [existingImages, setExistingImages] = useState([]) // 빈 배열로 초기화
-  const [selectedLocation, setSelectedLocation] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [searchResults, setSearchResults] = useState([])
-  const [isSearching, setIsSearching] = useState(false)
-  const [allPlaces, setAllPlaces] = useState([])
+  const [images, setImages] = useState([]) // 새로 추가된 이미지
+  const [existingImages, setExistingImages] = useState([]) // 기존 이미지
+  const [selectedLocation, setSelectedLocation] = useState(null) // 선택된 장소 정보
+  const [loading, setLoading] = useState(true) // 로딩 상태
+  const [searchTerm, setSearchTerm] = useState("") // 장소 검색어
+  const [searchResults, setSearchResults] = useState([]) // 검색 결과 리스트
+  const [isSearching, setIsSearching] = useState(false) // 검색 중 상태
 
+  const [selectedResultIndex, setSelectedResultIndex] = useState(-1) // 키보드로 선택된 항목 인덱스
+
+  // 검색 결과 리스트 DOM 참조용
+  const searchResultsRef = useRef(null)
+  const selectedItemRef = useRef(null)
+
+  // 게시글 데이터 불러오기
   useEffect(() => {
     const fetchPost = async () => {
       try {
         setLoading(true)
         const response = await axios.get(`http://localhost:9000/api/community/${id}`)
-        console.log("Fetched post data:", response.data)
-  
+        console.log("포스트 가져오기:", response.data)
         setTitle(response.data.title || "")
         setContent(response.data.content || "")
-  
-        // 기존 이미지 설정
         setExistingImages(response.data.imageUrls || [])
-  
-        // 장소 정보 설정
+
         if (response.data.placeId && response.data.placeName) {
-          setSelectedLocation({
-            id: response.data.placeId,
-            name: response.data.placeName,
-            address: "", // 상세 주소는 필요 시 백엔드에서 추가
-          })
+          setSelectedLocation({ id: response.data.placeId, name: response.data.placeName })
         }
-  
         setLoading(false)
       } catch (err) {
         console.error("데이터 로딩 실패:", err)
@@ -49,24 +47,27 @@ function EditPostPage() {
         navigate("/community")
       }
     }
-  
     fetchPost()
   }, [id, navigate])
 
-  // 장소 검색 함수
-  const searchPlaces = async () => {
-    if (!searchTerm.trim()) {
-      setSearchResults([])
-      return
+  // 선택된 결과가 키보드로 이동 시 화면에 보이도록 조정
+  useEffect(() => {
+    if (selectedItemRef.current) {
+      selectedItemRef.current.scrollIntoView({
+        behavior: "smooth", // 부드럽게 이동
+        block: "nearest",   // 가장 가까운 위치에 맞춰줌
+      })
     }
-  
+  }, [selectedResultIndex])
+
+  // 장소 검색 요청
+  const searchPlaces = async () => {
+    if (!searchTerm.trim()) return setSearchResults([])
     setIsSearching(true)
-  
     try {
-      const response = await axios.get(
-        `http://localhost:9000/api/places/search?keyword=${encodeURIComponent(searchTerm)}`
-      )
+      const response = await axios.get(`http://localhost:9000/api/places/search?keyword=${encodeURIComponent(searchTerm)}`)
       setSearchResults(response.data)
+      setSelectedResultIndex(-1)
     } catch (error) {
       console.error("장소 검색 실패:", error)
       setSearchResults([])
@@ -75,28 +76,36 @@ function EditPostPage() {
     }
   }
 
-  useEffect(() => {
-    if (searchTerm.trim()) {
-      searchPlaces()
-    } else {
-      setSearchResults([])
-    }
-  }, [searchTerm])
-  
-  // 검색어 변경 핸들러
+  // 검색어 입력 처리
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value)
+    if (e.target.value.trim()) searchPlaces()
+    else setSearchResults([])
   }
 
-  // 엔터키 검색 핸들러
+  // 키보드 입력 이벤트 (↑ ↓ Enter ESC)
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
+    if (searchResults.length === 0) return
+    if (e.key === "ArrowUp") {
       e.preventDefault()
-      searchPlaces()
+      setSelectedResultIndex((prev) => (prev <= 0 ? searchResults.length - 1 : prev - 1))
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault()
+      setSelectedResultIndex((prev) => (prev >= searchResults.length - 1 ? 0 : prev + 1))
+    } else if (e.key === "Enter") {
+      e.preventDefault()
+      if (selectedResultIndex >= 0 && selectedResultIndex < searchResults.length) {
+        handlePlaceSelect(searchResults[selectedResultIndex])
+      } else if (searchTerm.trim()) {
+        searchPlaces()
+      }
+    } else if (e.key === "Escape") {
+      e.preventDefault()
+      setSearchResults([])
     }
   }
 
-  // 장소 선택 핸들러
+  // 장소 선택 시 실행
   const handlePlaceSelect = (place) => {
     setSelectedLocation({
       id: place.placeId,
@@ -105,11 +114,12 @@ function EditPostPage() {
     })
     setSearchResults([])
     setSearchTerm("")
+    setSelectedResultIndex(-1)
   }
 
+  // 게시글 수정 제출
   const handleSubmit = async (e) => {
     e.preventDefault()
-
     if (!title.trim() || !content.trim()) {
       alert("제목과 내용은 필수입니다.")
       return
@@ -118,27 +128,15 @@ function EditPostPage() {
     const formData = new FormData()
     formData.append("postTitle", title)
     formData.append("postContent", content)
-
-    // 선택된 위치 정보 추가 - 간소화된 버전
     if (selectedLocation && selectedLocation.id) {
       formData.append("placeId", selectedLocation.id)
     }
-
-    // existingImages가 배열인지 확인 후 처리
-    const remainingImages = Array.isArray(existingImages) ? existingImages : []
-    formData.append("remainImages", JSON.stringify(remainingImages))
-
-    images.forEach((image) => {
-      formData.append("postImages", image)
-    })
+    formData.append("remainImages", JSON.stringify(Array.isArray(existingImages) ? existingImages : []))
+    images.forEach((image) => formData.append("postImages", image))
 
     try {
-      const { data } = await axios.post(
-        `http://localhost:9000/api/community/${id}/update`,
-        formData
-      );
-    console.log(data)
-
+      const { data } = await axios.post(`http://localhost:9000/api/community/${id}/update`, formData)
+      console.log(data)
       alert("수정 완료")
       navigate(`/community/post/${id}`)
     } catch (err) {
@@ -147,11 +145,12 @@ function EditPostPage() {
     }
   }
 
+  // 기존 이미지 삭제
   const handleRemoveExistingImage = (index) => {
     setExistingImages((prev) => prev.filter((_, i) => i !== index))
   }
 
-  //이미지 선택
+  // 새 이미지 추가
   const handleImageChange = (e) => {
     const selectedFiles = Array.from(e.target.files)
     if (selectedFiles.length > 0) {
@@ -159,12 +158,12 @@ function EditPostPage() {
     }
   }
 
-  // 이미지 제거 함수 수정
+  // 새 이미지 삭제
   const handleRemoveImage = (index) => {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index))
   }
 
-  // 선택한 장소 제거
+  // 장소 선택 제거
   const removeSelectedLocation = () => {
     setSelectedLocation(null)
   }
@@ -192,7 +191,7 @@ function EditPostPage() {
           <div className="col-lg-8 mx-auto">
             <div className="card shadow-sm">
               <div className="card-header bg-white">
-                <h2 className="text-center mb-0">게시글 수정</h2>
+                <h2 className="text-center mb-0">추억 적기</h2>
               </div>
               <div className="card-body">
                 <form onSubmit={handleSubmit}>
@@ -242,7 +241,7 @@ function EditPostPage() {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="장소 이름으로 검색..."
+                        placeholder="장소를 검색하세요"
                         value={searchTerm}
                         onChange={handleSearchChange}
                         onKeyDown={handleKeyDown}
@@ -271,22 +270,26 @@ function EditPostPage() {
                       </button>
                     </div>
 
-                    {/* 검색 결과 표시 */}
+                    {/* 검색 결과 표시 - 스크롤 가능한 컨테이너로 변경 */}
                     {searchResults.length > 0 && (
                       <div className="search-results-container mb-3">
-                        <div className="list-group">
-                          {searchResults.map((place) => (
+                        <div className="search-results-header">
+                          <small className="text-muted">검색 결과 ({searchResults.length})</small>
+                        </div>
+                        <div className="list-group search-results-scrollable" ref={searchResultsRef}>
+                          {searchResults.map((place, index) => (
                             <button
-                              key={place.placeId}
-                              type="button"
-                              className="list-group-item list-group-item-action"
-                              onClick={() => handlePlaceSelect(place)}
-                            >
+                            key={place.placeId}
+                            type="button"
+                            className={`list-group-item list-group-item-action ${selectedResultIndex === index ? "active" : ""}`}
+                            onClick={() => handlePlaceSelect(place)}
+                            onMouseEnter={() => setSelectedResultIndex(index)}
+                            ref={selectedResultIndex === index ? selectedItemRef : null}
+                          >
                               <div className="d-flex w-100 justify-content-between">
                                 <h6 className="mb-1">{place.placeName}</h6>
-                                {place.industrySub && <small className="text-muted">{place.industrySub}</small>}
                               </div>
-                              <p className="mb-1 small">{place.roadAddress}</p>
+                              <p className="mb-1 small text-muted">{place.roadAddress}</p>
                             </button>
                           ))}
                         </div>
@@ -326,7 +329,6 @@ function EditPostPage() {
                   {/* 기존 이미지 표시 - 배열 체크 추가 */}
                   {Array.isArray(existingImages) && existingImages.length > 0 && (
                     <div className="mb-3">
-                      <label className="form-label">기존 이미지</label>
                       <div className="d-flex flex-wrap gap-2">
                         {existingImages.map((imageUrl, index) => (
                           <div key={index} className="position-relative">
@@ -353,7 +355,6 @@ function EditPostPage() {
                   {/* 새로 추가한 이미지 표시 */}
                   {images.length > 0 && (
                     <div className="mb-3">
-                      <label className="form-label">새로 추가한 이미지</label>
                       <div className="d-flex flex-wrap gap-2">
                         {images.map((image, index) => (
                           <div key={index} className="position-relative">

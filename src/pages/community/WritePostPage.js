@@ -1,7 +1,6 @@
-"use client"
-
+// 필요한 라이브러리 및 컴포넌트 import
 import axios from "axios"
-import { useState, useEffect } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import "bootstrap-icons/font/bootstrap-icons.css"
 import "bootstrap/dist/css/bootstrap.min.css"
@@ -10,22 +9,37 @@ import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 
 function WritePostPage() {
+  // 게시글 제목, 내용, 이미지 등 상태 관리
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
   const [selectedLocation, setSelectedLocation] = useState(null)
   const [images, setImages] = useState([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(true)
+
+  // 장소 검색어 관련 상태
   const [searchTerm, setSearchTerm] = useState("")
   const [searchResults, setSearchResults] = useState([])
   const [isSearching, setIsSearching] = useState(false)
-  const [allPlaces, setAllPlaces] = useState([])
-  const [loading, setLoading] = useState(false)
+  const [selectedResultIndex, setSelectedResultIndex] = useState(-1)
+
+  // 검색 결과 DOM 참조용 ref
+  const searchResultsRef = useRef(null)
+  const selectedItemRef = useRef(null)
 
   const navigate = useNavigate()
 
-  
-  //이미지 선택
+  // 선택된 결과 항목이 보이도록 자동 스크롤 처리
+  useEffect(() => {
+    if (selectedItemRef.current) {
+      selectedItemRef.current.scrollIntoView({
+        behavior: "smooth", // 부드럽게 이동
+        block: "nearest",   // 가장 가까운 위치에 맞춰줌
+      })
+    }
+  }, [selectedResultIndex])
+
+  // 이미지 선택 시 상태 업데이트
   const handleImageChange = (e) => {
     const selectedFiles = Array.from(e.target.files)
     if (selectedFiles.length > 0) {
@@ -33,25 +47,26 @@ function WritePostPage() {
     }
   }
 
-  // 이미지 제거 함수 수정
+  // 이미지 제거 함수
   const handleRemoveImage = (index) => {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index))
   }
 
-  // 장소 검색 함수
+  // 장소 검색 요청 함수
   const searchPlaces = async () => {
     if (!searchTerm.trim()) {
       setSearchResults([])
       return
     }
-  
+
     setIsSearching(true)
-  
+
     try {
       const response = await axios.get(
         `http://localhost:9000/api/places/search?keyword=${encodeURIComponent(searchTerm)}`
       )
       setSearchResults(response.data)
+      setSelectedResultIndex(-1)
     } catch (error) {
       console.error("장소 검색 실패:", error)
       setSearchResults([])
@@ -60,11 +75,9 @@ function WritePostPage() {
     }
   }
 
-
-  // 검색어 변경 핸들러
+  // 입력창 변경 시 검색 자동 수행
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value)
-    // 검색어가 변경될 때마다 검색 실행
     if (e.target.value.trim()) {
       searchPlaces()
     } else {
@@ -72,15 +85,30 @@ function WritePostPage() {
     }
   }
 
-  // 엔터키 검색 핸들러
+  // 키보드 입력 이벤트 처리
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
+    if (searchResults.length === 0) return
+
+    if (e.key === "ArrowUp") {
       e.preventDefault()
-      searchPlaces()
+      setSelectedResultIndex((prev) => (prev <= 0 ? searchResults.length - 1 : prev - 1))
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault()
+      setSelectedResultIndex((prev) => (prev >= searchResults.length - 1 ? 0 : prev + 1))
+    } else if (e.key === "Enter") {
+      e.preventDefault()
+      if (selectedResultIndex >= 0 && selectedResultIndex < searchResults.length) {
+        handlePlaceSelect(searchResults[selectedResultIndex])
+      } else if (searchTerm.trim()) {
+        searchPlaces()
+      }
+    } else if (e.key === "Escape") {
+      e.preventDefault()
+      setSearchResults([])
     }
   }
 
-  // 장소 선택 핸들러
+  // 장소 선택 처리 함수
   const handlePlaceSelect = (place) => {
     setSelectedLocation({
       id: place.placeId,
@@ -89,37 +117,33 @@ function WritePostPage() {
     })
     setSearchResults([])
     setSearchTerm("")
+    setSelectedResultIndex(-1)
   }
 
-  // 선택한 장소 제거
+  // 선택된 장소 제거
   const removeSelectedLocation = () => {
     setSelectedLocation(null)
   }
 
+  // 게시글 등록 제출 함수
   const handleSubmit = async (e) => {
     e.preventDefault()
 
     if (!title.trim() || !content.trim()) {
-      //앞뒤 공백 제거했을때 없으면 alert
       alert("제목과 내용은 필수입니다.")
       return
     }
 
     const formData = new FormData()
-
     formData.append("postTitle", title)
     formData.append("postContent", content)
+
     images.forEach((image) => {
       formData.append("postImages", image)
     })
 
-    // 선택된 위치 정보 추가 - 간소화된 버전
     if (selectedLocation && selectedLocation.id) {
       formData.append("placeId", selectedLocation.id)
-    }
-
-    for (const pair of formData.entries()) {
-      console.log("[FormData]", pair[0], pair[1])
     }
 
     try {
@@ -129,16 +153,17 @@ function WritePostPage() {
           "Content-Type": "multipart/form-data",
         },
       })
-      console.log("글쓰기 보내기 완료", response.data)
+      console.log("글쓰기 성공", response.data)
       navigate("/community")
     } catch (err) {
-      console.log("오류", err)
+      console.log("글쓰기 오류", err)
       alert("게시글 등록에 실패했습니다.")
     } finally {
       setIsSubmitting(false)
     }
   }
 
+  // 렌더링 UI
   return (
     <>
       <Navbar isLoggedIn={isLoggedIn} />
@@ -152,10 +177,9 @@ function WritePostPage() {
               </div>
               <div className="card-body">
                 <form onSubmit={handleSubmit}>
+                  {/* 제목 입력창 */}
                   <div className="mb-3">
-                    <label htmlFor="posttitle" className="form-label">
-                      제목
-                    </label>
+                    <label htmlFor="posttitle" className="form-label">제목</label>
                     <input
                       type="text"
                       className="form-control"
@@ -167,11 +191,10 @@ function WritePostPage() {
                     />
                   </div>
 
-                  {/* 장소 선택 영역 - DB 검색 방식으로 변경 */}
+                  {/* 장소 자동완성 입력 및 선택 */}
                   <div className="mb-4">
                     <label className="form-label">장소 (선택사항)</label>
 
-                    {/* 선택된 장소가 있으면 표시 */}
                     {selectedLocation && (
                       <div className="selected-location-card mb-2">
                         <div className="card">
@@ -193,12 +216,11 @@ function WritePostPage() {
                       </div>
                     )}
 
-                    {/* 장소 검색 입력창 */}
                     <div className="input-group mb-2">
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="장소 이름으로 검색..."
+                        placeholder="장소를 검색하세요"
                         value={searchTerm}
                         onChange={handleSearchChange}
                         onKeyDown={handleKeyDown}
@@ -211,38 +233,37 @@ function WritePostPage() {
                       >
                         {isSearching ? (
                           <>
-                            <span
-                              className="spinner-border spinner-border-sm me-1"
-                              role="status"
-                              aria-hidden="true"
-                            ></span>
+                            <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
                             검색 중...
                           </>
                         ) : (
                           <>
-                            <i className="bi bi-search me-1"></i>
-                            검색
+                            <i className="bi bi-search me-1"></i>검색
                           </>
                         )}
                       </button>
                     </div>
 
-                    {/* 검색 결과 표시 */}
+                    {/* 검색 결과 리스트 */}
                     {searchResults.length > 0 && (
                       <div className="search-results-container mb-3">
-                        <div className="list-group">
-                          {searchResults.map((place) => (
+                        <div className="search-results-header">
+                          <small className="text-muted">검색 결과 ({searchResults.length})</small>
+                        </div>
+                        <div className="list-group search-results-scrollable" ref={searchResultsRef}>
+                          {searchResults.map((place, index) => (
                             <button
                               key={place.placeId}
                               type="button"
-                              className="list-group-item list-group-item-action"
+                              className={`list-group-item list-group-item-action ${selectedResultIndex === index ? "active" : ""}`}
                               onClick={() => handlePlaceSelect(place)}
+                              onMouseEnter={() => setSelectedResultIndex(index)}
+                              ref={selectedResultIndex === index ? selectedItemRef : null}
                             >
                               <div className="d-flex w-100 justify-content-between">
                                 <h6 className="mb-1">{place.placeName}</h6>
-                                {place.industrySub && <small className="text-muted">{place.industrySub}</small>}
                               </div>
-                              <p className="mb-1 small">{place.roadAddress}</p>
+                              <p className="mb-1 small text-muted">{place.roadAddress}</p>
                             </button>
                           ))}
                         </div>
@@ -250,10 +271,9 @@ function WritePostPage() {
                     )}
                   </div>
 
+                  {/* 내용 입력 */}
                   <div className="mb-3">
-                    <label htmlFor="postContent" className="form-label">
-                      내용
-                    </label>
+                    <label htmlFor="postContent" className="form-label">내용</label>
                     <textarea
                       className="form-control"
                       id="postContent"
@@ -265,10 +285,9 @@ function WritePostPage() {
                     ></textarea>
                   </div>
 
+                  {/* 이미지 업로드 */}
                   <div className="mb-3">
-                    <label htmlFor="postImages" className="form-label">
-                      이미지 첨부 (선택사항)
-                    </label>
+                    <label htmlFor="postImages" className="form-label">이미지 첨부 (선택사항)</label>
                     <input
                       type="file"
                       className="form-control"
@@ -279,6 +298,7 @@ function WritePostPage() {
                     />
                   </div>
 
+                  {/* 이미지 미리보기 */}
                   {images.length > 0 && (
                     <div className="mb-3">
                       <label className="form-label">선택된 이미지</label>
@@ -286,7 +306,7 @@ function WritePostPage() {
                         {images.map((image, index) => (
                           <div key={index} className="position-relative">
                             <img
-                              src={URL.createObjectURL(image) || "/placeholder.svg"}
+                              src={URL.createObjectURL(image)}
                               alt={`preview-${index}`}
                               width="100"
                               height="100"
@@ -305,6 +325,7 @@ function WritePostPage() {
                     </div>
                   )}
 
+                  {/* 등록 / 취소 버튼 */}
                   <div className="d-flex justify-content-between mt-4">
                     <button type="button" className="btn btn-outline-secondary" onClick={() => navigate("/community")}>
                       취소
@@ -312,11 +333,7 @@ function WritePostPage() {
                     <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
                       {isSubmitting ? (
                         <>
-                          <span
-                            className="spinner-border spinner-border-sm me-2"
-                            role="status"
-                            aria-hidden="true"
-                          ></span>
+                          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                           등록 중...
                         </>
                       ) : (

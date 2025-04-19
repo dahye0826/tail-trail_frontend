@@ -214,6 +214,65 @@
   font-size: 0.7rem;
 }
 
+/* 검색 결과 스크롤 가능한 컨테이너 스타일 추가 */
+.search-results-container {
+  position: relative;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.search-results-header {
+  padding: 8px 12px;
+  background-color: var(--light-bg);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+}
+
+.search-results-scrollable {
+  max-height: 300px;
+  overflow-y: auto;
+  border: none;
+}
+
+.search-results-scrollable .list-group-item {
+  border-left: none;
+  border-right: none;
+  padding: 10px 15px;
+  transition: background-color 0.2s;
+}
+
+.search-results-scrollable .list-group-item:last-child {
+  border-bottom: none;
+}
+
+/* 선택된 항목 스타일 변경 - 더 연한 색상으로 */
+.search-results-scrollable .list-group-item.active,
+.search-results-scrollable .list-group-item[data-selected="true"] {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  border-color: var(--secondary-color);
+  border-left: 3px solid var(--primary-color);
+}
+
+.search-results-scrollable .list-group-item.active h6,
+.search-results-scrollable .list-group-item[data-selected="true"] h6 {
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+.search-results-scrollable .list-group-item.active:hover,
+.search-results-scrollable .list-group-item[data-selected="true"]:hover {
+  background-color: var(--secondary-color);
+}
+
+.search-results-scrollable .list-group-item:hover {
+  background-color: var(--light-bg);
+}
+
 @media (max-width: 768px) {
   .card-header {
     padding: 1rem;
