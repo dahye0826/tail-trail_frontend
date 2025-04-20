@@ -229,10 +229,11 @@ function PlaceDetailPage() {
                     category: place.category,
                     rating: place.rating,
                   }}
-                  height="400px"
+                  height="800px"
                   showSearchBar={false}
                   defaultLevel={3}
                   showRegisteredPlaces={false} // 장소 상세 페이지에서는 등록된 장소 검색 비활성화
+                  showInfoCard={false} // 장소 정보 카드 표시 안 함
                 />
               </div>
             </div>

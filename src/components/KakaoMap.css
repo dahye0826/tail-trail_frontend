@@ -100,3 +100,83 @@
   line-height: 0 !important;
   font-size: 0 !important;
 }
+
+/* 마커 정보 표시 스타일 */
+.marker-info {
+  font-size: 0.85rem;
+  color: #6c757d;
+  text-align: right;
+}
+
+/* 선택된 장소 카드 스타일 수정 */
+.selected-place-card {
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.selected-place-card .card {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 2px solid #4ecdc4;
+}
+
+.selected-place-card .card-header {
+  background-color: #4ecdc4;
+  color: white;
+  padding: 0.75rem 1rem;
+}
+
+.selected-place-card .card-title {
+  color: #2a9d8f;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.selected-place-card .card-header .card-title {
+  color: white;
+  margin-bottom: 0;
+}
+
+.selected-place-card .card-text {
+  color: #6c757d;
+  margin-bottom: 1rem;
+}
+
+.selected-place-card .badge {
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.35rem 0.65rem;
+  margin-right: 0.3rem;
+  margin-bottom: 0.3rem;
+  border-radius: 20px;
+}
+
+.selected-place-card .btn-primary {
+  background-color: #4ecdc4;
+  border-color: #4ecdc4;
+  transition: all 0.2s;
+}
+
+.selected-place-card .btn-primary:hover {
+  background-color: #2a9d8f;
+  border-color: #2a9d8f;
+}
+
+/* 클러스터 스타일 */
+.cluster-marker {
+  color: #fff;
+  background: #4ecdc4;
+  border-radius: 50%;
+  padding: 10px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  border: 2px solid #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}

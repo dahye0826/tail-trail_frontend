@@ -128,6 +128,24 @@
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
+/* 지도 확장 아이콘 버튼 스타일 */
+.map-image-container .position-absolute .btn-light {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.map-image-container .position-absolute .btn-light:hover {
+  background-color: white;
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.map-image-container .position-absolute .btn-light i {
+  color: var(--accent-color);
+}
+
 /* 지도 아이콘 링크 스타일 추가 */
 .map-icon-link {
   display: flex;

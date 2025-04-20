@@ -15,6 +15,7 @@ const HomePage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [communityPosts, setCommunityPosts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [places, setPlaces] = useState([])
 
   // 커뮤니티 게시글 가져오기
   useEffect(() => {
@@ -47,6 +48,23 @@ const HomePage = () => {
     }
 
     fetchCommunityPosts()
+  }, [])
+
+  // 장소 데이터 가져오기
+  useEffect(() => {
+    const fetchPlaces = async () => {
+      try {
+        const response = await axios.get("http://localhost:9000/api/places/all")
+        console.log("홈페이지 장소 데이터:", response.data)
+        setPlaces(response.data)
+      } catch (error) {
+        console.error("장소 데이터 로딩 오류:", error)
+        // 오류 발생 시 빈 배열 설정
+        setPlaces([])
+      }
+    }
+
+    fetchPlaces()
   }, [])
 
   return (
@@ -111,56 +129,41 @@ const HomePage = () => {
 
         {/* 지도 검색 섹션 - 커뮤니티 섹션보다 앞으로 이동 */}
         <div className="map-section py-4 mt-3">
-          <Container>
-            <div className="text-center mb-4">
-              <h2 className="fw-bold section-title">지도로 쉽게 찾아보세요</h2>
-              <p className="lead text-muted">반려동물과 함께 갈 수 있는 다양한 장소를 지도에서 한눈에 확인하세요</p>
-            </div>
+  <Container>
+    <div className="text-center mb-4">
+      <h2 className="fw-bold section-title">지도로 쉽게 찾아보세요</h2>
+      <p className="lead text-muted">반려동물과 함께 갈 수 있는 다양한 장소를 지도에서 한눈에 확인하세요</p>
+    </div>
 
-            <div className="position-relative">
-              <div className="map-image-container mx-auto" style={{ maxWidth: "900px" }}>
-                <KakaoMap
-                  readOnly={true}
-                  initialLocation={{
-                    name: "서울 시청",
-                    address: "서울특별시 중구 세종대로 110",
-                    lat: 37.5666805,
-                    lng: 126.9784147,
-                  }}
-                  markerPositions={[
-                    {
-                      name: "서울 시청",
-                      address: "서울특별시 중구 세종대로 110",
-                      lat: 37.5666805,
-                      lng: 126.9784147,
-                    },
-                    {
-                      name: "경복궁",
-                      address: "서울특별시 종로구 사직로 161",
-                      lat: 37.579617,
-                      lng: 126.977041,
-                    },
-                    {
-                      name: "남산타워",
-                      address: "서울특별시 용산구 남산공원길 105",
-                      lat: 37.551348,
-                      lng: 126.988123,
-                    },
-                  ]}
-                  height="500px"
-                  showSearchBar={false}
-                  defaultLevel={9}
-                  showRegisteredPlaces={false}
-                />
-                <div className="position-absolute" style={{ top: "20px", right: "20px", zIndex: 1000 }}>
-                  <Link to="/map" className="simple-icon-link">
-                    <i className="bi bi-map" style={{ fontSize: "2rem", color: "#2c3e50" }}></i>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </Container>
+    <div className="position-relative">
+      <div className="map-image-container mx-auto" style={{ maxWidth: "1200px" }}>
+        <KakaoMap
+          readOnly={true}
+          initialLocation={null}
+          markerPositions={places.map((place) => ({
+            id: place.placeId,
+            lat: Number(place.latitude),
+            lng: Number(place.longitude),
+            placeName: place.placeName,
+            roadAddress: place.roadAddress,
+            category: place.industrySub,
+          }))}
+          height="500px"
+          showSearchBar={false}
+          defaultLevel={6}
+          showRegisteredPlaces={false}
+        />
+
+        {/* 🔁 확장 아이콘 버튼으로 교체 */}
+        <div className="position-absolute" style={{ top: "15px", right: "15px", zIndex: 1000 }}>
+          <Link to="/map" className="btn btn-light shadow-sm rounded-circle p-2" title="지도로 확장">
+            <i className="bi bi-arrows-fullscreen fs-4"></i>
+          </Link>
         </div>
+      </div>
+    </div>
+  </Container>
+</div>
 
         {/* 커뮤니티 섹션 - 지도 섹션 다음으로 이동 */}
         <div className="community-section py-5">

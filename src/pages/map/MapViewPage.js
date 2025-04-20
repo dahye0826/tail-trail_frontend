@@ -9,7 +9,6 @@ import "./MapViewPage.css"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 import KakaoMap from "../../components/KakaoMap"
-import { mockPlaces } from "../places/mockData"
 
 function MapViewPage() {
   const [places, setPlaces] = useState([])
@@ -21,28 +20,30 @@ function MapViewPage() {
   const [categoryFilter, setCategoryFilter] = useState("")
   const navigate = useNavigate()
 
-  useEffect(()=>{
-    const fetchPlaces = async () => 
-      {try{
+  useEffect(() => {
+    const fetchPlaces = async () => {
+      try {
         setLoading(true)
         const response = await axios.get("http://localhost:9000/api/places/all")
+        console.log("불러온 장소 데이터:", response.data)
         setPlaces(response.data)
-
-      }catch(err){
-        console.error("장소를 불러오기 실패:",err)
-      }finally{
+      } catch (err) {
+        console.error("장소를 불러오기 실패:", err)
+        // 오류 발생 시 빈 배열 설정
+        setPlaces([])
+      } finally {
         setLoading(false)
       }
     }
 
     fetchPlaces()
-  },[])
+  }, [])
 
   // 필터링된 장소 목록
   const filteredPlaces = places.filter((place) => {
     const matchesSearch = searchKeyword
-      ? place.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        place.address.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+      ? place.placeName?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        place.roadAddress?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
         (place.description && place.description.toLowerCase().includes(searchKeyword.toLowerCase()))
       : true
     const matchesRegion = regionFilter ? place.region === regionFilter : true
@@ -66,28 +67,6 @@ function MapViewPage() {
     // 검색 로직은 이미 filteredPlaces에서 처리됨
     console.log("Searching for:", searchKeyword)
   }
-
-  // 필터 초기화
-  const handleResetFilters = () => {
-    setSearchKeyword("")
-    setRegionFilter("")
-    setCategoryFilter("")
-  }
-
-  // 별점 렌더링 함수
-  // const renderStars = (rating) => {
-  //   return (
-  //     <>
-  //       {[...Array(Math.floor(rating))].map((_, i) => (
-  //         <i key={i} className="bi bi-star-fill text-warning"></i>
-  //       ))}
-  //       {rating % 1 !== 0 && <i className="bi bi-star-half text-warning"></i>}
-  //       {[...Array(5 - Math.ceil(rating))].map((_, i) => (
-  //         <i key={i} className="bi bi-star text-warning"></i>
-  //       ))}
-  //     </>
-  //   )
-  // }
 
   return (
     <>
@@ -149,10 +128,6 @@ function MapViewPage() {
                       <option value="의료시설">의료시설</option>
                     </select>
                   </div>
-
-                  <button className="btn btn-outline-secondary w-100 mb-3" onClick={handleResetFilters}>
-                    필터 초기화
-                  </button>
                 </div>
 
                 {/* 장소 목록 */}
@@ -176,26 +151,24 @@ function MapViewPage() {
                       {filteredPlaces.map((place) => (
                         <div
                           key={place.placeId}
-                          className={`place-list-item ${selectedPlace?.id === place.id ? "active" : ""}`}
-                          onClick={() => setSelectedPlace({
-                            lat: Number(place.latitude),
-                            lng: Number(place.longitude),
-                            name: place.placeName,
-                            address: place.roadAddress
-                          })}
+                          className={`place-list-item ${selectedPlace?.id === place.placeId ? "active" : ""}`}
+                          onClick={() =>
+                            setSelectedPlace({
+                              id: place.placeId,
+                              lat: Number(place.latitude),
+                              lng: Number(place.longitude),
+                              name: place.placeName,
+                              address: place.roadAddress,
+                              category: place.industrySub,
+                            })
+                          }
                         >
                           <h5 className="place-name">{place.placeName || "이름 없음"}</h5>
                           <p className="place-address">
                             <i className="bi bi-geo-alt me-1"></i>
                             {place.roadAddress || "주소 없음"}
                           </p>
-                          {/* <div className="place-info">
-                            <span className="badge category-badge me-2">{place.category}</span>
-                            <span className="rating">
-                              {renderStars(place.rating)}
-                              <span className="rating-value ms-1">{place.rating}</span>
-                            </span>
-                          </div> */}
+                          {place.industrySub && <span className="place-category">{place.industrySub}</span>}
                         </div>
                       ))}
                     </div>
@@ -217,53 +190,25 @@ function MapViewPage() {
                 ) : (
                   <KakaoMap
                     readOnly={false}
-                    initialLocation={ 
-                           { lat: 37.5665,
-                            lng: 126.978,
-                            name: "서울시청",
-                            address: "서울특별시 중구 세종대로 110" 
-                            }}
+                    initialLocation={null} // 초기 위치를 null로 설정하여 컴포넌트가 자동으로 찾도록 함
                     markerPositions={filteredPlaces.map((place) => ({
-                    
-                      lat:  place.latitude,
-                      lng: place.longitude,
+                      id: place.placeId,
+                      lat: Number(place.latitude),
+                      lng: Number(place.longitude),
                       name: place.placeName,
                       address: place.roadAddress,
-                      category: place.industrySub
+                      category: place.industrySub,
                     }))}
                     selectedPlace={selectedPlace}
                     height="calc(100vh - 150px)"
                     showSearchBar={false}
                     defaultLevel={selectedPlace ? 3 : 7}
+                    showInfoCard={true} // 지도 위에 정보 카드 표시
                   />
                 )}
-
-                {/* 선택된 장소 정보 표시 */}
-                {selectedPlace && (
-                  <div className="selected-place-info">
-                    <div className="d-flex justify-content-between align-items-start">
-                      <div>
-                        <h4>{selectedPlace.name}</h4>
-                        <p className="mb-1">
-                          <i className="bi bi-geo-alt me-1"></i>
-                          {selectedPlace.address}
-                        </p>
-                        {/* <div className="mb-2">
-                          <span className="badge category-badge me-2">{selectedPlace.category}</span>
-                          <span className="rating">
-                            {renderStars(selectedPlace.rating)}
-                            <span className="rating-value ms-1">{selectedPlace.rating}</span>
-                          </span>
-                        </div> */}
-                        <p className="place-description">{selectedPlace.description}</p>
-                      </div>
-                      <button className="btn btn-primary btn-sm" onClick={() => handleViewDetail(selectedPlace.id)}>
-                        상세보기
-                      </button>
-                    </div>
-                  </div>
-                )}
               </div>
+
+              {/* 선택된 장소 정보 카드 제거 - 지도 아래 카드 삭제 */}
             </div>
           </div>
         </div>
