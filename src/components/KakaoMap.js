@@ -392,11 +392,11 @@ const KakaoMap = ({
             <div className="card-header bg-primary text-white">
               <h5 className="card-title mb-0">
                 <i className="bi bi-geo-alt-fill me-2"></i>
-                선택된 장소 정보
+                장소 정보
               </h5>
             </div>
             <div className="card-body">
-              <h5 className="card-title">{selectedLocation.name}</h5>
+              <h5 className="card-title"> {selectedLocation.name}</h5>
               <p className="card-text">
                 <i className="bi bi-geo-alt me-1"></i>
                 {selectedLocation.address || selectedLocation.roadAddress}

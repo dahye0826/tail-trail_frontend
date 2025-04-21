@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 import "./PostDetailPage.css"
-
+import CommentSection from "../../pages/community/CommentSection"
 function PostDetailPage() {
   // 상태 정의
   const [post, setPost] = useState(null)
@@ -161,8 +161,8 @@ function PostDetailPage() {
             </div>
           {/* )} */}
 
-          {/* 댓글 섹션 (향후 확장 가능) */}
-          {/* <CommentSection postId={id} isLoggedIn={isLoggedIn} /> */}
+          {/* 댓글 섹션*/}
+          <CommentSection postId={post.postId} isLoggedIn={isLoggedIn} /> 
         </div>
       </div>
       <Footer />

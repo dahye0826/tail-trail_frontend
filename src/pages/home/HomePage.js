@@ -144,7 +144,7 @@ const HomePage = () => {
             id: place.placeId,
             lat: Number(place.latitude),
             lng: Number(place.longitude),
-            placeName: place.placeName,
+            name: place.placeName,
             roadAddress: place.roadAddress,
             category: place.industrySub,
           }))}

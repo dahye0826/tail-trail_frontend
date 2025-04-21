@@ -13,6 +13,7 @@ import ProfileEditPage from "./pages/mypage/ProfileEditPage"
 import RatedPlacesPage from "./pages/mypage/RatedPlacesPage"
 import HomePage from "./pages/home/HomePage"
 import MapViewPage from "./pages/map/MapViewPage"
+import CommentSection from "./pages/community/CommentSection"
 
 
 
@@ -34,6 +35,7 @@ function AppRouter() {
         <Route path="/mypage/rated" element={<RatedPlacesPage />} />
         <Route path="/mypage/edit-profile" element={<ProfileEditPage />} />
         <Route path="/map" element={<MapViewPage />} />
+        <Route path="/community/post/:id" element={<CommentSection />} />
 
         
         
