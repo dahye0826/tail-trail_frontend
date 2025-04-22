@@ -5,6 +5,7 @@ import Footer from "../../components/Footer"
 import { useEffect, useState, useRef } from "react"
 import axios from "axios"
 
+
 function EditPostPage() {
   const { id } = useParams() // URL 파라미터에서 게시글 ID 추출
   const navigate = useNavigate()

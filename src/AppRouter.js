@@ -13,7 +13,7 @@ import ProfileEditPage from "./pages/mypage/ProfileEditPage"
 import HomePage from "./pages/home/HomePage"
 import MapViewPage from "./pages/map/MapViewPage"
 import CommentSection from "./pages/community/CommentSection"
-import ReviewModal from "./pages/Review/ReviewModal"
+import ReviewModal from "./pages/places/ReviewModal"
 
 
 

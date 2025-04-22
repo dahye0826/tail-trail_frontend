@@ -9,6 +9,8 @@ import "./PlaceDetailPage.css"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 import KakaoMap from "../../components/KakaoMap"
+import { usePlaceViewTracker } from "../../api/PlaceViewTracker"
+import { useReview } from "../../hooks/useReview"
 
 const API_BASE_URL = "http://localhost:9000/api"
 
@@ -20,6 +22,7 @@ function PlaceDetailPage() {
   const [showReviewForm, setShowReviewForm] = useState(false)
   const { id } = useParams()
   const navigate = useNavigate()
+
 
   // Format incoming place data
   const formatPlaceData = useCallback((placeData) => {
