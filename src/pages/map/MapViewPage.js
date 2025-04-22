@@ -1,4 +1,5 @@
-"use client"
+// MapViewPage.js - PlaceListPage 방식으로 지역/카테고리 옵션 설정 (도로명 주소에서 시(city)만 추출)
+
 
 import axios from "axios"
 import { useState, useEffect } from "react"
@@ -10,62 +11,90 @@ import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 import KakaoMap from "../../components/KakaoMap"
 
+const API_BASE_URL = "http://localhost:9000/api";
+
 function MapViewPage() {
   const [places, setPlaces] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedPlace, setSelectedPlace] = useState(null)
-  const [isLoggedIn, setIsLoggedIn] = useState(false) // 테스트용
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [searchKeyword, setSearchKeyword] = useState("")
   const [regionFilter, setRegionFilter] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("")
   const navigate = useNavigate()
 
+  const [cities, setCities] = useState([])
+  const [categories, setCategories] = useState([])
+
   useEffect(() => {
     const fetchPlaces = async () => {
       try {
         setLoading(true)
-        const response = await axios.get("http://localhost:9000/api/places/all")
-        console.log("불러온 장소 데이터:", response.data)
-        setPlaces(response.data)
+        const response = await axios.get(`${API_BASE_URL}/places/all`)
+        const raw = response.data || []
+
+        const citySet = new Set()
+        const categorySet = new Set()
+
+        const formattedPlaces = raw.map(place => {
+          const city = place.roadAddress?.split(" ")[0] || ""
+          if (city) citySet.add(city)
+          if (place.industrySub) categorySet.add(place.industrySub)
+
+          return {
+            id: place.placeId,
+            name: place.placeName,
+            address: place.roadAddress || `${place.city} ${place.district}`,
+            region: city,
+            category: place.industrySub || "기타",
+            lat: Number(place.latitude),
+            lng: Number(place.longitude),
+            description: place.description || "상세 정보 없음"
+          }
+        })
+
+        setPlaces(formattedPlaces)
+        setCities([...citySet])
+        setCategories([...categorySet])
       } catch (err) {
         console.error("장소를 불러오기 실패:", err)
-        // 오류 발생 시 빈 배열 설정
         setPlaces([])
       } finally {
         setLoading(false)
       }
     }
-
     fetchPlaces()
   }, [])
 
-  // 필터링된 장소 목록
   const filteredPlaces = places.filter((place) => {
     const matchesSearch = searchKeyword
-      ? place.placeName?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        place.roadAddress?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        (place.description && place.description.toLowerCase().includes(searchKeyword.toLowerCase()))
+      ? place.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        place.address.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        place.description.toLowerCase().includes(searchKeyword.toLowerCase())
       : true
+
     const matchesRegion = regionFilter ? place.region === regionFilter : true
     const matchesCategory = categoryFilter ? place.category === categoryFilter : true
 
     return matchesSearch && matchesRegion && matchesCategory
   })
 
-  // 장소 선택 핸들러
   const handlePlaceSelect = (place) => {
     setSelectedPlace(place)
   }
 
-  // 장소 상세 페이지로 이동
   const handleViewDetail = (placeId) => {
     navigate(`/places/place/${placeId}`)
   }
 
-  // 검색 핸들러
   const handleSearch = () => {
-    // 검색 로직은 이미 filteredPlaces에서 처리됨
     console.log("Searching for:", searchKeyword)
+  }
+
+  const handleResetFilters = () => {
+    setSearchKeyword("")
+    setRegionFilter("")
+    setCategoryFilter("")
   }
 
   return (
@@ -75,15 +104,12 @@ function MapViewPage() {
       <div className="map-view-background">
         <div className="container-fluid py-4">
           <div className="row">
-            {/* 왼쪽 사이드바 (필터 및 장소 목록) */}
             <div className="col-md-4 col-lg-3">
               <div className="sidebar-container">
                 <div className="sidebar-header">
-                  <h4 className="sidebar-title">지도로 보기</h4>
-                  <p className="sidebar-subtitle">반려동물과 함께 갈 수 있는 장소</p>
+                  <h4 className="sidebar-title">함께 가는 지도</h4>
                 </div>
 
-                {/* 검색 및 필터 */}
                 <div className="filter-section">
                   <div className="input-group mb-3">
                     <input
@@ -106,11 +132,9 @@ function MapViewPage() {
                       onChange={(e) => setRegionFilter(e.target.value)}
                     >
                       <option value="">지역 선택</option>
-                      <option value="서울">서울</option>
-                      <option value="부산">부산</option>
-                      <option value="제주">제주</option>
-                      <option value="강원">강원</option>
-                      <option value="경주">경주</option>
+                      {cities.map((city, index) => (
+                        <option key={index} value={city}>{city}</option>
+                      ))}
                     </select>
                   </div>
 
@@ -121,16 +145,17 @@ function MapViewPage() {
                       onChange={(e) => setCategoryFilter(e.target.value)}
                     >
                       <option value="">카테고리 선택</option>
-                      <option value="여행지">여행지</option>
-                      <option value="숙박업소">숙박업소</option>
-                      <option value="카페">카페</option>
-                      <option value="식당">식당</option>
-                      <option value="의료시설">의료시설</option>
+                      {categories.map((category, index) => (
+                        <option key={index} value={category}>{category}</option>
+                      ))}
                     </select>
                   </div>
+
+                  <button className="btn btn-outline-secondary w-100 mb-3" onClick={handleResetFilters}>
+                    필터 초기화
+                  </button>
                 </div>
 
-                {/* 장소 목록 */}
                 <div className="places-list">
                   <div className="list-header">
                     <h5>검색 결과 ({filteredPlaces.length})</h5>
@@ -150,25 +175,16 @@ function MapViewPage() {
                     <div className="places-list-items">
                       {filteredPlaces.map((place) => (
                         <div
-                          key={place.placeId}
-                          className={`place-list-item ${selectedPlace?.id === place.placeId ? "active" : ""}`}
-                          onClick={() =>
-                            setSelectedPlace({
-                              id: place.placeId,
-                              lat: Number(place.latitude),
-                              lng: Number(place.longitude),
-                              name: place.placeName,
-                              address: place.roadAddress,
-                              category: place.industrySub,
-                            })
-                          }
+                          key={place.id}
+                          className={`place-list-item ${selectedPlace?.id === place.id ? "active" : ""}`}
+                          onClick={() => handlePlaceSelect(place)}
                         >
-                          <h5 className="place-name">{place.placeName || "이름 없음"}</h5>
+                          <h5 className="place-name">{place.name || "이름 없음"}</h5>
                           <p className="place-address">
                             <i className="bi bi-geo-alt me-1"></i>
-                            {place.roadAddress || "주소 없음"}
+                            {place.address || "주소 없음"}
                           </p>
-                          {place.industrySub && <span className="place-category">{place.industrySub}</span>}
+                          <span className="place-category">{place.category}</span>
                         </div>
                       ))}
                     </div>
@@ -177,7 +193,6 @@ function MapViewPage() {
               </div>
             </div>
 
-            {/* 오른쪽 지도 영역 */}
             <div className="col-md-8 col-lg-9">
               <div className="map-container">
                 {loading ? (
@@ -190,25 +205,23 @@ function MapViewPage() {
                 ) : (
                   <KakaoMap
                     readOnly={false}
-                    initialLocation={null} // 초기 위치를 null로 설정하여 컴포넌트가 자동으로 찾도록 함
+                    initialLocation={null}
                     markerPositions={filteredPlaces.map((place) => ({
-                      id: place.placeId,
-                      lat: Number(place.latitude),
-                      lng: Number(place.longitude),
-                      name: place.placeName,
-                      address: place.roadAddress,
-                      category: place.industrySub,
+                      id: place.id,
+                      lat: place.lat,
+                      lng: place.lng,
+                      name: place.name,
+                      address: place.address,
+                      category: place.category,
                     }))}
                     selectedPlace={selectedPlace}
                     height="calc(100vh - 150px)"
                     showSearchBar={false}
                     defaultLevel={selectedPlace ? 3 : 7}
-                    showInfoCard={true} // 지도 위에 정보 카드 표시
+                    showInfoCard={true}
                   />
                 )}
               </div>
-
-              {/* 선택된 장소 정보 카드 제거 - 지도 아래 카드 삭제 */}
             </div>
           </div>
         </div>
@@ -219,4 +232,4 @@ function MapViewPage() {
   )
 }
 
-export default MapViewPage
+export default MapViewPage;

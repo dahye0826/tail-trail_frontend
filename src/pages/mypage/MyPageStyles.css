@@ -1,349 +1,865 @@
 :root {
-    --primary-color: #4ecdc4;
-    --secondary-color: #a5e1e9;
-    --accent-color: #2a9d8f;
-    --text-color: #2c3e50;
-    --light-bg: #f0f9fa;
-    --border-color: #d1eeef;
-  }
-  
-  .mypage-background {
-    background-color: white;
-    padding: 1rem 0 3rem;
-    margin-bottom: -3rem;
-  }
-  
+  --primary-color: #4ecdc4;
+  --secondary-color: #a5e1e9;
+  --accent-color: #2a9d8f;
+  --text-color: #2c3e50;
+  --light-bg: #f0f9fa;
+  --border-color: #d1eeef;
+}
+
+/* 배경색 관련 스타일 수정 */
+.mypage-background {
+  background-color: white;
+  padding: 1rem 0 3rem;
+  margin-bottom: -3rem;
+}
+
+.mypage-content-container {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+  border: 1px solid var(--border-color);
+}
+
+.mypage-title {
+  color: var(--accent-color);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.mypage-subtitle {
+  color: var(--text-color);
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+/* 사이드바 스타일 수정 */
+.sidebar-container {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.sidebar-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-title {
+  color: var(--accent-color);
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-menu-item {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-menu-item:last-child {
+  border-bottom: none;
+}
+
+.sidebar-menu-link {
+  display: block;
+  padding: 1rem 1.5rem;
+  color: var(--text-color);
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.sidebar-menu-link:hover {
+  background-color: rgba(78, 205, 196, 0.1);
+  color: var(--accent-color);
+}
+
+.sidebar-menu-item.active .sidebar-menu-link {
+  background-color: rgba(78, 205, 196, 0.2);
+  color: var(--accent-color);
+  font-weight: 600;
+  border-left: 4px solid var(--accent-color);
+}
+
+/* 프로필 카드 스타일 수정 */
+.profile-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  background-color: #e8f8f7;
+  color: var(--accent-color);
+  font-size: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+/* 활동 카드 스타일 수정 */
+.activity-title {
+  color: var(--accent-color);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.activity-card {
+  display: block;
+  height: 100%;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+  text-decoration: none;
+  color: var(--text-color);
+  transition: transform 0.2s;
+}
+
+.activity-card:hover {
+  transform: translateY(-5px);
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+.activity-card-title {
+  color: var(--accent-color);
+}
+
+.activity-icon {
+  font-size: 1.5rem;
+  color: var(--accent-color);
+}
+
+/* 프로모션 배너 스타일 수정 */
+.promo-banner {
+  background-color: var(--light-bg);
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.promo-title {
+  color: var(--accent-color);
+  margin-bottom: 0.5rem;
+}
+
+/* 프로필 섹션 스타일 수정 */
+.profile-section {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.profile-section-header {
+  padding: 1rem 1.5rem;
+  background-color: white;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.profile-section-title {
+  color: var(--accent-color);
+  margin-bottom: 0;
+  font-weight: 600;
+}
+
+.profile-section-body {
+  padding: 1.5rem;
+}
+
+/* 포스트 카드 스타일 수정 */
+.post-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.post-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.post-card .card-body {
+  padding: 1.5rem;
+}
+
+.post-card .card-title {
+  color: var(--accent-color);
+  font-weight: 700;
+  font-size: 1.3rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  letter-spacing: 0.02em;
+}
+
+.post-content {
+  color: var(--text-color);
+  line-height: 1.7;
+  font-size: 1rem;
+  padding: 0.5rem 0;
+  margin-bottom: 1rem;
+  max-height: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+ 
+}
+
+.post-meta {
+  font-size: 0.9rem;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+}
+
+.post-date {
+  display: inline-flex;
+  align-items: center;
+  background-color: transparent; /* 배경색 제거 */
+  padding: 0.3rem 0;
+  border-radius: 0; /* 둥근 모서리 제거 */
+  color: var(--accent-color);
+}
+
+.post-date i {
+  margin-right: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.post-actions .btn {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.post-actions .btn:hover {
+  transform: translateY(-2px);
+}
+
+/* 방문한 장소 카드 스타일 수정 */
+.visited-place-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  transition: transform 0.2s;
+}:root {
+  --primary-color: #4ecdc4;
+  --secondary-color: #a5e1e9;
+  --accent-color: #2a9d8f;
+  --text-color: #2c3e50;
+  --light-bg: #f0f9fa;
+  --border-color: #d1eeef;
+}
+
+/* 배경색 관련 스타일 수정 */
+.mypage-background {
+  background-color: white;
+  padding: 1rem 0 3rem;
+  margin-bottom: -3rem;
+}
+
+.mypage-content-container {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+  border: 1px solid var(--border-color);
+}
+
+.mypage-title {
+  color: var(--accent-color);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.mypage-subtitle {
+  color: var(--text-color);
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+/* 사이드바 스타일 수정 */
+.sidebar-container {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.sidebar-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-title {
+  color: var(--accent-color);
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-menu-item {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-menu-item:last-child {
+  border-bottom: none;
+}
+
+.sidebar-menu-link {
+  display: block;
+  padding: 1rem 1.5rem;
+  color: var(--text-color);
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.sidebar-menu-link:hover {
+  background-color: rgba(78, 205, 196, 0.1);
+  color: var(--accent-color);
+}
+
+.sidebar-menu-item.active .sidebar-menu-link {
+  background-color: rgba(78, 205, 196, 0.2);
+  color: var(--accent-color);
+  font-weight: 600;
+  border-left: 4px solid var(--accent-color);
+}
+
+/* 프로필 카드 스타일 수정 */
+.profile-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  background-color: #e8f8f7;
+  color: var(--accent-color);
+  font-size: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+/* 활동 카드 스타일 수정 */
+.activity-title {
+  color: var(--accent-color);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.activity-card {
+  display: block;
+  height: 100%;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+  text-decoration: none;
+  color: var(--text-color);
+  transition: transform 0.2s;
+}
+
+.activity-card:hover {
+  transform: translateY(-5px);
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+.activity-card-title {
+  color: var(--accent-color);
+}
+
+.activity-icon {
+  font-size: 1.5rem;
+  color: var(--accent-color);
+}
+
+/* 프로모션 배너 스타일 수정 */
+.promo-banner {
+  background-color: var(--light-bg);
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.promo-title {
+  color: var(--accent-color);
+  margin-bottom: 0.5rem;
+}
+
+/* 프로필 섹션 스타일 수정 */
+.profile-section {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.profile-section-header {
+  padding: 1rem 1.5rem;
+  background-color: white;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.profile-section-title {
+  color: var(--accent-color);
+  margin-bottom: 0;
+  font-weight: 600;
+}
+
+.profile-section-body {
+  padding: 1.5rem;
+}
+
+/* 포스트 카드 스타일 수정 */
+.post-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.post-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.post-card .card-body {
+  padding: 1.5rem;
+}
+
+.post-card .card-title {
+  color: var(--accent-color);
+  font-weight: 700;
+  font-size: 1.3rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  letter-spacing: 0.02em;
+}
+
+.post-content {
+  color: var(--text-color);
+  line-height: 1.7;
+  font-size: 1rem;
+  padding: 0.5rem 0;
+  margin-bottom: 1rem;
+  max-height: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.post-meta {
+  font-size: 0.9rem;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+}
+
+.post-date {
+  display: inline-flex;
+  align-items: center;
+  background-color: transparent; /* 배경색 제거 */
+  padding: 0.3rem 0;
+  border-radius: 0; /* 둥근 모서리 제거 */
+  color: var(--accent-color);
+}
+
+.post-date i {
+  margin-right: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.post-actions .btn {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.post-actions .btn:hover {
+  transform: translateY(-2px);
+}
+
+/* 방문한 장소 카드 스타일 수정 */
+.visited-place-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+
+.visited-place-card:hover {
+  transform: translateY(-3px);
+}
+
+.visited-place-image {
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Form Controls */
+.form-control,
+.form-select {
+  border-color: var(--border-color);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(78, 205, 196, 0.25);
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.btn-outline-primary {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+/* 별점 등록한 장소 카드 스타일 수정 */
+.rated-place-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+  height: 100%;
+}
+
+.rated-place-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.rated-place-image {
+  height: 100%;
+  object-fit: cover;
+  min-height: 200px;
+  transition: all 0.5s ease;
+}
+
+.rated-place-card:hover .rated-place-image {
+  transform: scale(1.05);
+}
+
+.rated-place-card .card-body {
+  padding: 1.25rem;
+  height: 100%;
+  background-color: white;
+}
+
+.rated-place-card .badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  background-color: var(--primary-color);
+  margin-bottom: 0.5rem;
+  display: inline-block;
+}
+
+.rated-place-card .card-title {
+  color: var(--accent-color);
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.rated-place-card .card-text {
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.rated-place-card .comment-text {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-color);
+  background-color: rgba(78, 205, 196, 0.05);
+  padding: 0.75rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--primary-color);
+  margin: 0.5rem 0 1rem;
+  font-style: italic;
+}
+
+.rating-stars {
+  color: #ffc107;
+  font-size: 1.2rem;
+  margin-right: 0.5rem;
+  letter-spacing: -0.05em;
+}
+
+.rating-value {
+  font-weight: 700;
+  color: var(--text-color);
+  font-size: 1.1rem;
+}
+
+.rating-date {
+  font-size: 0.85rem;
+  color: #6c757d;
+  background-color: transparent; /* 배경색 제거 */
+  padding: 0.25rem 0;
+  border-radius: 0; /* 둥근 모서리 제거 */
+  display: inline-flex;
+  align-items: center;
+}
+
+.rating-date i {
+  margin-right: 0.3rem;
+  font-size: 0.8rem;
+}
+
+.col-md-5 {
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
   .mypage-content-container {
-    background-color: var(--light-bg);
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    padding: 2rem;
-    border: 1px solid var(--border-color);
-  }
-  
-  .mypage-title {
-    color: var(--accent-color);
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-  }
-  
-  .mypage-subtitle {
-    color: var(--text-color);
-    font-size: 0.95rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  /* Sidebar Styles */
-  .sidebar-container {
-    background-color: var(--light-bg);
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-    border: 1px solid var(--border-color);
-  }
-  
-  .sidebar-header {
     padding: 1.5rem;
-    border-bottom: 1px solid var(--border-color);
   }
-  
-  .sidebar-title {
-    color: var(--accent-color);
-    font-weight: 600;
-    margin-bottom: 0;
-  }
-  
-  .sidebar-menu {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .sidebar-menu-item {
-    border-bottom: 1px solid var(--border-color);
-  }
-  
-  .sidebar-menu-item:last-child {
-    border-bottom: none;
-  }
-  
-  .sidebar-menu-link {
-    display: block;
-    padding: 1rem 1.5rem;
-    color: var(--text-color);
-    text-decoration: none;
-    transition: all 0.2s;
-  }
-  
-  .sidebar-menu-link:hover {
-    background-color: rgba(78, 205, 196, 0.1);
-    color: var(--accent-color);
-  }
-  
-  .sidebar-menu-item.active .sidebar-menu-link {
-    background-color: rgba(78, 205, 196, 0.2);
-    color: var(--accent-color);
-    font-weight: 600;
-    border-left: 4px solid var(--accent-color);
-  }
-  
-  /* Profile Card Styles */
-  .profile-card {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    padding: 1.5rem;
-    border: 1px solid var(--border-color);
-  }
-  
+
   .profile-avatar {
-    width: 100px;
-    height: 100px;
-    background-color: #e8f8f7;
-    color: var(--accent-color);
-    font-size: 2.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    margin: 0 auto;
+    width: 80px;
+    height: 80px;
+    font-size: 2rem;
   }
-  
-  /* Activity Cards */
-  .activity-title {
-    color: var(--accent-color);
-    font-weight: 600;
-    margin-bottom: 1rem;
-  }
-  
-  .activity-card {
-    display: block;
-    height: 100%;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    border: 1px solid var(--border-color);
-    text-decoration: none;
-    color: var(--text-color);
-    transition: transform 0.2s;
-  }
-  
-  .activity-card:hover {
-    transform: translateY(-5px);
-    text-decoration: none;
-    color: var(--text-color);
-  }
-  
-  .activity-card-title {
-    color: var(--accent-color);
-  }
-  
-  .activity-icon {
-    font-size: 1.5rem;
-    color: var(--accent-color);
-  }
-  
-  /* Promo Banner */
-  .promo-banner {
-    background-color: #e8f8f7;
+}
+
+/* place-address 또는 주소 관련 클래스가 있다면 배경색 제거 */
+.place-address,
+.profile-section .address {
+  background-color: transparent;
+  border-radius: 0;
+}
+
+
+.visited-place-card:hover {
+  transform: translateY(-3px);
+}
+
+.visited-place-image {
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Form Controls */
+.form-control,
+.form-select {
+  border-color: var(--border-color);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(78, 205, 196, 0.25);
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.btn-outline-primary {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+/* 별점 등록한 장소 카드 스타일 수정 */
+.rated-place-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+  height: 100%;
+}
+
+.rated-place-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.rated-place-image {
+  height: 100%;
+  object-fit: cover;
+  min-height: 200px;
+  transition: all 0.5s ease;
+}
+
+.rated-place-card:hover .rated-place-image {
+  transform: scale(1.05);
+}
+
+.rated-place-card .card-body {
+  padding: 1.25rem;
+  height: 100%;
+  background-color: white;
+}
+
+.rated-place-card .badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  background-color: var(--primary-color);
+  margin-bottom: 0.5rem;
+  display: inline-block;
+}
+
+.rated-place-card .card-title {
+  color: var(--accent-color);
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.rated-place-card .card-text {
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.rated-place-card .comment-text {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-color);
+  background-color: rgba(78, 205, 196, 0.05);
+  padding: 0.75rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--primary-color);
+  margin: 0.5rem 0 1rem;
+  font-style: italic;
+}
+
+.rating-stars {
+  color: #ffc107;
+  font-size: 1.2rem;
+  margin-right: 0.5rem;
+  letter-spacing: -0.05em;
+}
+
+.rating-value {
+  font-weight: 700;
+  color: var(--text-color);
+  font-size: 1.1rem;
+}
+
+.rating-date {
+  font-size: 0.85rem;
+  color: #6c757d;
+  background-color: transparent; /* 배경색 제거 */
+  padding: 0.25rem 0;
+  border-radius: 0; /* 둥근 모서리 제거 */
+  display: inline-flex;
+  align-items: center;
+}
+
+.rating-date i {
+  margin-right: 0.3rem;
+  font-size: 0.8rem;
+}
+
+.col-md-5 {
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .mypage-content-container {
     padding: 1.5rem;
-    border-radius: 8px;
-    text-align: center;
   }
-  
-  .promo-title {
-    color: var(--accent-color);
-    margin-bottom: 0.5rem;
+
+  .profile-avatar {
+    width: 80px;
+    height: 80px;
+    font-size: 2rem;
   }
-  
-  /* Profile Edit Page */
-  .profile-section {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-    border: 1px solid var(--border-color);
-  }
-  
-  .profile-section-header {
-    padding: 1rem 1.5rem;
-    background-color: white;
-    border-bottom: 1px solid var(--border-color);
-  }
-  
-  .profile-section-title {
-    color: var(--accent-color);
-    margin-bottom: 0;
-    font-weight: 600;
-  }
-  
-  .profile-section-body {
-    padding: 1.5rem;
-  }
-  
-  
-  /* Visited Place Card */
-  .visited-place-card {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    border: 1px solid var(--border-color);
-    overflow: hidden;
-    transition: transform 0.2s;
-  }
-  
-  .visited-place-card:hover {
-    transform: translateY(-3px);
-  }
-  
-  .visited-place-image {
-    height: 100%;
-    object-fit: cover;
-  }
-  
-  /* Form Controls */
-  .form-control,
-  .form-select {
-    border-color: var(--border-color);
-  }
-  
-  .form-control:focus,
-  .form-select:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(78, 205, 196, 0.25);
-  }
-  
-  /* Buttons */
-  .btn-primary {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-  }
-  
-  .btn-primary:hover {
-    background-color: var(--accent-color);
-    border-color: var(--accent-color);
-  }
-  
-  .btn-outline-primary {
-    color: var(--primary-color);
-    border-color: var(--primary-color);
-  }
-  
-  .btn-outline-primary:hover {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-  }
-  
-  /* Rated Places Card - Enhanced styling */
-  .rated-place-card {
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    border: 1px solid var(--border-color);
-    overflow: hidden;
-    transition: all 0.3s ease;
-    margin-bottom: 1.5rem;
-    height: 100%;
-  }
-  
-  .rated-place-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  }
-  
-  .rated-place-image {
-    height: 100%;
-    object-fit: cover;
-    min-height: 200px;
-    transition: all 0.5s ease;
-  }
-  
-  .rated-place-card:hover .rated-place-image {
-    transform: scale(1.05);
-  }
-  
-  .rated-place-card .card-body {
-    padding: 1.25rem;
-    height: 100%;
-  }
-  
-  .rated-place-card .badge {
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 0.35rem 0.75rem;
-    background-color: var(--primary-color);
-    margin-bottom: 0.5rem;
-    display: inline-block;
-  }
-  
-  .rated-place-card .card-title {
-    color: var(--accent-color);
-    font-weight: 700;
-    font-size: 1.2rem;
-    margin-bottom: 0.5rem;
-    line-height: 1.3;
-  }
-  
-  .rated-place-card .card-text {
-    margin-bottom: 0.75rem;
-    font-size: 0.9rem;
-    color: #6c757d;
-  }
-  
-  .rated-place-card .comment-text {
-    font-size: 0.95rem;
-    line-height: 1.6;
-    color: var(--text-color);
-    background-color: rgba(78, 205, 196, 0.05);
-    padding: 0.75rem;
-    border-radius: 8px;
-    border-left: 3px solid var(--primary-color);
-    margin: 0.5rem 0 1rem;
-    font-style: italic;
-  }
-  
-  .rating-stars {
-    color: #ffc107;
-    font-size: 1.2rem;
-    margin-right: 0.5rem;
-    letter-spacing: -0.05em;
-  }
-  
-  .rating-value {
-    font-weight: 700;
-    color: var(--text-color);
-    font-size: 1.1rem;
-  }
-  
-  .rating-date {
-    font-size: 0.85rem;
-    color: #6c757d;
-    background-color: rgba(78, 205, 196, 0.1);
-    padding: 0.25rem 0.6rem;
-    border-radius: 20px;
-    display: inline-flex;
-    align-items: center;
-  }
-  
-  .rating-date i {
-    margin-right: 0.3rem;
-    font-size: 0.8rem;
-  }
-  
-  .col-md-5 {
-    overflow: hidden;
-  }
-  
-  @media (max-width: 768px) {
-    .mypage-content-container {
-      padding: 1.5rem;
-    }
-  
-    .profile-avatar {
-      width: 80px;
-      height: 80px;
-      font-size: 2rem;
-    }
-  }
-  
-  
+}
+
+/* place-address 또는 주소 관련 클래스가 있다면 배경색 제거 */
+.place-address,
+.profile-section .address {
+  background-color: transparent;
+  border-radius: 0;
+}

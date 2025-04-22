@@ -1,4 +1,4 @@
-"use client"
+
 
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
@@ -82,10 +82,10 @@ function PostListPage() {
   }
 
   const handleWriteClick = () => {
-    if (!isLoggedIn) {
-      alert("글을 작성하려면 로그인이 필요합니다.")
-      return
-    }
+    // if (!isLoggedIn) {
+    //   alert("글을 작성하려면 로그인이 필요합니다.")
+    //   return
+    // }
     navigate("/community/write")
   }
 

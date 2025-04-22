@@ -10,10 +10,11 @@ import SignupPage from "./pages/auth/SignupPage"
 import MyPage from "./pages/mypage/MyPage"
 import MyPostsPage from "./pages/mypage/MyPostsPage"
 import ProfileEditPage from "./pages/mypage/ProfileEditPage"
-import RatedPlacesPage from "./pages/mypage/RatedPlacesPage"
 import HomePage from "./pages/home/HomePage"
 import MapViewPage from "./pages/map/MapViewPage"
 import CommentSection from "./pages/community/CommentSection"
+import ReviewModal from "./pages/Review/ReviewModal"
+
 
 
 
@@ -32,10 +33,12 @@ function AppRouter() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/mypage/posts" element={<MyPostsPage />} />
-        <Route path="/mypage/rated" element={<RatedPlacesPage />} />
         <Route path="/mypage/edit-profile" element={<ProfileEditPage />} />
         <Route path="/map" element={<MapViewPage />} />
         <Route path="/community/post/:id" element={<CommentSection />} />
+        <Route path="/review" element={<ReviewModal />} />
+        
+        
 
         
         

@@ -1,223 +1,435 @@
+/* PlaceListPage.css */
+
 :root {
-  --primary-color: #4ecdc4;
-  --secondary-color: #a5e1e9;
-  --accent-color: #2a9d8f;
+  --primary-color: #4ecdc4; /* 민트색 - 원래 사용하던 색상 */
+  --secondary-color: #a5e1e9; /* 하늘색 */
+  --accent-color: #2a9d8f; /* 진한 민트색 */
   --text-color: #2c3e50;
   --light-bg: #f0f9fa;
   --border-color: #d1eeef;
 }
 
-body {
-  background-color: white;
-}
-
-/* Change the places-background to white */
 .places-background {
-  background-color: white;
-  padding: 1rem 0 3rem;
-  margin-bottom: -3rem;
+  background-color: white; /* 배경은 하얀색으로 유지 */
+  padding: 30px 0;
+  min-height: 85vh;
 }
 
-.container {
-  max-width: 1140px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* Change the place-list-container to light blue */
-.place-list-container {
-  background-color: var(--light-bg);
-  border-radius: 12px 12px 0 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  padding: 2rem;
-  margin-top: 2rem;
-  margin-bottom: 0;
+.places-content-wrapper {
+  background-color: var(--light-bg); /* 카드 배경을 연한 민트색으로 변경 */
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 30px;
   border: 1px solid var(--border-color);
-  border-bottom: none;
 }
 
-/* Change the place-header to light blue */
-.place-header {
-  text-align: center;
-  background-color: var(--light-bg);
-  padding: 2rem;
-  border-radius: 8px 8px 0 0;
-  margin-bottom: 0;
-  border: 1px solid var(--border-color);
-  border-bottom: none;
-}
-
+/* 장소 헤더 스타일 개선 - 언더바와 색상 제거하고 심플하게 수정 */
 .place-header h2 {
-  color: var(--accent-color);
-  font-weight: 700;
-  letter-spacing: 1px;
+  color: var(--accent-color); /* 원래 색상으로 복원 */
+  font-weight: 600; /* 약간 더 가벼운 폰트 무게 */
   margin-bottom: 1rem;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 0;
 }
 
-.place-header .subtitle {
-  color: var(--text-color);
-  font-size: 0.95rem;
-  margin-bottom: 0;
+/* 언더바 제거 */
+.place-header h2:after {
+  content: none; /* 언더바 제거 */
 }
 
-.place-header p {
-  color: var(--text-color);
-  font-size: 1.1rem;
+/* 부제목도 심플하게 */
+.subtitle {
+  color: #6c757d;
+  font-size: 1rem;
+  font-weight: 400;
 }
 
-.place-header .subtitle {
-  color: #888;
-  font-size: 0.95rem;
-  font-style: italic;
-}
-
-/* Change the filter-container to light blue */
+/* 필터 컨테이너 스타일 개선 */
 .filter-container {
-  margin-bottom: 0;
-  padding: 1rem;
-  background-color: var(--light-bg);
-  border-radius: 0 0 8px 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  border: 1px solid var(--border-color);
-  border-top: none;
-}
-
-.filter-container .form-select,
-.filter-container .form-control {
-  border-color: var(--border-color);
-}
-
-.filter-container .form-select:focus,
-.filter-container .form-control:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 0.2rem rgba(78, 205, 196, 0.25);
-}
-
-.place-card {
-  transition: all 0.3s ease;
+  background-color: white;
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  overflow: hidden;
-  cursor: pointer;
-  background-color: white;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
 }
 
-.place-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+.filter-container:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
-.place-card .card-img-top {
-  height: 200px;
-  object-fit: cover;
+.form-select,
+.form-control {
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  transition: all 0.2s ease;
 }
 
-.place-card .card-title {
-  color: var(--text-color);
-  font-weight: 600;
-}
-
-.place-card .location {
-  font-size: 0.9rem;
-  color: #6c757d;
-}
-
-.place-card .rating {
-  font-size: 0.9rem;
-}
-
-.place-card .badges {
-  margin-top: 0.5rem;
-}
-
-.place-card .badge {
-  font-size: 0.75rem;
-  font-weight: 500;
-  padding: 0.35rem 0.65rem;
-  margin-right: 0.3rem;
-  margin-bottom: 0.3rem;
-  border-radius: 20px;
-}
-
-.place-card .badge.bg-secondary {
-  background-color: var(--accent-color) !important;
-  color: white;
-  border: none;
-}
-
-.place-card .badge:not(.bg-secondary) {
-  background-color: var(--light-bg);
-  color: var(--accent-color);
-  border: 1px solid var(--border-color);
+.form-select:focus,
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(78, 205, 196, 0.25);
 }
 
 .btn-primary {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
+  border-radius: 4px;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
   background-color: var(--accent-color);
   border-color: var(--accent-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(42, 157, 143, 0.3);
 }
 
-/* Change the pagination-container to light blue */
-.pagination-container {
+.btn-outline-secondary {
+  color: var(--text-color);
+  border-color: #dee2e6;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #f8f9fa;
+  color: var(--accent-color);
+  border-color: var(--border-color);
+}
+
+/* 카드 디자인 개선 */
+.place-card {
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  position: relative;
+}
+
+.place-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  border-color: var(--primary-color);
+}
+
+.place-card:hover .card-img-top {
+  transform: scale(1.08);
+}
+
+.card-img-container {
+  overflow: hidden;
+  position: relative;
+  height: 180px;
+}
+
+.card-img-top {
+  transition: transform 0.5s ease;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+/* 하트 버튼 스타일 수정 - 더 잘 보이도록 */
+.btn-favorite {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 4px;
+  width: 36px;
+  height: 36px;
   display: flex;
+  align-items: center;
   justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.btn-favorite:hover {
+  background-color: rgba(255, 255, 255, 1);
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.btn-favorite i {
+  font-size: 1.2rem;
+  color: #ff6b6b;
+  transition: transform 0.2s ease;
+}
+
+.btn-favorite:hover i {
+  transform: scale(1.1);
+}
+
+.btn-favorite i.bi-heart {
+  color: #6c757d;
+}
+
+.btn-favorite:hover i.bi-heart {
+  color: #ff6b6b;
+}
+
+/* 카테고리 배지 스타일 개선 */
+.badge {
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 카드 내용 스타일 개선 */
+.card-body {
   padding: 1rem;
-  background-color: var(--light-bg);
-  border-radius: 0 0 8px 8px;
-  border: 1px solid var(--border-color);
-  border-top: none;
-  margin-top: 0;
+  position: relative;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-color);
+  transition: color 0.2s ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.place-card:hover .card-title {
+  color: var(--accent-color);
+}
+
+/* 주소 스타일 개선 */
+.card-text {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+}
+
+/* 평점 스타일 개선 */
+.rating {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #ff9800;
+  display: flex;
+  align-items: center;
+}
+
+.rating i {
+  margin-right: 3px;
+  font-size: 0.9rem;
+}
+
+/* 반려견 크기 태그 스타일 개선 */
+.pet-tag {
+  display: inline-block;
+  background-color: rgba(78, 205, 196, 0.15);
+  color: var(--accent-color);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-right: 4px;
+  border: 1px solid rgba(78, 205, 196, 0.3);
+  transition: all 0.2s ease;
+}
+
+.pet-tag-active,
+.place-card:hover .pet-tag {
+  background-color: rgba(78, 205, 196, 0.3);
+  border-color: var(--primary-color);
+}
+
+/* 페이지네이션 스타일 개선 */
+.pagination {
+  margin-top: 2rem;
 }
 
 .pagination .page-link {
   color: var(--text-color);
   border-color: var(--border-color);
+  margin: 0 2px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
 }
 
 .pagination .page-item.active .page-link {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
+  color: white;
+  box-shadow: 0 2px 5px rgba(78, 205, 196, 0.3);
 }
 
 .pagination .page-link:hover {
   background-color: var(--light-bg);
   color: var(--accent-color);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* Change the admin-controls-container to light blue */
-.admin-controls-container {
-  text-align: right;
-  margin-top: 2rem;
-  padding: 1rem;
-  background-color: var(--light-bg);
+/* 부분 로딩 오버레이 스타일 개선 */
+.partial-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
   border-radius: 8px;
+  backdrop-filter: blur(2px);
+}
+
+/* 검색 요약 스타일 개선 */
+.search-summary {
+  font-size: 0.9rem;
+  color: var(--text-color);
+  background-color: white;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
   border: 1px solid var(--border-color);
+  font-weight: 500;
+}
+
+.search-summary strong {
+  color: var(--accent-color);
+  font-weight: 700;
+}
+
+/* 카테고리 배지 스타일 개선 */
+.bg-info {
+  background-color: #4ecdc4 !important;
+  color: white;
+}
+
+.bg-success {
+  background-color: #2a9d8f !important;
+  color: white;
+}
+
+.bg-warning {
+  background-color: #ff9f1c !important;
+  color: white;
+}
+
+.bg-primary {
+  background-color: #3d5a80 !important;
+  color: white;
+}
+
+.bg-secondary {
+  background-color: #6c757d !important;
+  color: white;
+}
+
+.bg-dark {
+  background-color: #7dcfcf !important; /* 문예회관 - 청록색 */
+}
+
+/* 카드 하단 정보 영역 개선 */
+.card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* 애니메이션 효과 추가 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.col {
+  animation: fadeIn 0.3s ease-out;
 }
 
 @media (max-width: 768px) {
-  .container {
-    padding: 1rem;
+  .places-content-wrapper {
+    padding: 15px;
+  }
+
+  .filter-container {
+    position: sticky;
+    top: 56px;
+    z-index: 10;
+    padding: 15px;
+    margin-bottom: 15px;
   }
 
   .place-header h2 {
     font-size: 1.5rem;
   }
 
-  .place-header p {
-    font-size: 0.9rem;
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .pet-tag {
+    margin-bottom: 5px;
   }
 }
 
-/* Add a container to group all elements */
-.places-content-wrapper {
-  background-color: var(--light-bg);
-  border-radius: 12px;
-  border: 1px solid var(--border-color);
-  margin-bottom: 2rem;
-  overflow: hidden;
+@media (max-width: 576px) {
+  .col-md-3,
+  .col-md-2 {
+    margin-bottom: 10px;
+  }
 }
 
+.place-list-container {
+  animation: fadeIn 0.5s ease;
+  background-color: white; /* 리스트 컨테이너 배경은 하얀색으로 */
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+/* 로딩 스피너 스타일 개선 */
+.spinner-border {
+  color: var(--primary-color);
+  width: 3rem;
+  height: 3rem;
+}
+
+/* 검색 결과 없음 메시지를 위한 새로운 심플한 스타일 추가 */
+.no-results-message {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+  font-size: 1rem;
+  background-color: white;
+  border: none;
+  margin: 2rem 0;
+}
