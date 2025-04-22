@@ -50,7 +50,7 @@ function PostListPage() {
     setLoading(false)
   }
 
-  //페이지 변경 or 검색 상태 변경 시 자동으로 API를 요청해서 게시글을 불러오는 역할
+  //페이지 변경 또는 검색 상태 변경 시 자동으로 API를 요청해서 게시글을 불러오는 역할
   useEffect(() => {
     const fetchPosts = async () => {
       setLoading(true)
