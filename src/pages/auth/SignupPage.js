@@ -1,3 +1,4 @@
+// SignupPage.js 업데이트
 "use client"
 
 import { useState } from "react"
@@ -7,20 +8,26 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import "./AuthPages.css"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
+import { authAPI } from "../../services/api" // api.js에서 authAPI 사용
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
-    name: "",
+    userName: "",
     email: "",
     password: "",
     confirmPassword: "",
+    userPhone: "",
+    userAddress: "",
+    birthdate: "",
     petName: "",
-    petType: "",
+    type: "",
+    breed: "",
+    petAge: ""
   })
 
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
-  const [isLoggedIn, setIsLoggedIn] = useState(false) // For Navbar
+  const [isLoggedIn, setIsLoggedIn] = useState(false) 
 
   const navigate = useNavigate()
 
@@ -45,19 +52,30 @@ const SignupPage = () => {
     }
 
     try {
-      // 실제 API 호출 로직으로 대체 필요
-      // const response = await api.register(formData);
+      // authAPI를 사용하여 회원가입 API 호출
+      const response = await authAPI.signup({
+        userName: formData.userName,
+        email: formData.email,
+        password: formData.password,
+        userPhone: formData.userPhone || null,
+        userAddress: formData.userAddress || null,
+        birthdate: formData.birthdate || null,
+        petName: formData.petName || null,
+        type: formData.type || null,
+        breed: formData.breed || null,
+        petAge: formData.petAge ? parseInt(formData.petAge) : null
+      })
 
-      // Mock signup for demonstration
-      if (formData.name && formData.email && formData.password) {
-        // 회원가입 성공 시 처리
-        alert("회원가입이 완료되었습니다. 로그인해주세요.")
-        navigate("/login")
-      } else {
-        setError("모든 필수 항목을 입력해주세요.")
-      }
+      // 회원가입 성공
+      alert("회원가입이 완료되었습니다. 로그인해주세요.")
+      navigate("/login")
     } catch (err) {
-      setError("회원가입에 실패했습니다. 다시 시도해주세요.")
+      console.error("회원가입 오류:", err)
+      if (err.response && err.response.data) {
+        setError(err.response.data.message || "회원가입에 실패했습니다.")
+      } else {
+        setError("회원가입에 실패했습니다. 다시 시도해주세요.")
+      }
     } finally {
       setLoading(false)
     }
@@ -84,16 +102,16 @@ const SignupPage = () => {
                     <div className="row">
                       <div className="col-md-6">
                         <div className="mb-3">
-                          <label htmlFor="name" className="form-label">
+                          <label htmlFor="userName" className="form-label">
                             이름 <span className="text-danger">*</span>
                           </label>
                           <input
                             type="text"
                             className="form-control"
-                            id="name"
-                            name="name"
+                            id="userName"
+                            name="userName"
                             placeholder="이름을 입력하세요"
-                            value={formData.name}
+                            value={formData.userName}
                             onChange={handleChange}
                             required
                           />
@@ -157,6 +175,60 @@ const SignupPage = () => {
                       </div>
                     </div>
 
+                    <div className="row">
+                      <div className="col-md-6">
+                        <div className="mb-3">
+                          <label htmlFor="userPhone" className="form-label">
+                            전화번호
+                          </label>
+                          <input
+                            type="tel"
+                            className="form-control"
+                            id="userPhone"
+                            name="userPhone"
+                            placeholder="010-0000-0000"
+                            value={formData.userPhone}
+                            onChange={handleChange}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="col-md-6">
+                        <div className="mb-3">
+                          <label htmlFor="userAddress" className="form-label">
+                            주소
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="userAddress"
+                            name="userAddress"
+                            placeholder="주소를 입력하세요"
+                            value={formData.userAddress}
+                            onChange={handleChange}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="row">
+                      <div className="col-md-6">
+                        <div className="mb-3">
+                          <label htmlFor="birthdate" className="form-label">
+                            생년월일
+                          </label>
+                          <input
+                            type="date"
+                            className="form-control"
+                            id="birthdate"
+                            name="birthdate"
+                            value={formData.birthdate}
+                            onChange={handleChange}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
                     <hr className="my-4" />
                     <h5 className="mb-3 pet-info-title">반려동물 정보</h5>
 
@@ -180,14 +252,14 @@ const SignupPage = () => {
 
                       <div className="col-md-6">
                         <div className="mb-3">
-                          <label htmlFor="petType" className="form-label">
+                          <label htmlFor="type" className="form-label">
                             반려동물 종류
                           </label>
                           <select
                             className="form-select"
-                            id="petType"
-                            name="petType"
-                            value={formData.petType}
+                            id="type"
+                            name="type"
+                            value={formData.type}
                             onChange={handleChange}
                           >
                             <option value="">선택하세요</option>
@@ -195,6 +267,43 @@ const SignupPage = () => {
                             <option value="고양이">고양이</option>
                             <option value="기타">기타</option>
                           </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="row">
+                      <div className="col-md-6">
+                        <div className="mb-3">
+                          <label htmlFor="breed" className="form-label">
+                            품종
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="breed"
+                            name="breed"
+                            placeholder="품종을 입력하세요"
+                            value={formData.breed}
+                            onChange={handleChange}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="col-md-6">
+                        <div className="mb-3">
+                          <label htmlFor="petAge" className="form-label">
+                            나이
+                          </label>
+                          <input
+                            type="number"
+                            className="form-control"
+                            id="petAge"
+                            name="petAge"
+                            placeholder="나이를 입력하세요"
+                            value={formData.petAge}
+                            onChange={handleChange}
+                            min="0"
+                          />
                         </div>
                       </div>
                     </div>
@@ -227,4 +336,3 @@ const SignupPage = () => {
 }
 
 export default SignupPage
-

@@ -1,8 +1,10 @@
+// ProfileEditPage.js 완성
 "use client"
 
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { FaUser, FaDog, FaKey, FaMapMarkerAlt, FaPhoneAlt } from "react-icons/fa"
+import axios from "axios"
 import "bootstrap-icons/font/bootstrap-icons.css"
 import "bootstrap/dist/css/bootstrap.min.css"
 import "./MyPageStyles.css"
@@ -13,8 +15,8 @@ const ProfileEditPage = () => {
   const [userProfile, setUserProfile] = useState({
     name: "",
     email: "",
-    phone: "",
-    address: "",
+    userPhone: "",
+    userAddress: "",
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
@@ -28,43 +30,56 @@ const ProfileEditPage = () => {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
-  const [isLoggedIn, setIsLoggedIn] = useState(true) // For Navbar
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  
+  const navigate = useNavigate()
 
   useEffect(() => {
-    const loadProfile = async () => {
+    // 로그인 상태 확인
+    const loginStatus = localStorage.getItem("isLoggedIn") === "true"
+    setIsLoggedIn(loginStatus)
+
+    if (!loginStatus) {
+      navigate("/login")
+      return
+    }
+
+    const userId = localStorage.getItem("userId")
+    if (!userId) {
+      navigate("/login")
+      return
+    }
+
+    // 사용자 데이터 가져오기
+    const fetchUserProfile = async () => {
       try {
-        // 실제 API 호출 대신 목업 데이터 사용
-        setTimeout(() => {
-          const mockProfile = {
-            name: "김반려",
-            email: "pet@example.com",
-            phone: "010-1234-5678",
-            address: "서울시 강남구",
-            petName: "멍멍이",
-            petType: "강아지",
-            petBreed: "말티즈",
-            petAge: "3",
-          }
-
-          setUserProfile((prevState) => ({
-            ...prevState,
-            ...mockProfile,
-            currentPassword: "",
-            newPassword: "",
-            confirmPassword: "",
-          }))
-
-          setLoading(false)
-        }, 1000)
-      } catch (err) {
+        setLoading(true)
+        const response = await axios.get(`http://localhost:9000/api/users/${userId}`)
+        
+        setUserProfile({
+          name: response.data.userName || "",
+          email: response.data.email || "",
+          userPhone: response.data.userPhone || "",
+          userAddress: response.data.userAddress || "",
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+          petName: response.data.petName || "",
+          petType: response.data.type || "",
+          petBreed: response.data.breed || "",
+          petAge: response.data.petAge || "",
+        })
+        
+        setLoading(false)
+      } catch (error) {
+        console.error("사용자 프로필 로딩 오류:", error)
         setError("프로필 정보를 불러오는데 실패했습니다.")
-        console.error(err)
         setLoading(false)
       }
     }
 
-    loadProfile()
-  }, [])
+    fetchUserProfile()
+  }, [navigate])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -95,15 +110,53 @@ const ProfileEditPage = () => {
       }
     }
 
+    const userId = localStorage.getItem("userId")
+    if (!userId) {
+      setError("사용자 정보를 찾을 수 없습니다. 다시 로그인해주세요.")
+      setSubmitting(false)
+      return
+    }
+
     try {
-      // 실제 API 호출 대신 목업 응답
-      setTimeout(() => {
-        setSuccess("프로필이 성공적으로 업데이트되었습니다.")
-        setSubmitting(false)
-      }, 1000)
+      // 프로필 업데이트 요청
+      const updateData = {
+        userName: userProfile.name,
+        userPhone: userProfile.userPhone,
+        userAddress: userProfile.userAddress,
+        petName: userProfile.petName,
+        type: userProfile.petType,
+        breed: userProfile.petBreed,
+        petAge: userProfile.petAge ? parseInt(userProfile.petAge) : null
+      }
+
+      // 비밀번호 변경이 있는 경우만 비밀번호 필드 추가
+      if (userProfile.newPassword) {
+        updateData.currentPassword = userProfile.currentPassword
+        updateData.newPassword = userProfile.newPassword
+      }
+
+      const response = await axios.put(`http://localhost:9000/api/users/${userId}`, updateData)
+      
+      // 로컬 스토리지 업데이트
+      localStorage.setItem("userName", response.data.userName)
+      
+      setSuccess("프로필이 성공적으로 업데이트되었습니다.")
+      
+      // 비밀번호 필드 초기화
+      setUserProfile({
+        ...userProfile,
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: ""
+      })
     } catch (err) {
-      setError("프로필 업데이트에 실패했습니다. 다시 시도해주세요.")
-      console.error(err)
+      console.error("프로필 업데이트 오류:", err)
+      if (err.response && err.response.data) {
+        setError(err.response.data.message || "프로필 업데이트에 실패했습니다.")
+      } else {
+        setError("프로필 업데이트에 실패했습니다. 다시 시도해주세요.")
+      }
+    } finally {
       setSubmitting(false)
     }
   }
@@ -134,6 +187,12 @@ const ProfileEditPage = () => {
                   <li className="sidebar-menu-item">
                     <Link to="/mypage/rated" className="sidebar-menu-link">
                       <i className="bi bi-star me-2"></i>별점 등록한 곳
+                    </Link>
+                  </li>
+                    {/* 여기에 즐겨찾기 항목 추가 */}
+                  <li className="sidebar-menu-item">
+                    <Link to="/mypage/favorites" className="sidebar-menu-link">
+                      <i className="bi bi-bookmark-heart me-2"></i>즐겨찾기
                     </Link>
                   </li>
                   <li className="sidebar-menu-item active">
@@ -205,30 +264,30 @@ const ProfileEditPage = () => {
                           </div>
 
                           <div className="col-md-6 mb-3">
-                            <label htmlFor="phone" className="form-label">
+                            <label htmlFor="userPhone" className="form-label">
                               <FaPhoneAlt className="me-1" /> 휴대폰 번호
                             </label>
                             <input
                               type="tel"
                               className="form-control"
-                              id="phone"
-                              name="phone"
-                              value={userProfile.phone}
+                              id="userPhone"
+                              name="userPhone"
+                              value={userProfile.userPhone}
                               onChange={handleChange}
                               placeholder="010-0000-0000"
                             />
                           </div>
 
                           <div className="col-md-6 mb-3">
-                            <label htmlFor="address" className="form-label">
+                            <label htmlFor="userAddress" className="form-label">
                               <FaMapMarkerAlt className="me-1" /> 주소
                             </label>
                             <input
                               type="text"
                               className="form-control"
-                              id="address"
-                              name="address"
-                              value={userProfile.address}
+                              id="userAddress"
+                              name="userAddress"
+                              value={userProfile.userAddress}
                               onChange={handleChange}
                               placeholder="주소를 입력하세요"
                             />
@@ -392,4 +451,3 @@ const ProfileEditPage = () => {
 }
 
 export default ProfileEditPage
-

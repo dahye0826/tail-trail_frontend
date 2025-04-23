@@ -1,50 +1,122 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { FaPen, FaUser } from "react-icons/fa"
 import "bootstrap-icons/font/bootstrap-icons.css"
 import "bootstrap/dist/css/bootstrap.min.css"
 import "./MyPageStyles.css"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
+import { userAPI } from "../../services/api"  // api.js에서 userAPI 가져오기
+
 
 const MyPage = () => {
+  const navigate = useNavigate();
   const [userData, setUserData] = useState({
-    name: "",
+    userName: "",
     email: "",
+    userPhone: "",
+    userAddress: "",
+    birthdate: "",
+    profile: "",
     petName: "",
-    petType: "",
-  })
+    type: "",
+    breed: "",
+    petAge: "",
+    role: ""
+  });
 
   const [stats, setStats] = useState({
-    favorites: 0,
-    visited: 0,
     posts: 0,
-  })
+    visited_places: 0,
+    favorites: 0
+  });
 
-  const [isLoggedIn, setIsLoggedIn] = useState(true) // For Navbar
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // 실제 구현에서는 API 호출로 데이터를 가져옴
-    // 지금은 로컬 스토리지에서 가져오는 것으로 대체
-    const user = JSON.parse(localStorage.getItem("user") || "{}")
+    const fetchUserData = async () => {
+      try {
+        // 로컬 스토리지에서 사용자 정보 확인
+        const loginStatus = localStorage.getItem("isLoggedIn") === "true";
+        setIsLoggedIn(loginStatus);
+        
+        if (!loginStatus) {
+          navigate("/login");
+          return;
+        }
+        
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+          navigate("/login");
+          return;
+        }
+        
+        // API를 통해 사용자 프로필 및 통계 정보 가져오기
+        const profileResponse = await userAPI.getProfile(userId);
+        const statsResponse = await userAPI.getUserStats(userId);
+        
+        // 프로필 정보 설정
+        setUserData({
+          userName: profileResponse.data.userName || "",
+          email: profileResponse.data.email || "",
+          userPhone: profileResponse.data.userPhone || "",
+          userAddress: profileResponse.data.userAddress || "",
+          birthdate: profileResponse.data.birthdate || "",
+          profile: profileResponse.data.profile || "",
+          petName: profileResponse.data.petName || "",
+          type: profileResponse.data.type || "",
+          breed: profileResponse.data.breed || "",
+          petAge: profileResponse.data.petAge || "",
+          role: profileResponse.data.role || "user"
+        });
+        
+        // 통계 정보 설정
+        setStats({
+          posts: statsResponse.data.posts || 0,
+          visited_places: statsResponse.data.visited_places || 0,
+          favorites: statsResponse.data.favorites || 0
+        });
+        
+        setLoading(false);
+      } catch (err) {
+        console.error("데이터 가져오기 오류:", err);
+        setError("사용자 데이터를 가져오는데 실패했습니다.");
+        setLoading(false);
+        
+        // 오류 발생 시 기본 데이터로 대체 (테스트용)
+        provideMockData();
+      }
+    };
+    
+    // 테스트용 더미 데이터 함수
+    const provideMockData = () => {
+      setUserData({
+        userName: "김반려",
+        email: "pet@example.com",
+        userPhone: "010-1234-5678",
+        userAddress: "서울특별시 강남구",
+        birthdate: "1990-01-01",
+        profile: "",
+        petName: "멍멍이",
+        type: "강아지",
+        breed: "말티즈",
+        petAge: 3,
+        role: "user"
+      });
+      
+      setStats({
+        posts: 5,
+        visited_places: 8,
+        favorites: 3
+      });
+    };
 
-    // 사용자 데이터 설정 (로컬 스토리지에 없으면 기본값 사용)
-    setUserData({
-      name: user.name || "김반려",
-      email: user.email || "pet@example.com",
-      petName: user.petName || "멍멍이",
-      petType: user.petType || "강아지",
-    })
-
-    // 통계 데이터 설정 (실제로는 API에서 가져와야 함)
-    setStats({
-      favorites: 5,
-      visited: 8,
-      posts: 3,
-    })
-  }, [])
+    fetchUserData();
+  }, [navigate]);
 
   return (
     <>
@@ -71,8 +143,13 @@ const MyPage = () => {
                     </Link>
                   </li>
                   <li className="sidebar-menu-item">
-                    <Link to="/mypage/rated" className="sidebar-menu-link">
-                      <i className="bi bi-star me-2"></i>별점 등록한 곳
+                    <Link to="/mypage/visited" className="sidebar-menu-link">
+                      <i className="bi bi-star me-2"></i>방문이력관광지
+                    </Link>
+                  </li>
+                  <li className="sidebar-menu-item">
+                    <Link to="/mypage/favorites" className="sidebar-menu-link">
+                      <i className="bi bi-bookmark-heart me-2"></i>즐겨찾기
                     </Link>
                   </li>
                   <li className="sidebar-menu-item">
@@ -86,73 +163,116 @@ const MyPage = () => {
 
             <div className="col-lg-9 col-md-8">
               <div className="mypage-content-container">
-                <div className="mb-4">
-                  <h2 className="mypage-title">마이페이지</h2>
-                  <p className="mypage-subtitle">나의 활동 정보와 즐겨찾기, 방문이력을 관리하세요.</p>
-                </div>
-
-                <div className="profile-card mb-4">
-                  <div className="row">
-                    <div className="col-md-3 text-center mb-3 mb-md-0">
-                      <div className="profile-avatar">{userData.name.charAt(0)}</div>
+                {loading ? (
+                  <div className="text-center py-5">
+                    <div className="spinner-border text-primary" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                    <p className="mt-3 text-muted">사용자 정보를 불러오는 중...</p>
+                  </div>
+                ) : error ? (
+                  <div className="alert alert-danger" role="alert">
+                    {error}
+                  </div>
+                ) : (
+                  <>
+                    <div className="mb-4">
+                      <h2 className="mypage-title">마이페이지</h2>
+                      <p className="mypage-subtitle">나의 활동 정보와 즐겨찾기, 방문이력을 관리하세요.</p>
                     </div>
 
-                    <div className="col-md-9">
-                      <h4 className="mb-2">{userData.name}님</h4>
-                      <p className="text-muted mb-1">{userData.email}</p>
+                    <div className="profile-card mb-4">
+                      <div className="row">
+                        <div className="col-md-3 text-center mb-3 mb-md-0">
+                          <div className="profile-avatar">{userData.userName.charAt(0)}</div>
+                        </div>
 
-                      {userData.petName && (
-                        <p className="mb-3">
-                          <span className="badge bg-light text-dark me-2">
-                            반려동물: {userData.petName} ({userData.petType})
-                          </span>
-                        </p>
-                      )}
+                        <div className="col-md-9">
+                          <h4 className="mb-2">{userData.userName}님</h4>
+                          <p className="text-muted mb-1">{userData.email}</p>
+                          
+                          {userData.userPhone && (
+                            <p className="text-muted mb-1">
+                              <i className="bi bi-telephone me-2"></i>{userData.userPhone}
+                            </p>
+                          )}
+                          
+                          {userData.userAddress && (
+                            <p className="text-muted mb-1">
+                              <i className="bi bi-geo-alt me-2"></i>{userData.userAddress}
+                            </p>
+                          )}
 
-                      <Link to="/mypage/edit-profile" className="btn btn-outline-secondary btn-sm">
-                        <FaUser className="me-1" /> 프로필 수정
+                          {userData.petName && (
+                            <p className="mb-3">
+                              <span className="badge bg-light text-dark me-2">
+                                반려동물: {userData.petName}
+                                {userData.type && ` (${userData.type})`}
+                                {userData.breed && ` / ${userData.breed}`}
+                                {userData.petAge && ` / ${userData.petAge}살`}
+                              </span>
+                            </p>
+                          )}
+
+                          <Link to="/mypage/edit-profile" className="btn btn-outline-secondary btn-sm">
+                            <FaUser className="me-1" /> 프로필 수정
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+
+                    <h5 className="activity-title mb-3">나의 활동</h5>
+
+                    <div className="row">
+                      <div className="col-md-4 mb-3">
+                        <Link to="/mypage/posts" className="activity-card">
+                          <div className="card-body p-4">
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                              <h5 className="m-0 activity-card-title">내가 쓴 글</h5>
+                              <FaPen className="activity-icon" />
+                            </div>
+                            <h3 className="mb-2">{stats.posts}</h3>
+                            <p className="text-muted mb-0">작성한 글</p>
+                          </div>
+                        </Link>
+                      </div>
+
+                      <div className="col-md-4 mb-3">
+                        <Link to="/mypage/visited" className="activity-card">
+                          <div className="card-body p-4">
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                              <h5 className="m-0 activity-card-title">방문이력관광지</h5>
+                              <i className="bi bi-star-fill activity-icon"></i>
+                            </div>
+                            <h3 className="mb-2">{stats.visited_places}</h3>
+                            <p className="text-muted mb-0">방문한 장소</p>
+                          </div>
+                        </Link>
+                      </div>
+
+                      <div className="col-md-4 mb-3">
+                        <Link to="/mypage/favorites" className="activity-card">
+                          <div className="card-body p-4">
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                              <h5 className="m-0 activity-card-title">즐겨찾기</h5>
+                              <i className="bi bi-bookmark-heart-fill activity-icon"></i>
+                            </div>
+                            <h3 className="mb-2">{stats.favorites}</h3>
+                            <p className="text-muted mb-0">저장한 장소</p>
+                          </div>
+                        </Link>
+                      </div>
+                    </div>
+
+                    <div className="promo-banner mt-4">
+                      <h5 className="promo-title">반려동물과 함께하는 새로운 여행지를 발견해보세요!</h5>
+                      <p className="mb-3">전국의 반려동물 친화적인 장소들을 둘러보고 여행 계획을 세워보세요.</p>
+                      <Link to="/places" className="btn btn-primary">
+                        여행지 둘러보기
                       </Link>
                     </div>
-                  </div>
-                </div>
-
-                <h5 className="activity-title mb-3">나의 활동</h5>
-
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <Link to="/mypage/posts" className="activity-card">
-                      <div className="card-body p-4">
-                        <div className="d-flex justify-content-between align-items-center mb-3">
-                          <h5 className="m-0 activity-card-title">내가 쓴 글</h5>
-                          <FaPen className="activity-icon" />
-                        </div>
-                        <h3 className="mb-2">{stats.posts}</h3>
-                        <p className="text-muted mb-0">작성한 글</p>
-                      </div>
-                    </Link>
-                  </div>
-
-                  <div className="col-md-6 mb-3">
-                    <Link to="/mypage/rated" className="activity-card">
-                      <div className="card-body p-4">
-                        <div className="d-flex justify-content-between align-items-center mb-3">
-                          <h5 className="m-0 activity-card-title">별점 등록한 곳</h5>
-                          <i className="bi bi-star-fill activity-icon"></i>
-                        </div>
-                        <h3 className="mb-2">{stats.visited}</h3>
-                        <p className="text-muted mb-0">평가한 장소</p>
-                      </div>
-                    </Link>
-                  </div>
-                </div>
-
-                <div className="promo-banner mt-4">
-                  <h5 className="promo-title">반려동물과 함께하는 새로운 여행지를 발견해보세요!</h5>
-                  <p className="mb-3">전국의 반려동물 친화적인 장소들을 둘러보고 여행 계획을 세워보세요.</p>
-                  <Link to="/places" className="btn btn-primary">
-                    여행지 둘러보기
-                  </Link>
-                </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -161,8 +281,7 @@ const MyPage = () => {
 
       <Footer />
     </>
-  )
-}
+  );
+};
 
-export default MyPage
-
+export default MyPage;

@@ -1,3 +1,4 @@
+// LoginPage.js 업데이트
 "use client"
 
 import { useState } from "react"
@@ -7,13 +8,14 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import "./AuthPages.css"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
+import { authAPI } from "../../services/api" // api.js에서 authAPI 사용
 
 const LoginPage = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
-  const [isLoggedIn, setIsLoggedIn] = useState(false) // For Navbar
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   const navigate = useNavigate()
 
@@ -23,22 +25,30 @@ const LoginPage = () => {
     setLoading(true)
 
     try {
-      // 실제 API 호출 로직으로 대체 필요
-      // const response = await api.login(email, password);
+      // authAPI 사용하여 로그인 요청
+      const response = await authAPI.login(email, password)
 
-      // Mock login for demonstration
-      if (email && password) {
-        // 로그인 성공 시 토큰 저장 (실제론 API 응답에서 받은 토큰 사용)
-        localStorage.setItem("token", "mock-jwt-token")
-        localStorage.setItem("user", JSON.stringify({ email, name: "반려인" }))
+      if (response.data.success) {
+        // 로그인 성공 시 로컬 스토리지에 사용자 정보 저장
+        localStorage.setItem("isLoggedIn", "true")
+        localStorage.setItem("userId", response.data.userId)
+        localStorage.setItem("userName", response.data.userName)
+        localStorage.setItem("userEmail", response.data.email)
+        localStorage.setItem("userRole", response.data.role)
+        
+        // 사용자 프로필 정보가 있으면 저장
+        if (response.data.profile) {
+          localStorage.setItem("userProfile", response.data.profile)
+        }
 
         // 마이페이지로 리다이렉트
         navigate("/mypage")
       } else {
-        setError("이메일과 비밀번호를 입력해주세요.")
+        setError(response.data.message || "로그인에 실패했습니다.")
       }
     } catch (err) {
-      setError("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.")
+      console.error("로그인 오류:", err)
+      setError("로그인에 실패했습니다. 서버 연결을 확인해주세요.")
     } finally {
       setLoading(false)
     }
@@ -120,4 +130,3 @@ const LoginPage = () => {
 }
 
 export default LoginPage
-

@@ -10,16 +10,19 @@ import SignupPage from "./pages/auth/SignupPage"
 import MyPage from "./pages/mypage/MyPage"
 import MyPostsPage from "./pages/mypage/MyPostsPage"
 import ProfileEditPage from "./pages/mypage/ProfileEditPage"
-import RatedPlacesPage from "./pages/mypage/RatedPlacesPage"
 import HomePage from "./pages/home/HomePage"
 import MapViewPage from "./pages/map/MapViewPage"
 import CommentSection from "./pages/community/CommentSection"
+// AppRouter.js에 경로 추가
+import FavoritesPage from "./pages/mypage/FavoritesPage";
+import VisitedPlacesPage from "./pages/mypage/VisitedPlacesPage"; // 방문 이력 페이지 import
 
 
 
 function AppRouter() {
   return (
     <BrowserRouter>
+      <AuthProvider>
       <Routes>
         <Route path="/" element={<HomePage />} /> 
         <Route path="/community" element={<PostListPage />} />
@@ -32,14 +35,17 @@ function AppRouter() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/mypage/posts" element={<MyPostsPage />} />
-        <Route path="/mypage/rated" element={<RatedPlacesPage />} />
         <Route path="/mypage/edit-profile" element={<ProfileEditPage />} />
         <Route path="/map" element={<MapViewPage />} />
         <Route path="/community/post/:id" element={<CommentSection />} />
 
+        {/* // 기존 라우트 사이에 추가 */}
+        <Route path="/mypage/favorites" element={<FavoritesPage /> } />
+        <Route path="/mypage/visited" element={<VisitedPlacesPage /> } />     
         
         
       </Routes>
+      </AuthProvider>
     </BrowserRouter>
   )
 }

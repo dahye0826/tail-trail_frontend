@@ -1,45 +1,39 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import axios from "axios"
+import { commentAPI } from "../../services/api"
 import CommentItem from "./CommentItem"
 import CommentForm from "./CommentForm"
+import { useAuth } from '../../contexts/AuthContext' // 추가된 부분
 import "./CommentSection.css"
 
-function CommentSection({ postId, isLoggedIn }) {
+function CommentSection({ postId }) {
     const [comments, setComments] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
-    const currentUser = localStorage.getItem("username") || null
+    const { isLoggedIn, user } = useAuth() // AuthContext에서 가져오기
 
     // 댓글 목록 불러오기
     useEffect(() => {
-
         const fetchComments = async () => {
             try {
-                const response = await axios.get(`http://localhost:9000/api/comments/post/${postId}`)
                 setLoading(true)
+                // 중앙화된 API 사용
+                const response = await commentAPI.getComments(postId)
                 setComments(response.data)
-                console.log(response.data)
                 setError(null)
-
             } catch (err) {
                 console.error("댓글 오류", err)
-                alert("댓글 불러오기 실패")
-            }
-            finally {
+                setError("댓글을 불러오는데 실패했습니다")
+            } finally {
                 setLoading(false)
             }
         }
         fetchComments()
-
     }, [postId])
     
-    
-    const handleCommentAdded =(CommentAdded) => {
-        setComments((prevComments)=>
-            [CommentAdded, ...prevComments])
-
+    const handleCommentAdded = (commentAdded) => {
+        setComments((prevComments) => [commentAdded, ...prevComments])
     }
 
     const handleCommentUpdated = (updatedComment) => {
@@ -48,12 +42,11 @@ function CommentSection({ postId, isLoggedIn }) {
         )
     }
     
-    const handleCommentDeleted =  (deletedCommentId) => {
+    const handleCommentDeleted = (deletedCommentId) => {
         setComments((prevComments) =>
           prevComments.filter((comment) => comment.commentId !== deletedCommentId)
         )
-      }
-
+    }
 
     return (
         <div className="comment-section">
@@ -61,7 +54,12 @@ function CommentSection({ postId, isLoggedIn }) {
                 댓글 <span className="comment-count">({comments.length})</span>
             </h4>
 
-            <CommentForm postId={postId} onCommentAdded={handleCommentAdded}/>
+            <CommentForm 
+              postId={postId} 
+              onCommentAdded={handleCommentAdded} 
+              isLoggedIn={isLoggedIn}
+              currentUser={user}
+            />
 
             {loading ? (
                 <div className="text-center py-4">
@@ -71,7 +69,7 @@ function CommentSection({ postId, isLoggedIn }) {
                 </div>
             ) : error ? (
                 <div className="no-comments">
-                    <p className="text-muted text-center my-4">댓글을 불러오지 못했습니다</p>
+                    <p className="text-muted text-center my-4">{error}</p>
                 </div>
             ) : comments.length === 0 ? (
                 <div className="no-comments">
@@ -79,14 +77,15 @@ function CommentSection({ postId, isLoggedIn }) {
                 </div>
             ) : (
                 <div className="comments-list mt-4">
-            {comments.map((comment) => (
-            <CommentItem
-              key={comment.commentId}
-              comment={comment}
-              onCommentUpdated={handleCommentUpdated}
-              onCommentDeleted={handleCommentDeleted}
-            />
-          ))}
+                    {comments.map((comment) => (
+                        <CommentItem
+                            key={comment.commentId}
+                            comment={comment}
+                            onCommentUpdated={handleCommentUpdated}
+                            onCommentDeleted={handleCommentDeleted}
+                            currentUser={user}
+                        />
+                    ))}
                 </div>
             )}
         </div>
