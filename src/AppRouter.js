@@ -13,14 +13,9 @@ import ProfileEditPage from "./pages/mypage/ProfileEditPage"
 import HomePage from "./pages/home/HomePage"
 import MapViewPage from "./pages/map/MapViewPage"
 import CommentSection from "./pages/community/CommentSection"
-<<<<<<< HEAD
 // AppRouter.js에 경로 추가
 import FavoritesPage from "./pages/mypage/FavoritesPage";
 import VisitedPlacesPage from "./pages/mypage/VisitedPlacesPage"; // 방문 이력 페이지 import
-=======
-import ReviewModal from "./pages/places/ReviewModal"
-
->>>>>>> 5eb7e8411869dbb9b4a9eaae0b14fff53d8d0835
 
 
 

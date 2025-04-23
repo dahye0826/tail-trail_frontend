@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 // LoginPage.js 업데이트
 "use client"
-=======
->>>>>>> 5eb7e8411869dbb9b4a9eaae0b14fff53d8d0835
 
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
