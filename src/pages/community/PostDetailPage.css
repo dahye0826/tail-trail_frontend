@@ -12,10 +12,11 @@
   margin: 0 auto;
   background-color: white;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* 그림자 복원 */
   padding: 2rem;
   overflow: visible;
   position: relative;
+  border: none; /* 테두리 완전히 제거 */
 }
 
 .post-title {
@@ -31,6 +32,9 @@
   align-items: center;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--border-color);
+  background-color: transparent; 
+  border: none; /* 테두리 제거 */
+  box-shadow: none; /* 그림자 제거 */
 }
 
 .author-avatar {
@@ -45,7 +49,7 @@
 
 .post-date {
   font-size: 0.85rem;
-  color: #6c757d;
+  color: #000000; /* Changed from #6c757d to black */
 }
 
 .post-stats {
@@ -87,16 +91,17 @@
   color: white;
 }
 
-/* 장소 배지 스타일을 추가합니다. */
+/* Add or modify the place-badge style to have a rounded background */
 .place-badge {
   display: inline-block;
   background-color: var(--light-bg);
   color: var(--accent-color);
   padding: 0.2rem 0.5rem;
-  border-radius: 12px;
+  border-radius: 20px; /* Make it more rounded */
   font-size: 0.8rem;
   font-weight: 500;
   margin-left: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow for depth */
 }
 
 .place-badge i {
@@ -119,7 +124,7 @@
 
 /* 이미지 섹션 스타일 */
 .post-images-section {
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--border-color); /* 테두리 복원 */
   padding-top: 1.5rem;
   margin-top: 1.5rem;
 }
@@ -143,7 +148,7 @@
 .post-actions {
   margin-top: 2rem;
   padding-top: 1rem;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--border-color); /* 테두리 복원 */
   position: relative;
   clear: both;
 }
@@ -156,9 +161,10 @@
 }
 
 .post-actions .edit-btn:hover {
-  background-color:var(--secondary-color);
-  color:  white;
-  border-color:  white;
+  /* 호버 시 색상 변경 방지 */
+  background-color: white;
+  color: var(--text-color);
+  border-color: var(--border-color);
 }
 
 /* 삭제 버튼 스타일 */
@@ -169,9 +175,10 @@
 }
 
 .post-actions .delete-btn:hover {
-  background-color: #dc3545;
-  color:  white;
-  border-color:  white;
+  /* 호버 시 색상 변경 방지 */
+  background-color: white;
+  color: #dc3545;
+  border-color: #dc3545;
 }
 
 @media (max-width: 768px) {

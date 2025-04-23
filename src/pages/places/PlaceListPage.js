@@ -1,190 +1,531 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import "bootstrap-icons/font/bootstrap-icons.css"
 import "bootstrap/dist/css/bootstrap.min.css"
 import "./PlaceListPage.css"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
-import { mockPlaces } from "./mockData"
+import axios from "axios"
+
+const API_BASE_URL = "http://localhost:9000/api"
 
 function PlaceListPage() {
+  // State management
   const [places, setPlaces] = useState([])
   const [loading, setLoading] = useState(true)
-  const [isLoggedIn, setIsLoggedIn] = useState(false) // 로그인 상태 관리
+  const [partialLoading, setPartialLoading] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [regionFilter, setRegionFilter] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("")
+  const [subCategoryFilter, setSubCategoryFilter] = useState("")
+  const [petSizeFilter, setPetSizeFilter] = useState("")
+  const [petSizeDisplay, setPetSizeDisplay] = useState({})
+  const [cities, setCities] = useState([])
+  const [categories, setCategories] = useState([])
+  const [subCategories, setSubCategories] = useState([])
+  const [favorites, setFavorites] = useState([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(5)
+  const [totalResults, setTotalResults] = useState(0)
+  const [error, setError] = useState(null)
+
   const navigate = useNavigate()
   const location = useLocation()
-
-  // 페이징 관련 상태 추가
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(5) // 테스트용 총 페이지 수
   const placesPerPage = 9
 
-  useEffect(() => {
-    // Fetch places from backend
-    const fetchPlaces = async () => {
-      try {
-        setLoading(true)
-        // 실제 API 연결 시 아래 주석을 해제하세요
-        // const response = await axios.get('/api/places');
-        // setPlaces(response.data);
+  // Constants
+  const categoryMapping = useMemo(
+    () => ({
+      여행지: ["여행지"],
+      숙박업소: ["펜션", "호텔"],
+      카페: ["카페"],
+      식당: ["식당"],
+      박물관: ["박물관"],
+      문예회관: ["문예회관"],
+    }),
+    [],
+  )
 
-        // 테스트용 목업 데이터
-        setTimeout(() => {
-          setPlaces(mockPlaces)
-          setLoading(false)
-        }, 500)
+  const petSizes = useMemo(
+    () => [
+      { value: "small", label: "소형견" },
+      { value: "medium", label: "중형견" },
+      { value: "large", label: "대형견" },
+    ],
+    [],
+  )
+
+  // Initialize data and check login status
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        // Load cities and categories
+        const [citiesResponse, categoriesResponse] = await Promise.all([
+          axios.get(`${API_BASE_URL}/places/cities`),
+          axios.get(`${API_BASE_URL}/places/categories`),
+        ])
+
+        if (citiesResponse.data) setCities(citiesResponse.data)
+        if (categoriesResponse.data) setCategories(categoriesResponse.data)
+
+        // Check login status and load favorites if logged in
+        const token = localStorage.getItem("token")
+        if (token) {
+          setIsLoggedIn(true)
+          await fetchFavorites(token)
+        }
       } catch (error) {
-        console.error("Error fetching places:", error)
-        setLoading(false)
+        console.error("Error fetching initial data:", error)
       }
     }
 
-    fetchPlaces()
+    fetchInitialData()
   }, [])
 
-  const handleSearch = () => {
-    if (!searchTerm.trim() && !regionFilter && !categoryFilter) return
-
-    // 실제 구현에서는 API 호출로 대체
-    setLoading(true)
-    setTimeout(() => {
-      const filteredPlaces = mockPlaces.filter((place) => {
-        const matchesSearch = searchTerm
-          ? place.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            place.address.toLowerCase().includes(searchTerm.toLowerCase())
-          : true
-        const matchesRegion = regionFilter ? place.region === regionFilter : true
-        const matchesCategory = categoryFilter ? place.category === categoryFilter : true
-
-        return matchesSearch && matchesRegion && matchesCategory
+  // Fetch user favorites
+  const fetchFavorites = async (token) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/user/favorites`, {
+        headers: { Authorization: `Bearer ${token}` },
       })
-      setPlaces(filteredPlaces)
-      setCurrentPage(1)
-      setLoading(false)
-    }, 300)
-  }
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      handleSearch()
+      if (response.data) {
+        setFavorites(response.data.map((fav) => fav.placeId))
+      }
+    } catch (error) {
+      console.error("Error fetching favorites:", error)
     }
   }
 
-  const handlePlaceClick = (placeId) => {
-    navigate(`/places/place/${placeId}`)
-  }
+  // Update subcategories when category changes
+  useEffect(() => {
+    if (categoryFilter) {
+      setSubCategories(categoryMapping[categoryFilter] || [])
+      setSubCategoryFilter("")
+    } else {
+      setSubCategories([])
+    }
+  }, [categoryFilter, categoryMapping])
 
-  // 페이지 변경 핸들러 추가
-  const handlePageChange = (page) => {
-    if (page < 1 || page > totalPages) return
-    setCurrentPage(page)
+  // Calculate pet size categories
+  const calculatePetSizeCategories = useCallback((petSizeStr) => {
+    if (!petSizeStr) return []
 
-    // 실제 구현에서는 여기서 해당 페이지의 데이터를 불러옵니다
-    setLoading(true)
-    setTimeout(() => {
-      // 테스트용 데이터 - 페이지 번호에 따라 다른 데이터를 보여줍니다
-      const paginatedPlaces = mockPlaces.map((place) => ({
-        ...place,
-        id: place.id + (page - 1) * placesPerPage,
-        name: `${place.name} - 페이지 ${page}`,
-      }))
-      setPlaces(paginatedPlaces)
-      setLoading(false)
-    }, 500)
-  }
+    const sizes = []
+    const lowerPetSize = petSizeStr.toLowerCase()
 
-  // 현재 페이지에 표시할 장소 목록
-  const getCurrentPlaces = () => {
-    const indexOfLastPlace = currentPage * placesPerPage
-    const indexOfFirstPlace = indexOfLastPlace - placesPerPage
-    return places.slice(indexOfFirstPlace, indexOfLastPlace)
-  }
-
-  // 페이지네이션 UI를 위한 페이지 번호 배열 생성
-  const getPageNumbers = () => {
-    const pageNumbers = []
-    const maxPagesToShow = 5 // 한 번에 보여줄 페이지 번호 개수
-
-    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2))
-    let endPage = startPage + maxPagesToShow - 1
-
-    if (endPage > totalPages) {
-      endPage = totalPages
-      startPage = Math.max(1, endPage - maxPagesToShow + 1)
+    // Universal indicators
+    if (lowerPetSize.includes("모두") || lowerPetSize.includes("전체")) {
+      return ["small", "medium", "large"]
     }
 
+    // Text-based indicators
+    if (lowerPetSize.includes("소형")) sizes.push("small")
+    if (lowerPetSize.includes("중형")) sizes.push("medium")
+    if (lowerPetSize.includes("대형")) sizes.push("large")
+
+    // Weight-based parsing
+    const weightMatch = lowerPetSize.match(/(\d+)\s*kg/)
+    if (weightMatch) {
+      const weight = Number.parseInt(weightMatch[1])
+      if (weight < 10) sizes.push("small")
+      else if (weight >= 10 && weight < 25) sizes.push("medium")
+      else if (weight >= 25) sizes.push("large")
+    }
+
+    return [...new Set(sizes)]
+  }, [])
+
+  // Fetch places data with filters
+  const fetchPlaces = useCallback(async () => {
+    try {
+      setPartialLoading(true)
+
+      // Prepare filter parameters
+      const params = {
+        page: currentPage,
+        size: placesPerPage,
+        search: searchTerm || undefined,
+        city: regionFilter || undefined,
+        petSize: petSizeFilter || undefined,
+      }
+
+      // Handle category/subcategory filtering
+      if (subCategoryFilter) {
+        params.industry = subCategoryFilter
+      } else if (categoryFilter) {
+        params.industry = categoryFilter === "숙박업소" ? "펜션" : categoryFilter
+      }
+
+      const response = await axios.get(`${API_BASE_URL}/places`, { params })
+
+      if (response.data && response.data.places) {
+        setPlaces(response.data.places)
+        setTotalPages(response.data.totalPages || 1)
+        setTotalResults(response.data.totalCount || 0)
+      } else {
+        setPlaces([])
+        setTotalPages(1)
+        setTotalResults(0)
+      }
+      setError(null)
+    } catch (error) {
+      console.error("Error fetching places:", error)
+      setError(
+        error.response
+          ? `서버 오류: ${error.response.status}`
+          : error.request
+            ? "서버 응답이 없습니다. 연결을 확인해주세요."
+            : `오류: ${error.message}`,
+      )
+      setPlaces([])
+    } finally {
+      setLoading(false)
+      setPartialLoading(false)
+    }
+  }, [currentPage, searchTerm, categoryFilter, subCategoryFilter, regionFilter, petSizeFilter, placesPerPage])
+
+  useEffect(() => {
+    fetchPlaces()
+  }, [fetchPlaces])
+
+  // Process pet size information
+  useEffect(() => {
+    if (!places.length) return
+
+    const sizeDisplayMap = {}
+    places.forEach((place) => {
+      if (place.placeId) {
+        sizeDisplayMap[place.placeId] =
+          place.petSizeCategories?.length > 0 ? place.petSizeCategories : calculatePetSizeCategories(place.petSize)
+      }
+    })
+    setPetSizeDisplay(sizeDisplayMap)
+  }, [places, calculatePetSizeCategories])
+
+  // Event handlers
+  const handleSearch = () => setCurrentPage(1)
+
+  const handlePageChange = (pageNumber) => {
+    if (pageNumber < 1 || pageNumber > totalPages || pageNumber === currentPage) return
+    setCurrentPage(pageNumber)
+    window.scrollTo({
+      top: document.querySelector(".place-list-container").offsetTop - 100,
+      behavior: "smooth",
+    })
+  }
+
+  const handlePlaceClick = (placeId) => navigate(`/places/place/${placeId}`)
+
+  const handleFavoriteToggle = useCallback(
+    async (placeId, e) => {
+      e.stopPropagation()
+      if (!isLoggedIn) {
+        navigate("/login", { state: { from: location } })
+        return
+      }
+
+      try {
+        const token = localStorage.getItem("token")
+        const isFavorited = favorites.includes(placeId)
+
+        // Move updateFavorites inside the try block
+        const updateFavorites = async () => {
+          if (isFavorited) {
+            await axios.delete(`${API_BASE_URL}/user/favorites/${placeId}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            })
+            setFavorites(favorites.filter((id) => id !== placeId))
+          } else {
+            await axios.post(
+              `${API_BASE_URL}/user/favorites/${placeId}`,
+              {},
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              },
+            )
+            setFavorites([...favorites, placeId])
+          }
+        }
+
+        await updateFavorites()
+      } catch (error) {
+        console.error("Error toggling favorite:", error)
+        alert("즐겨찾기 업데이트 중 오류가 발생했습니다.")
+      }
+    },
+    [isLoggedIn, navigate, location, favorites],
+  )
+
+  const handleResetFilters = () => {
+    setRegionFilter("")
+    setCategoryFilter("")
+    setSubCategoryFilter("")
+    setPetSizeFilter("")
+    setSearchTerm("")
+    setCurrentPage(1)
+  }
+
+  // Helper rendering functions
+  const renderPetSizeTags = useCallback(
+    (placeId) => {
+      const sizes = petSizeDisplay[placeId] || []
+      if (!sizes.length) return null
+
+      return (
+        <div className="pet-sizes">
+          {sizes.includes("small") && (
+            <span className={`pet-tag ${petSizeFilter === "small" ? "pet-tag-active" : ""}`}>소형견</span>
+          )}
+          {sizes.includes("medium") && (
+            <span className={`pet-tag ${petSizeFilter === "medium" ? "pet-tag-active" : ""}`}>중형견</span>
+          )}
+          {sizes.includes("large") && (
+            <span className={`pet-tag ${petSizeFilter === "large" ? "pet-tag-active" : ""}`}>대형견</span>
+          )}
+        </div>
+      )
+    },
+    [petSizeDisplay, petSizeFilter],
+  )
+
+  const getCategoryLabel = useCallback(
+    (place) => {
+      if (categoryFilter && !subCategoryFilter) {
+        if (categoryFilter === "숙박업소") {
+          return place.industrySub === "호텔" ? "호텔" : "펜션"
+        }
+        return categoryFilter
+      }
+
+      if (subCategoryFilter) return subCategoryFilter
+
+      return place.industrySub || place.industryMain || "기타"
+    },
+    [categoryFilter, subCategoryFilter],
+  )
+
+  const getCategoryBadgeClass = useCallback((categoryLabel) => {
+    switch (categoryLabel) {
+      case "카페":
+        return "bg-info"
+      case "식당":
+        return "bg-success"
+      case "펜션":
+        return "bg-warning"
+      case "호텔":
+        return "bg-warning text-dark"
+      case "여행지":
+        return "bg-primary"
+      case "박물관":
+        return "bg-secondary"
+      case "문예회관":
+        return "bg-dark"
+      default:
+        return "bg-primary"
+    }
+  }, [])
+
+  const renderPaginationItems = useCallback(() => {
+    const items = []
+    const maxPageButtons = 5 // Reduced from 10 for cleaner UI
+
+    let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2))
+    const endPage = Math.min(totalPages, startPage + maxPageButtons - 1)
+
+    if (endPage - startPage + 1 < maxPageButtons) {
+      startPage = Math.max(1, endPage - maxPageButtons + 1)
+    }
+
+    // First and previous buttons
+    items.push(
+      <li key="first" className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+        <button className="page-link" onClick={() => handlePageChange(1)} aria-label="First">
+          <span aria-hidden="true">&laquo;&laquo;</span>
+        </button>
+      </li>,
+      <li key="prev" className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+        <button className="page-link" onClick={() => handlePageChange(currentPage - 1)} aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </button>
+      </li>,
+    )
+
+    // Page numbers
     for (let i = startPage; i <= endPage; i++) {
-      pageNumbers.push(i)
+      items.push(
+        <li key={i} className={`page-item ${currentPage === i ? "active" : ""}`}>
+          <button className="page-link" onClick={() => handlePageChange(i)}>
+            {i}
+          </button>
+        </li>,
+      )
     }
 
-    return pageNumbers
-  }
+    // Next and last buttons
+    items.push(
+      <li key="next" className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+        <button className="page-link" onClick={() => handlePageChange(currentPage + 1)} aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </button>
+      </li>,
+      <li key="last" className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+        <button className="page-link" onClick={() => handlePageChange(totalPages)} aria-label="Last">
+          <span aria-hidden="true">&raquo;&raquo;</span>
+        </button>
+      </li>,
+    )
 
-  // 별점 렌더링 함수
-  const renderStars = (rating) => {
+    return items
+  }, [currentPage, totalPages, handlePageChange])
+
+  const renderPlaceCard = (place) => {
+    const categoryLabel = getCategoryLabel(place)
+    const isFavorited = favorites.includes(place.placeId)
+
+    const handleCardClick = () => {
+      handlePlaceClick(place.placeId)
+    }
+
     return (
-      <>
-        {[...Array(Math.floor(rating))].map((_, i) => (
-          <i key={i} className="bi bi-star-fill text-warning"></i>
-        ))}
-        {rating % 1 !== 0 && <i className="bi bi-star-half text-warning"></i>}
-        {[...Array(5 - Math.ceil(rating))].map((_, i) => (
-          <i key={i} className="bi bi-star text-warning"></i>
-        ))}
-      </>
+      <div className="col" key={place.placeId}>
+        <div
+          className="card h-100 place-card"
+          onClick={handleCardClick}
+          tabIndex="0"
+          onKeyPress={(e) => e.key === "Enter" && handleCardClick()}
+          aria-label={`${place.placeName} - ${place.city} ${place.district}`}
+        >
+          <div className="card-img-container">
+            <img
+              src={place.placeImage || "/assets/default-pet-place.jpg"}
+              className="card-img-top"
+              alt={place.placeName}
+            />
+            {isLoggedIn && (
+              <button
+                className="btn-favorite"
+                onClick={(e) => handleFavoriteToggle(place.placeId, e)}
+                aria-label={isFavorited ? "즐겨찾기 삭제" : "즐겨찾기 추가"}
+              >
+                <i className={`bi ${isFavorited ? "bi-heart-fill" : "bi-heart"}`}></i>
+              </button>
+            )}
+          </div>
+          <div className="card-body">
+            <span className={`badge ${getCategoryBadgeClass(categoryLabel)}`}>{categoryLabel}</span>
+            <h5 className="card-title mt-2">{place.placeName}</h5>
+            <p className="card-text">
+              <i className="bi bi-geo-alt me-1"></i> {place.city} {place.district}
+            </p>
+            <div className="card-meta">
+              {renderPetSizeTags(place.placeId)}
+              {place.rating > 0 && (
+                <span className="rating">
+                  <i className="bi bi-star-fill"></i> {place.rating.toFixed(1)}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     )
   }
 
-  // Update the JSX structure to use the new wrapper
+  // Render main component
   return (
     <>
-      {/* 네비게이션 바 컴포넌트 */}
       <Navbar isLoggedIn={isLoggedIn} />
 
       <div className="places-background">
         <div className="container mt-4 mb-5">
           <div className="places-content-wrapper">
+            {/* Header */}
             <div className="place-header text-center">
               <h2 className="mb-4">반려동물과 함께하는 장소</h2>
               <p className="subtitle mb-5">반려동물과 함께 방문할 수 있는 다양한 장소를 찾아보세요.</p>
             </div>
 
-            {/* 필터 및 검색 */}
-            <div className="filter-container">
+            {/* Filters and search */}
+            <div className="filter-container p-3 mb-4 rounded shadow-sm">
               <div className="row g-3">
                 <div className="col-md-3">
                   <select
                     className="form-select"
                     value={regionFilter}
-                    onChange={(e) => setRegionFilter(e.target.value)}
+                    onChange={(e) => {
+                      setRegionFilter(e.target.value)
+                      setCurrentPage(1)
+                    }}
+                    aria-label="지역 선택"
                   >
                     <option value="">지역 선택</option>
-                    <option value="서울">서울</option>
-                    <option value="부산">부산</option>
-                    <option value="제주">제주</option>
-                    <option value="강원">강원</option>
-                    <option value="경주">경주</option>
+                    {cities.map((city, index) => (
+                      <option key={index} value={city}>
+                        {city}
+                      </option>
+                    ))}
                   </select>
                 </div>
-                <div className="col-md-3">
+                <div className="col-md-2">
                   <select
                     className="form-select"
                     value={categoryFilter}
-                    onChange={(e) => setCategoryFilter(e.target.value)}
+                    onChange={(e) => {
+                      setCategoryFilter(e.target.value)
+                      setCurrentPage(1)
+                    }}
+                    aria-label="카테고리 선택"
                   >
                     <option value="">카테고리 선택</option>
-                    <option value="여행지">여행지</option>
-                    <option value="숙박업소">숙박업소</option>
-                    <option value="카페">카페</option>
-                    <option value="식당">식당</option>
+                    {Object.keys(categoryMapping).map((category, index) => (
+                      <option key={index} value={category}>
+                        {category}
+                      </option>
+                    ))}
                   </select>
                 </div>
-                <div className="col-md-6">
+                {categoryFilter === "숙박업소" && (
+                  <div className="col-md-2">
+                    <select
+                      className="form-select"
+                      value={subCategoryFilter}
+                      onChange={(e) => {
+                        setSubCategoryFilter(e.target.value)
+                        setCurrentPage(1)
+                      }}
+                      aria-label="세부 카테고리 선택"
+                    >
+                      <option value="">세부 카테고리</option>
+                      {subCategories.map((subCat, index) => (
+                        <option key={index} value={subCat}>
+                          {subCat}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                <div className="col-md-2">
+                  <select
+                    className="form-select"
+                    value={petSizeFilter}
+                    onChange={(e) => {
+                      setPetSizeFilter(e.target.value)
+                      setCurrentPage(1)
+                    }}
+                    aria-label="반려견 크기 선택"
+                  >
+                    <option value="">반려견 크기</option>
+                    {petSizes.map((size, index) => (
+                      <option key={index} value={size.value}>
+                        {size.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className={categoryFilter === "숙박업소" ? "col-md-3" : "col-md-5"}>
                   <div className="input-group">
                     <input
                       type="text"
@@ -192,120 +533,88 @@ function PlaceListPage() {
                       placeholder="장소 검색..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      onKeyDown={handleKeyDown}
+                      onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                      aria-label="장소 검색"
                     />
-                    <button className="btn btn-primary" type="button" onClick={handleSearch}>
+                    <button className="btn btn-primary" type="button" onClick={handleSearch} aria-label="검색">
                       <i className="bi bi-search"></i>
                     </button>
                   </div>
                 </div>
               </div>
+
+              {/* Filter control buttons */}
+              <div className="d-flex justify-content-between mt-3">
+                <div>
+                  <button
+                    className="btn btn-outline-secondary btn-sm me-2"
+                    onClick={handleResetFilters}
+                    aria-label="필터 초기화"
+                  >
+                    <i className="bi bi-x-circle me-1"></i> 필터 초기화
+                  </button>
+                </div>
+              </div>
             </div>
 
-            {/* 장소 목록 */}
+            {/* Search results summary */}
+            {!loading && places && (
+              <div className="search-summary mb-3">
+                <p className="m-0">
+                  <strong>{totalResults}</strong>개의 장소를 찾았습니다
+                  {regionFilter && ` - ${regionFilter}`}
+                  {categoryFilter && ` - ${categoryFilter}`}
+                  {subCategoryFilter && ` - ${subCategoryFilter}`}
+                  {petSizeFilter && ` - ${petSizes.find((s) => s.value === petSizeFilter)?.label}`}
+                  {searchTerm && ` - "${searchTerm}" 검색결과`}
+                </p>
+              </div>
+            )}
+
+            {/* Place list */}
             <div className="place-list-container">
               {loading ? (
                 <div className="text-center py-5">
-                  <div className="spinner-border text-primary" role="status">
+                  <div className="spinner-border" role="status">
                     <span className="visually-hidden">Loading...</span>
                   </div>
                 </div>
-              ) : places.length > 0 ? (
-                <div className="row row-cols-1 row-cols-md-3 g-4">
-                  {getCurrentPlaces().map((place) => (
-                    <div key={place.id} className="col">
-                      <div className="card h-100 place-card" onClick={() => handlePlaceClick(place.id)}>
-                        <img
-                          src={place.image || "/placeholder.svg?height=200&width=300"}
-                          className="card-img-top"
-                          alt={place.name}
-                        />
-                        <div className="card-body">
-                          <div className="d-flex justify-content-between align-items-start mb-2">
-                            <h5 className="card-title">{place.name}</h5>
-                            <span className="rating">{renderStars(place.rating)}</span>
-                          </div>
-                          <p className="card-text location">
-                            <i className="bi bi-geo-alt me-1"></i>
-                            {place.address}
-                          </p>
-                          <div className="badges">
-                            <span className="badge bg-secondary me-1">{place.category}</span>
-                            {place.amenities.map((amenity, index) => (
-                              <span key={index} className="badge">
-                                {amenity}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
+              ) : error ? (
+                <div className="alert alert-danger">
+                  <p>{error}</p>
+                  <button className="btn btn-outline-danger mt-2" onClick={fetchPlaces} aria-label="다시 시도">
+                    <i className="bi bi-arrow-clockwise me-1"></i> 다시 시도
+                  </button>
+                </div>
+              ) : places && places.length > 0 ? (
+                <div className="row row-cols-1 row-cols-md-3 g-4 position-relative">
+                  {partialLoading && (
+                    <div className="partial-loading-overlay">
+                      <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
                       </div>
                     </div>
-                  ))}
+                  )}
+                  {places.map(renderPlaceCard)}
                 </div>
               ) : (
-                <div className="text-center py-4">
-                  <p className="text-muted">검색 결과가 없습니다.</p>
-                </div>
+                <div className="no-results-message">검색 결과가 없습니다. 다른 검색어나 필터를 시도해보세요.</div>
               )}
             </div>
 
-            {/* 페이지네이션 */}
-            {places.length > 0 && (
-              <div className="pagination-container">
-                <nav aria-label="Page navigation">
-                  <ul className="pagination">
-                    <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                      <button className="page-link" onClick={() => handlePageChange(1)} aria-label="First">
-                        <i className="bi bi-chevron-double-left"></i>
-                      </button>
-                    </li>
-                    <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                      <button
-                        className="page-link"
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        aria-label="Previous"
-                      >
-                        <i className="bi bi-chevron-left"></i>
-                      </button>
-                    </li>
-
-                    {getPageNumbers().map((number) => (
-                      <li key={number} className={`page-item ${currentPage === number ? "active" : ""}`}>
-                        <button className="page-link" onClick={() => handlePageChange(number)}>
-                          {number}
-                        </button>
-                      </li>
-                    ))}
-
-                    <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                      <button className="page-link" onClick={() => handlePageChange(currentPage + 1)} aria-label="Next">
-                        <i className="bi bi-chevron-right"></i>
-                      </button>
-                    </li>
-                    <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                      <button className="page-link" onClick={() => handlePageChange(totalPages)} aria-label="Last">
-                        <i className="bi bi-chevron-double-right"></i>
-                      </button>
-                    </li>
-                  </ul>
-                </nav>
-              </div>
+            {/* Pagination */}
+            {!loading && places && places.length > 0 && (
+              <nav aria-label="Page navigation" className="mt-4">
+                <ul className="pagination justify-content-center">{renderPaginationItems()}</ul>
+              </nav>
             )}
-          </div>
-
-          <div className="admin-controls-container">
-            <button className="btn btn-outline-secondary me-2" onClick={() => setIsLoggedIn(!isLoggedIn)}>
-              테스트: {isLoggedIn ? "로그아웃 상태로 변경" : "로그인 상태로 변경"}
-            </button>
           </div>
         </div>
       </div>
 
-      {/* 푸터 컴포넌트 */}
       <Footer />
     </>
   )
 }
 
 export default PlaceListPage
-

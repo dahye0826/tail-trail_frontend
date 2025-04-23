@@ -1,0 +1,63 @@
+.review-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.review-modal {
+  background-color: white;
+  border-radius: 16px;
+  padding: 2rem;
+  width: 600px;
+  max-width: 90%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.btn-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--text-color);
+  opacity: 0.6;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.btn-close:hover {
+  opacity: 1;
+}
+
+.review-modal .modal-title {
+  color: var(--accent-color);
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+.review-modal .stars i {
+  cursor: pointer;
+}
+
+.review-modal .form-control {
+  border: 1px solid var(--border-color);
+  background-color: var(--light-bg);
+  resize: none;
+  color: var(--text-color);
+}
+
+.review-modal .btn-primary {
+  background-color: var(--primary-color);
+  border: none;
+  font-weight: 600;
+}
+
+.review-modal .btn-primary:hover {
+  background-color: var(--accent-color);
+}

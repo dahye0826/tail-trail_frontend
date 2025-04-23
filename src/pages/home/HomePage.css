@@ -1,546 +1,547 @@
 :root {
-  --primary-color: #4ecdc4;
-  --secondary-color: #a5e1e9;
-  --accent-color: #2a9d8f;
-  --text-color: #2c3e50;
-  --light-bg: #f0f9fa;
-  --border-color: #d1eeef;
-}
-
-/* 둥근 배너 스타일 */
-.rounded-banner {
-  width: 100%;
-  margin-bottom: 2rem;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-}
-
-.banner-carousel {
-  border-radius: 20px;
-  overflow: hidden;
-}
-
-/* 배너 이미지 크기 키우기 */
-.banner-image {
-  position: relative;
-  width: 100%;
-  height: 500px; /* 350px에서 500px로 증가 */
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-}
-
-/* lawon 이미지 특별 스타일 */
-.lawon-image {
-  background-position: center center;
-}
-
-/* ddomi 이미지 특별 스타일 - 얼굴이 보이도록 위치 조정 */
-.ddomi-image {
-  background-position: center 30%;
-}
-
-/* 고양이 이미지 특별 스타일 */
-.cat-image {
-  background-position: center center;
-}
-
-.banner-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(to right, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.1) 100%);
-}
-
-.banner-content {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-160%);
-  left: 10%;
-  z-index: 2;
-  color: white;
-}
-
-/* 배너 콘텐츠 크기도 키우기 */
-.banner-content h1 {
-  font-size: 2.8rem; /* 3.5rem에서 4.5rem으로 증가 */
-  margin-bottom: 1rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-  font-family: "TmoneyRoundWindExtraBold", sans-serif; /* 폰트 추가 */
-}
-
-.banner-content p {
-  font-size: 1.5rem; /* 1.5rem에서 2rem으로 증가 */
-  margin-bottom: 0;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-  font-family: "TmoneyRoundWindExtraBold", sans-serif; /* 폰트 추가 */
-}
-
-/* 서비스 소개 섹션 */
-.section-title {
-  color: var(--accent-color);
-  position: relative;
-  display: inline-block;
-  margin-bottom: 1rem;
-}
-
-.section-title::after {
-  content: "";
-  position: absolute;
-  bottom: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 50px;
-  height: 3px;
-  background-color: var(--primary-color);
-  border-radius: 3px;
-}
-
-/* 지도 섹션 */
-.map-section {
-  background: white;
-  padding: 3rem 0;
-  box-shadow: inset 0 5px 10px rgba(0, 0, 0, 0.03);
-}
-
-.map-image-container {
-  position: relative;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-  border: 5px solid white;
-}
-
-/* 지도 위에 버튼을 위한 스타일 */
-.map-image-container .position-absolute .btn-primary {
-  background-color: rgba(78, 205, 196, 0.9);
-  border-color: transparent;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
-}
-
-.map-image-container .position-absolute .btn-primary:hover {
-  background-color: var(--accent-color);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-}
-
-/* 지도 확장 아이콘 버튼 스타일 */
-.map-image-container .position-absolute .btn-light {
-  background-color: rgba(255, 255, 255, 0.9);
-  border: none;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
-}
-
-.map-image-container .position-absolute .btn-light:hover {
-  background-color: white;
-  transform: scale(1.1);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.map-image-container .position-absolute .btn-light i {
-  color: var(--accent-color);
-}
-
-/* 지도 아이콘 링크 스타일 추가 */
-.map-icon-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-color);
-  text-decoration: none;
-  transition: all 0.3s ease;
-  background: none;
-  border: none;
-  padding: 0;
-}
-
-.map-icon-link:hover {
-  color: var(--accent-color);
-  transform: scale(1.1);
-}
-
-.map-icon-large {
-  font-size: 2.5rem;
-  color: var(--text-color);
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 50%;
-  padding: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.map-icon-link:hover .map-icon-large {
-  color: var(--accent-color);
-  background-color: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.feature-list {
-  list-style: none;
-  padding-left: 0;
-  margin-bottom: 1.5rem;
-}
-
-.feature-list li {
-  margin-bottom: 0.8rem;
-  display: flex;
-  align-items: center;
-  background-color: rgba(255, 255, 255, 0.7);
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-}
-
-.feature-list li:hover {
-  transform: translateX(5px);
-  background-color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
-}
-
-.feature-list li i {
-  color: var(--primary-color);
-  margin-right: 10px;
-  font-size: 1.2rem;
-}
-
-/* 리뷰 섹션 */
-.review-section {
-  background-color: white;
-  padding: 3rem 0;
-}
-
-.review-carousel {
-  margin: 1.5rem 0;
-}
-
-.carousel-review {
-  background-color: white;
-  border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  margin: 1rem 0;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.carousel-review:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
-}
-
-.rating {
-  color: #ffd700;
-  font-size: 20px;
-  display: flex;
-  align-items: center;
-}
-
-.rating svg {
-  margin-right: 3px;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
-}
-
-.review-title {
-  color: var(--accent-color);
-  font-weight: 600;
-  margin-bottom: 0.3rem;
-}
-
-.review-location {
-  color: #6c757d;
-  font-size: 0.9rem;
-  display: inline-block;
-  background-color: rgba(78, 205, 196, 0.1);
-  padding: 0.2rem 0.6rem;
-  border-radius: 20px;
-}
-
-.review-text {
-  font-style: italic;
-  line-height: 1.6;
-  background-color: rgba(245, 245, 245, 0.5);
-  padding: 1rem;
-  border-radius: 8px;
-  border-left: 3px solid var(--primary-color);
-}
-
-.review-author {
-  color: #6c757d;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-/* 버튼 스타일 */
-.btn-primary {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-  transition: all 0.3s ease;
-}
-
-.btn-primary:hover {
-  background-color: var(--accent-color);
-  border-color: var(--accent-color);
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(42, 157, 143, 0.3);
-}
-
-/* 간단한 아이콘 링크 스타일 추가 */
-.simple-icon-link {
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-.simple-icon-link:hover {
-  transform: scale(1.1);
-  color: var(--accent-color);
-}
-
-/* 커뮤니티 섹션 - 새로운 스타일 */
-.community-section {
-  background-color: white;
-  position: relative;
-  overflow: hidden;
-}
-
-.community-content {
-  position: relative;
-  z-index: 1;
-}
-
-.community-content .section-title::after {
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.community-features {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.feature-item {
-  display: flex;
-  align-items: center;
-  background-color: white;
-  padding: 1rem 1.5rem;
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-}
-
-.feature-item:hover {
-  transform: translateX(10px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-}
-
-.feature-icon {
-  font-size: 1.5rem;
-  color: var(--primary-color);
-  margin-right: 1rem;
-}
-
-.feature-item span {
-  font-weight: 500;
-  color: var(--text-color);
-}
-
-.community-image-container {
-  position: relative;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-  border: 5px solid white;
-}
-
-.community-image {
-  width: 100%;
-  height: auto;
-  border-radius: 12px;
-  transition: all 0.5s ease;
-}
-
-.community-image-container:hover .community-image {
-  transform: scale(1.05);
-}
-
-.floating-card {
-  position: absolute;
-  background-color: white;
-  border-radius: 10px;
-  padding: 0.75rem 1rem;
-  display: flex;
-  align-items: center;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  z-index: 2;
-}
-
-.card1 {
-  top: 20px;
-  right: 20px;
-  animation: float 3s ease-in-out infinite;
-}
-
-.card2 {
-  bottom: 20px;
-  left: 20px;
-  animation: float 3s ease-in-out infinite 1.5s;
-}
-
-.card-icon {
-  font-size: 1.2rem;
-  color: var(--primary-color);
-  margin-right: 0.5rem;
-}
-
-.card-text {
-  font-weight: 600;
-  color: var(--text-color);
-  font-size: 0.9rem;
-}
-
-@keyframes float {
-  0% {
-    transform: translateY(0px);
+    --primary-color: #4ecdc4;
+    --secondary-color: #a5e1e9;
+    --accent-color: #2a9d8f;
+    --text-color: #2c3e50;
+    --light-bg: #f0f9fa;
+    --border-color: #d1eeef;
   }
-  50% {
-    transform: translateY(-10px);
+  
+  /* 둥근 배너 스타일 */
+  .rounded-banner {
+    width: 100%;
+    margin-bottom: 2rem;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   }
-  100% {
-    transform: translateY(0px);
+  
+  .banner-carousel {
+    border-radius: 20px;
+    overflow: hidden;
   }
-}
-
-/* 반응형 스타일 */
-@media (max-width: 768px) {
+  
+  /* 배너 이미지 크기 키우기 */
   .banner-image {
-    height: 400px; /* 300px에서 400px로 증가 */
+    position: relative;
+    width: 100%;
+    height: 500px; /* 350px에서 500px로 증가 */
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
   }
-
+  
+  /* lawon 이미지 특별 스타일 */
+  .lawon-image {
+    background-position: center center;
+  }
+  
+  /* ddomi 이미지 특별 스타일 - 얼굴이 보이도록 위치 조정 */
+  .ddomi-image {
+    background-position: center 30%;
+  }
+  
+  /* 고양이 이미지 특별 스타일 */
+  .cat-image {
+    background-position: center center;
+  }
+  
+  .banner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.1) 100%);
+  }
+  
+  .banner-content {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-160%);
+    left: 10%;
+    z-index: 2;
+    color: white;
+  }
+  
+  /* 배너 콘텐츠 크기도 키우기 */
   .banner-content h1 {
-    font-size: 3.5rem; /* 2.5rem에서 3.5rem으로 증가 */
+    font-size: 2.8rem; /* 3.5rem에서 4.5rem으로 증가 */
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    font-family: "TmoneyRoundWindExtraBold", sans-serif; /* 폰트 추가 */
   }
-
+  
   .banner-content p {
-    font-size: 1.8rem; /* 1.2rem에서 1.8rem으로 증가 */
+    font-size: 1.5rem; /* 1.5rem에서 2rem으로 증가 */
+    margin-bottom: 0;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    font-family: "TmoneyRoundWindExtraBold", sans-serif; /* 폰트 추가 */
   }
-
-  .feature-item {
-    padding: 0.75rem 1rem;
+  
+  /* 서비스 소개 섹션 */
+  .section-title {
+    color: var(--accent-color);
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1rem;
   }
-
-  .floating-card {
-    padding: 0.5rem 0.75rem;
+  
+  .section-title::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 3px;
+    background-color: var(--primary-color);
+    border-radius: 3px;
   }
-
-  .card-text {
-    font-size: 0.8rem;
+  
+  /* 지도 섹션 */
+  .map-section {
+    background: white;
+    padding: 3rem 0;
+    box-shadow: inset 0 5px 10px rgba(0, 0, 0, 0.03);
   }
-}
-
-/* 커뮤니티 카드 스타일 */
-.community-card {
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-  height: 100%;
-  border: 1px solid var(--border-color);
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.community-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
-}
-
-.community-card .card-body {
-  padding: 1.5rem;
-}
-
-.community-card .card-title {
-  color: var(--accent-color);
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 0.75rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  height: 2.8rem;
-}
-
-/* 커뮤니티 카드 텍스트 색상 변경 */
-.community-card .card-text {
-  color: #6c757d; /* 회색으로 변경 */
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  height: 4.2rem;
-  font-weight: normal; /* 굵게 표시 제거 */
-}
-
-.community-card .card-meta {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.8rem;
-  color: #6c757d;
-}
-
-.more-btn {
-  padding: 0.5rem 2rem;
-  border-radius: 30px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.more-btn:hover {
-  background-color: var(--primary-color);
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
-}
-
-/* 새로운 + 버튼 스타일 추가 */
-.plus-btn {
-  font-size: 2rem;
-  color: var(--primary-color);
-  text-decoration: none;
-  transition: all 0.3s ease;
-  margin-left: 1rem;
-}
-
-.plus-btn:hover {
-  color: var(--accent-color);
-  transform: rotate(90deg);
-}
-
-/* 커뮤니티 섹션 헤더 스타일 수정 */
-.community-section .text-center {
-  text-align: left !important;
-  padding: 0 1rem;
-}
-
-/* 반응형 스타일 추가 */
-@media (max-width: 768px) {
-  .community-section .text-center {
+  
+  .map-image-container {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    border: 5px solid white;
+  }
+  
+  /* 지도 위에 버튼을 위한 스타일 */
+  .map-image-container .position-absolute .btn-primary {
+    background-color: rgba(78, 205, 196, 0.9);
+    border-color: transparent;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+  }
+  
+  .map-image-container .position-absolute .btn-primary:hover {
+    background-color: var(--accent-color);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* 지도 확장 아이콘 버튼 스타일 */
+  .map-image-container .position-absolute .btn-light {
+    background-color: rgba(255, 255, 255, 0.9);
+    border: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+  }
+  
+  .map-image-container .position-absolute .btn-light:hover {
+    background-color: white;
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .map-image-container .position-absolute .btn-light i {
+    color: var(--accent-color);
+  }
+  
+  /* 지도 아이콘 링크 스타일 추가 */
+  .map-icon-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  
+  .map-icon-link:hover {
+    color: var(--accent-color);
+    transform: scale(1.1);
+  }
+  
+  .map-icon-large {
+    font-size: 2.5rem;
+    color: var(--text-color);
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .map-icon-link:hover .map-icon-large {
+    color: var(--accent-color);
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .feature-list {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 1.5rem;
+  }
+  
+  .feature-list li {
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+  
+  .feature-list li:hover {
+    transform: translateX(5px);
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  }
+  
+  .feature-list li i {
+    color: var(--primary-color);
+    margin-right: 10px;
+    font-size: 1.2rem;
+  }
+  
+  /* 리뷰 섹션 */
+  .review-section {
+    background-color: white;
+    padding: 3rem 0;
+  }
+  
+  .review-carousel {
+    margin: 1.5rem 0;
+  }
+  
+  .carousel-review {
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    margin: 1rem 0;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  
+  .carousel-review:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+  }
+  
+  .rating {
+    color: #ffd700;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .rating svg {
+    margin-right: 3px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+  }
+  
+  .review-title {
+    color: var(--accent-color);
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+  }
+  
+  .review-location {
+    color: #6c757d;
+    font-size: 0.9rem;
+    display: inline-block;
+    background-color: rgba(78, 205, 196, 0.1);
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+  }
+  
+  .review-text {
+    font-style: italic;
+    line-height: 1.6;
+    background-color: rgba(245, 245, 245, 0.5);
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 3px solid var(--primary-color);
+  }
+  
+  .review-author {
+    color: #6c757d;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  
+  /* 버튼 스타일 */
+  .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    transition: all 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(42, 157, 143, 0.3);
+  }
+  
+  /* 간단한 아이콘 링크 스타일 추가 */
+  .simple-icon-link {
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  
+  .simple-icon-link:hover {
+    transform: scale(1.1);
+    color: var(--accent-color);
+  }
+  
+  /* 커뮤니티 섹션 - 새로운 스타일 */
+  .community-section {
+    background-color: white;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .community-content {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .community-content .section-title::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .community-features {
+    display: flex;
     flex-direction: column;
-    align-items: flex-start !important;
+    gap: 1rem;
+    margin-bottom: 2rem;
   }
-
+  
+  .feature-item {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+  
+  .feature-item:hover {
+    transform: translateX(10px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  }
+  
+  .feature-icon {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-right: 1rem;
+  }
+  
+  .feature-item span {
+    font-weight: 500;
+    color: var(--text-color);
+  }
+  
+  .community-image-container {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    border: 5px solid white;
+  }
+  
+  .community-image {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    transition: all 0.5s ease;
+  }
+  
+  .community-image-container:hover .community-image {
+    transform: scale(1.05);
+  }
+  
+  .floating-card {
+    position: absolute;
+    background-color: white;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+  }
+  
+  .card1 {
+    top: 20px;
+    right: 20px;
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  .card2 {
+    bottom: 20px;
+    left: 20px;
+    animation: float 3s ease-in-out infinite 1.5s;
+  }
+  
+  .card-icon {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    margin-right: 0.5rem;
+  }
+  
+  .card-text {
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 0.9rem;
+  }
+  
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+  
+  /* 반응형 스타일 */
+  @media (max-width: 768px) {
+    .banner-image {
+      height: 400px; /* 300px에서 400px로 증가 */
+    }
+  
+    .banner-content h1 {
+      font-size: 3.5rem; /* 2.5rem에서 3.5rem으로 증가 */
+    }
+  
+    .banner-content p {
+      font-size: 1.8rem; /* 1.2rem에서 1.8rem으로 증가 */
+    }
+  
+    .feature-item {
+      padding: 0.75rem 1rem;
+    }
+  
+    .floating-card {
+      padding: 0.5rem 0.75rem;
+    }
+  
+    .card-text {
+      font-size: 0.8rem;
+    }
+  }
+  
+  /* 커뮤니티 카드 스타일 */
+  .community-card {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    height: 100%;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    cursor: pointer;
+  }
+  
+  .community-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  }
+  
+  .community-card .card-body {
+    padding: 1.5rem;
+  }
+  
+  .community-card .card-title {
+    color: var(--accent-color);
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 2.8rem;
+  }
+  
+  /* 커뮤니티 카드 텍스트 색상 변경 */
+  .community-card .card-text {
+    color: #6c757d; /* 회색으로 변경 */
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 4.2rem;
+    font-weight: normal; /* 굵게 표시 제거 */
+  }
+  
+  .community-card .card-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #6c757d;
+  }
+  
+  .more-btn {
+    padding: 0.5rem 2rem;
+    border-radius: 30px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .more-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
+  }
+  
+  /* 새로운 + 버튼 스타일 추가 */
   .plus-btn {
-    margin-top: 1rem;
-    margin-left: 0;
+    font-size: 2rem;
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-left: 1rem;
   }
-}
+  
+  .plus-btn:hover {
+    color: var(--accent-color);
+    transform: rotate(90deg);
+  }
+  
+  /* 커뮤니티 섹션 헤더 스타일 수정 */
+  .community-section .text-center {
+    text-align: left !important;
+    padding: 0 1rem;
+  }
+  
+  /* 반응형 스타일 추가 */
+  @media (max-width: 768px) {
+    .community-section .text-center {
+      flex-direction: column;
+      align-items: flex-start !important;
+    }
+  
+    .plus-btn {
+      margin-top: 1rem;
+      margin-left: 0;
+    }
+  }
+  

@@ -13,9 +13,14 @@ import ProfileEditPage from "./pages/mypage/ProfileEditPage"
 import HomePage from "./pages/home/HomePage"
 import MapViewPage from "./pages/map/MapViewPage"
 import CommentSection from "./pages/community/CommentSection"
+<<<<<<< HEAD
 // AppRouter.js에 경로 추가
 import FavoritesPage from "./pages/mypage/FavoritesPage";
 import VisitedPlacesPage from "./pages/mypage/VisitedPlacesPage"; // 방문 이력 페이지 import
+=======
+import ReviewModal from "./pages/places/ReviewModal"
+
+>>>>>>> 5eb7e8411869dbb9b4a9eaae0b14fff53d8d0835
 
 
 
@@ -38,6 +43,9 @@ function AppRouter() {
         <Route path="/mypage/edit-profile" element={<ProfileEditPage />} />
         <Route path="/map" element={<MapViewPage />} />
         <Route path="/community/post/:id" element={<CommentSection />} />
+        <Route path="/review" element={<ReviewModal />} />
+        
+        
 
         {/* // 기존 라우트 사이에 추가 */}
         <Route path="/mypage/favorites" element={<FavoritesPage /> } />

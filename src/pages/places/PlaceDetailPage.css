@@ -1,7 +1,7 @@
 :root {
-  --primary-color: #4ecdc4;
-  --secondary-color: #a5e1e9;
-  --accent-color: #2a9d8f;
+  --primary-color: #4ecdc4; /* 민트색 - 원래 사용하던 색상 */
+  --secondary-color: #a5e1e9; /* 하늘색 */
+  --accent-color: #2a9d8f; /* 진한 민트색 */
   --text-color: #2c3e50;
   --light-bg: #f0f9fa;
   --border-color: #d1eeef;
@@ -11,39 +11,52 @@ body {
   background-color: white;
 }
 
-/* Change the places-background to white */
 .places-background {
   background-color: white;
   padding: 1rem 0 3rem;
   margin-bottom: -3rem;
 }
 
-/* Change the place-detail-container to light blue */
 .place-detail-container {
   background-color: var(--light-bg);
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   padding: 2rem;
-  margin-top: 2rem;
-  margin-bottom: 2rem;
+  margin: 2rem 0;
   border: 1px solid var(--border-color);
 }
 
+/* 모든 h3 태그에서 배경, 테두리, 패딩 제거하여 언더바 효과 없애기 */
 h3 {
-  color: var(--accent-color);
+  color: var(--text-color);
   font-weight: 600;
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  margin-bottom: 15px;
+  border: none;
 }
 
-.info-card {
-  border: none;
+.info-card,
+.review-card {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   background-color: white;
   border: 1px solid var(--border-color);
 }
 
+.review-card {
+  border-left: 4px solid var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+/* 정보 카드 제목 스타일 */
 .info-card h4 {
-  color: var(--accent-color);
+  color: var(--text-color);
+}
+
+.review-card .card-title {
+  color: var(--primary-color);
   font-size: 1.2rem;
   font-weight: 600;
 }
@@ -55,20 +68,6 @@ h3 {
 
 .info-card dd {
   margin-bottom: 0.5rem;
-}
-
-.review-card {
-  border: 1px solid var(--border-color);
-  border-left: 4px solid var(--primary-color);
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  background-color: white;
-  margin-bottom: 1rem;
-}
-
-.review-card .card-title {
-  font-weight: 600;
-  color: var(--text-color);
 }
 
 .rating-display {
@@ -89,32 +88,11 @@ h3 {
   border: 1px solid var(--border-color);
 }
 
-.map-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.map-overlay p {
-  background-color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  font-weight: 500;
-  color: var(--text-color);
-}
-
-/* Change the admin-controls-container to light blue */
 .admin-controls-container {
   text-align: right;
   margin-top: 2rem;
   padding: 1rem;
-  background-color: var(--light-bg);
+  background-color: white;
   border-radius: 8px;
   border: 1px solid var(--border-color);
 }
@@ -129,8 +107,8 @@ h3 {
 }
 
 .category-badge {
-  background-color: var(--accent-color);
-  color: white;
+  background-color: var(--secondary-color);
+  color: var(--text-color);
 }
 
 .amenity-badge {
@@ -139,15 +117,242 @@ h3 {
   border: 1px solid var(--border-color);
 }
 
-.container {
-  max-width: 1140px;
-  margin-left: auto;
-  margin-right: auto;
+/* 목록으로 돌아가기 버튼 스타일 - 커뮤니티 스타일과 일치시킴 */
+.btn-outline-secondary {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+  background-color: white;
+  font-size: 0.9rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 4px;
+  transition: all 0.2s;
 }
 
+.btn-outline-secondary:hover {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+/* 네이버/카카오 지도 버튼 스타일 */
+.nav-card .btn-success {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.nav-card .btn-success:hover {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.nav-card .btn-warning {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  color: var(--text-color);
+}
+
+.nav-card .btn-warning:hover {
+  background-color: #8fd3e8;
+  border-color: #8fd3e8;
+}
+
+/* 리뷰 작성 버튼 스타일 */
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+/* 반려견 크기 아이콘 스타일 */
+.pet-size-icons .badge {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  font-weight: 500;
+  padding: 0.35rem 0.75rem;
+}
+
+.container {
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+.post-meta {
+  background-color: white;
+  padding: 10px;
+  border-radius: 8px;
+  margin: 10px 0;
+  border: 1px solid var(--border-color);
+}
+
+/* 장소 이름 스타일 수정 */
+.place-detail-container h3.mb-1 {
+  color: var(--text-color);
+  font-weight: 700;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  margin-bottom: 0.25rem !important;
+}
+
+/* 위치 섹션 제목 스타일 통일 */
+.row h3.mb-3 {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  color: var(--text-color);
+}
+
+/* 리뷰 섹션 제목 스타일 통일 */
+.d-flex h3.mb-0 {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  color: var(--text-color);
+}
+
+/* 카카오맵 길찾기 버튼 스타일 개선 */
+.kakao-directions-top {
+  display: none;
+}
+
+.btn-kakao {
+  display: none;
+}
+
+/* 후기 없음 영역 디자인 수정 */
+.no-reviews-container {
+  background-color: white;
+  border-radius: 12px;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  border: 1px dashed var(--border-color);
+  margin-bottom: 2rem;
+}
+
+.no-reviews-icon {
+  font-size: 3rem;
+  color: var(--secondary-color);
+  margin-bottom: 1rem;
+}
+
+.no-reviews-text {
+  font-size: 1.2rem;
+  color: var(--text-color);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.no-reviews-subtext {
+  color: #6c757d;
+  font-size: 0.95rem;
+}
+
+/* 지도 컨테이너 높이 조정 */
+.map-container {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 2rem;
+}
+
+/* 리뷰 폼 카드 스타일 개선 */
+.review-form-card {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.review-form-card .card-title {
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+.rating-select {
+  cursor: pointer;
+  font-size: 1.5rem;
+}
+
+/* 섹션 제목 스타일 통일 */
+.section-title {
+  color: var(--text-color);
+  font-weight: 600;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.section-title::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--primary-color);
+}
+
+/* 주소 복사 아이콘 버튼 스타일 */
+.btn-icon-copy {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  padding: 0;
+  font-size: 0.9rem;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: all 0.2s;
+}
+
+.btn-icon-copy:hover {
+  color: var(--accent-color);
+  transform: scale(1.1);
+}
+
+/* 카카오맵 작은 길찾기 버튼 스타일 */
+.btn-kakao-small {
+  background-color: #fee500;
+  color: #000000;
+  border: none;
+  border-radius: 4px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-kakao-small:hover {
+  background-color: #f6dc00;
+  color: #000000;
+  text-decoration: none;
+}
+
+.btn-kakao-small i {
+  font-size: 0.8rem;
+  margin-right: 0.2rem;
+}
+
+/* 방문 후기 제목 스타일 */
+.review-title {
+  padding-bottom: 8px;
+}
+
+/* 위치 섹션 제목 스타일도 통일 */
+.row .section-title {
+  padding-bottom: 8px;
+}
+
+/* 모바일 대응 스타일 */
 @media (max-width: 768px) {
   .place-detail-container {
-    padding: 1rem;
+    padding: 1.5rem;
   }
 
   h3 {
@@ -161,5 +366,24 @@ h3 {
   .info-card .col-md-6:last-child h4 {
     margin-top: 1.5rem;
   }
-}
 
+  .kakao-directions-top {
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .btn-kakao {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .btn-kakao-small {
+    margin-top: 0.5rem;
+    margin-left: 0 !important;
+    display: inline-flex;
+  }
+
+  .btn-icon-copy {
+    margin-top: 0.5rem;
+  }
+}
