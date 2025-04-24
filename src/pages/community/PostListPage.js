@@ -1,4 +1,4 @@
-
+"use client"
 
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
@@ -8,9 +8,10 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import "./PostListPage.css"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
+import LoadingSpinner from "../../common/LoadingSpinner"
 
 function PostListPage() {
-  const [isLoggedIn, setIsLoggedIn] = useState(true)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState("")
@@ -20,35 +21,41 @@ function PostListPage() {
 
   const navigate = useNavigate()
 
-  const handleSearch = async () => {
-    console.log("검색 실행됨")
-    if (!searchTerm.trim()) return
+  useEffect(() => {
+    const loggedIn = localStorage.getItem("isLoggedIn") === "true"
+    setIsLoggedIn(loggedIn)
+  }, [])
 
-    try {
-      setLoading(true)
-      const response = await axios.get("http://localhost:9000/api/community", {
-        params: {
-          search: searchTerm,
-          page: currentPage - 1,
-          size: 10,
-        },
-      })
-
-      const formattedPosts = response.data.content.map((post) => ({
-        ...post,
-        createdAt: post.createdAt.split("T")[0],
-      }))
-
-      setPosts(formattedPosts)
-      setCurrentPage(1)
-      setTotalPages(response.data.totalPages)
-      setIsSearching(true) // 검색상태
-      setLoading(false)
-    } catch (error) {
-      console.error("검색오류:", error)
-    }
-    setLoading(false)
-  }
+       const handleSearch = async () => {
+        console.log("검색 실행됨")
+        if (!searchTerm.trim()) return
+      
+      
+        try {
+          setLoading(true)
+          const response = await axios.get("http://localhost:9000/api/community", {
+            params: {
+              search: searchTerm,
+              page: currentPage - 1,
+              size: 10,
+            },
+          })
+      
+          const formattedPosts = response.data.content.map((post) => ({
+            ...post,
+            createdAt: post.createdAt.split("T")[0],
+          }))
+      
+          setPosts(formattedPosts)
+          setCurrentPage(1)
+          setTotalPages(response.data.totalPages)
+          setIsSearching(true)
+          setLoading(false)
+        } catch (error) {
+          console.error("검색오류:", error)
+          setLoading(false)
+        }
+      }
 
   //페이지 변경 또는 검색 상태 변경 시 자동으로 API를 요청해서 게시글을 불러오는 역할
   useEffect(() => {
@@ -82,10 +89,10 @@ function PostListPage() {
   }
 
   const handleWriteClick = () => {
-    // if (!isLoggedIn) {
-    //   alert("글을 작성하려면 로그인이 필요합니다.")
-    //   return
-    // }
+    if (!isLoggedIn) {
+      alert("글을 작성하려면 로그인이 필요합니다.")
+      return
+    }
     navigate("/community/write")
   }
 
@@ -113,6 +120,12 @@ function PostListPage() {
       pageNumbers.push(i)
     }
     return pageNumbers
+  }
+
+  const hanleResetSearch = () => {
+    setSearchTerm("")
+    setIsSearching(false)
+    setCurrentPage(1)
   }
 
   return (
@@ -146,8 +159,11 @@ function PostListPage() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyDown={handleKeyDown}
               />
-              <button className="btn btn-primary" type="button" onClick={handleSearch}>
+              <button className="btn btn-primary search-btn" type="button" onClick={handleSearch} title="검색">
                 <i className="bi bi-search"></i>
+              </button>
+              <button className="reset-btn ms-2" type="button" onClick={hanleResetSearch} title="검색 초기화">
+                <i className="bi bi-arrow-counterclockwise me-1"></i> 초기화
               </button>
             </div>
           </div>
@@ -155,11 +171,7 @@ function PostListPage() {
 
         <div className="post-list-container">
           {loading ? (
-            <div className="text-center py-5">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
-              </div>
-            </div>
+            <LoadingSpinner text="게시글을 불러오는 중입니다..." />
           ) : posts.length > 0 ? (
             posts.map((post) => (
               <div
@@ -174,14 +186,14 @@ function PostListPage() {
 
                 <div className="d-flex justify-content-between text-muted small">
                   <div className="d-flex">
-                    <span className="me-2">{post.username} </span>
+                    <span className="me-2">{post.userName} </span>
                     <span className="me-3">{post.createdAt}</span>
-                    <span>
+                    <span className="comment-count">
                       <i className="bi bi-chat-left-text me-1"></i> {post.commentCount}
                     </span>
                   </div>
                   <div>
-                    <span>
+                    <span className="view-count">
                       <i className="bi bi-eye me-1"></i> {post.viewCount}
                     </span>
                   </div>

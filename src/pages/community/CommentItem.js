@@ -1,63 +1,62 @@
-// 파일 상단 부분만 수정
+"use client"
+
 import { useState } from "react"
-import { commentAPI } from "../../services/api"  // 경로 수정됨
-import { useAuth } from '../../contexts/AuthContext'  // AuthContext 경로도 확인
+import axios from "axios"
 import "./CommentSection.css"
 
-function CommentItem({ comment, onCommentUpdated, onCommentDeleted }) {
+function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser }) {
   const [isEditing, setIsEditing] = useState(false)
   const [editedContent, setEditedContent] = useState(comment.content)
   const [isDeleting, setIsDeleting] = useState(false)
-  const { user } = useAuth();
 
-  // 댓글 작성자인지 확인 (userId 또는 id 필드 확인)
-  const isAuthor = user && (user.id === comment.userId || user.userId === comment.userId);
+  // 댓글 작성자인지 확인
+  const isAuthor = currentUser === comment.userName
 
-  const handleUpdateComment = async() => {
+  // 댓글 수정 처리
+  const handleUpdateComment = async () => {
     if (!editedContent.trim()) {
       alert("댓글 내용을 입력해주세요.")
       return
     }
+
     try {
-      const response = await commentAPI.updateComment(comment.commentId, editedContent);
-      if (response.data && response.data.success) {
-        onCommentUpdated(response.data.data);
-        setIsEditing(false);
-      } else {
-        alert("댓글 수정에 실패했습니다.");
-      }
-    } catch (err) {
-      console.error("댓글 수정 실패:", err)
+      const response = await axios.put(`http://localhost:9000/api/comments/${comment.commentId}`, {
+        content: editedContent,
+      })
+
+      onCommentUpdated(response.data)
+      setIsEditing(false)
+    } catch (error) {
+      console.error("댓글 수정 오류:", error)
       alert("댓글 수정에 실패했습니다.")
     }
   }
-  
-  const handleCancelEdit = () => {
-    setIsEditing(false)
-    setEditedContent(comment.content)
-  }
 
-  const handleDeleteComment = async() => {
-    if(!window.confirm("정말 이 댓글을 삭제하시겠습니까?")) {
+  // 댓글 삭제 처리
+  const handleDeleteComment = async () => {
+    if (!window.confirm("정말 이 댓글을 삭제하시겠습니까?")) {
       return
     }
-    
+
     try {
       setIsDeleting(true)
-      const response = await commentAPI.deleteComment(comment.commentId);
-      if (response.data && response.data.success) {
-        onCommentDeleted(comment.commentId);
-      } else {
-        alert("댓글 삭제에 실패했습니다.");
-      }
-    } catch (err) {
-      console.error("댓글 삭제 오류:", err)
+      await axios.delete(`http://localhost:9000/api/comments/${comment.commentid}`)
+      onCommentDeleted(comment.id)
+    } catch (error) {
+      console.error("댓글 삭제 오류:", error)
       alert("댓글 삭제에 실패했습니다.")
     } finally {
       setIsDeleting(false)
     }
   }
-  
+
+  // 수정 취소
+  const handleCancelEdit = () => {
+    setIsEditing(false)
+    setEditedContent(comment.content)
+  }
+
+  // 날짜 포맷팅
   const formatDate = (dateString) => {
     const date = new Date(dateString)
     return date.toLocaleDateString("ko-KR", {
@@ -69,6 +68,38 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted }) {
     })
   }
 
+  // 멘션 형식 처리 (@userName)
+  const formatMentions = (text) => {
+    // @userName 패턴을 찾아 하이라이트
+    const mentionRegex = /@(\w+)/g
+    const parts = []
+    let lastIndex = 0
+    let match
+
+    while ((match = mentionRegex.exec(text)) !== null) {
+      // 멘션 앞 텍스트 추가
+      if (match.index > lastIndex) {
+        parts.push(text.substring(lastIndex, match.index))
+      }
+
+      // 멘션 부분 추가 (스타일링 적용)
+      parts.push(
+        <span key={match.index} className="mention-highlight">
+          {match[0]}
+        </span>,
+      )
+
+      lastIndex = match.index + match[0].length
+    }
+
+    // 남은 텍스트 추가
+    if (lastIndex < text.length) {
+      parts.push(text.substring(lastIndex))
+    }
+
+    return parts.length > 0 ? parts : text
+  }
+
   return (
     <div className="comment-item">
       <div className="comment-header">
@@ -77,12 +108,11 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted }) {
             <i className="bi bi-person-circle"></i>
           </div>
           <div className="ms-2">
-            <div className="comment-author">{comment.username}</div>
+            <div className="comment-author">{comment.userName}</div>
             <div className="comment-date">{formatDate(comment.createdAt)}</div>
           </div>
         </div>
-        {/* 권한 확인 로직 활성화 */}
-        {isAuthor && !isEditing && (
+        {/* {isAuthor && !isEditing && ( */}
           <div className="comment-actions">
             <button className="btn btn-sm btn-link" onClick={() => setIsEditing(true)}>
               수정
@@ -91,7 +121,7 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted }) {
               {isDeleting ? "삭제 중..." : "삭제"}
             </button>
           </div>
-        )}
+        {/* )} */}
       </div>
 
       {isEditing ? (
@@ -111,11 +141,11 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted }) {
             </button>
           </div>
         </div>
-      ) : ( 
-        <div className="comment-content mt-2">{comment.content}</div>
-     )} 
+      ) : (
+        <div className="comment-content mt-2">{formatMentions(comment.content)}</div>
+      )}
     </div>
   )
 }
 
-export default CommentItem;
+export default CommentItem

@@ -1,3 +1,5 @@
+"use client"
+
 // 필요한 라이브러리 및 컴포넌트 import
 import axios from "axios"
 import { useState, useRef, useEffect } from "react"
@@ -34,7 +36,7 @@ function WritePostPage() {
     if (selectedItemRef.current) {
       selectedItemRef.current.scrollIntoView({
         behavior: "smooth", // 부드럽게 이동
-        block: "nearest",   // 가장 가까운 위치에 맞춰줌
+        block: "nearest", // 가장 가까운 위치에 맞춰줌
       })
     }
   }, [selectedResultIndex])
@@ -63,7 +65,7 @@ function WritePostPage() {
 
     try {
       const response = await axios.get(
-        `http://localhost:9000/api/places/search?keyword=${encodeURIComponent(searchTerm)}`
+        `http://localhost:9000/api/places/search?keyword=${encodeURIComponent(searchTerm)}`,
       )
       setSearchResults(response.data)
       setSelectedResultIndex(-1)
@@ -179,7 +181,9 @@ function WritePostPage() {
                 <form onSubmit={handleSubmit}>
                   {/* 제목 입력창 */}
                   <div className="mb-3">
-                    <label htmlFor="posttitle" className="form-label">제목</label>
+                    <label htmlFor="posttitle" className="form-label">
+                      제목
+                    </label>
                     <input
                       type="text"
                       className="form-control"
@@ -233,7 +237,11 @@ function WritePostPage() {
                       >
                         {isSearching ? (
                           <>
-                            <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                            <span
+                              className="spinner-border spinner-border-sm me-1"
+                              role="status"
+                              aria-hidden="true"
+                            ></span>
                             검색 중...
                           </>
                         ) : (
@@ -273,7 +281,9 @@ function WritePostPage() {
 
                   {/* 내용 입력 */}
                   <div className="mb-3">
-                    <label htmlFor="postContent" className="form-label">내용</label>
+                    <label htmlFor="postContent" className="form-label">
+                      내용
+                    </label>
                     <textarea
                       className="form-control"
                       id="postContent"
@@ -287,7 +297,9 @@ function WritePostPage() {
 
                   {/* 이미지 업로드 */}
                   <div className="mb-3">
-                    <label htmlFor="postImages" className="form-label">이미지 첨부 (선택사항)</label>
+                    <label htmlFor="postImages" className="form-label">
+                      이미지 첨부 (선택사항)
+                    </label>
                     <input
                       type="file"
                       className="form-control"
@@ -301,12 +313,12 @@ function WritePostPage() {
                   {/* 이미지 미리보기 */}
                   {images.length > 0 && (
                     <div className="mb-3">
-                      <label className="form-label">선택된 이미지</label>
+                      <label className="form-label">선택한 이미지</label>
                       <div className="d-flex flex-wrap gap-2">
                         {images.map((image, index) => (
                           <div key={index} className="position-relative">
                             <img
-                              src={URL.createObjectURL(image)}
+                              src={URL.createObjectURL(image) || "/placeholder.svg"}
                               alt={`preview-${index}`}
                               width="100"
                               height="100"
@@ -333,7 +345,11 @@ function WritePostPage() {
                     <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
                       {isSubmitting ? (
                         <>
-                          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          <span
+                            className="spinner-border spinner-border-sm me-2"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
                           등록 중...
                         </>
                       ) : (

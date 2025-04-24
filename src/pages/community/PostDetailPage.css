@@ -5,6 +5,8 @@
   --text-color: #2c3e50;
   --light-bg: #f0f9fa;
   --border-color: #d1eeef;
+  --place-tag-bg: #e6f4ea;
+  --place-tag-color: #2a9d8f;
 }
 
 .post-detail-container {
@@ -12,11 +14,11 @@
   margin: 0 auto;
   background-color: white;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* 그림자 복원 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   padding: 2rem;
   overflow: visible;
   position: relative;
-  border: none; /* 테두리 완전히 제거 */
+  border: none;
 }
 
 .post-title {
@@ -32,29 +34,71 @@
   align-items: center;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--border-color);
-  background-color: transparent; 
-  border: none; /* 테두리 제거 */
-  box-shadow: none; /* 그림자 제거 */
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 .author-avatar {
   font-size: 2rem;
   color: var(--accent-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.author-profile-image {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .author-name {
   font-weight: 600;
   color: var(--text-color);
+  margin-left: 8px;
 }
 
 .post-date {
   font-size: 0.85rem;
-  color: #000000; /* Changed from #6c757d to black */
+  color: #6c757d;
+  margin-top: 4px;
 }
 
 .post-stats {
   color: #6c757d;
   font-size: 0.9rem;
+}
+
+/* 장소 태그 스타일 개선 */
+.place-badge {
+  display: inline-block;
+  background-color: var(--place-tag-bg);
+  color: var(--place-tag-color);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-left: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  border: 1px solid rgba(42, 157, 143, 0.2);
+}
+
+.place-badge:hover {
+  background-color: #d4eadd;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.place-badge i {
+  font-size: 0.7rem;
+  margin-right: 4px;
 }
 
 /* 장소 정보 카드 스타일 */
@@ -91,42 +135,38 @@
   color: white;
 }
 
-/* Add or modify the place-badge style to have a rounded background */
-.place-badge {
-  display: inline-block;
-  background-color: var(--light-bg);
-  color: var(--accent-color);
-  padding: 0.2rem 0.5rem;
-  border-radius: 20px; /* Make it more rounded */
-  font-size: 0.8rem;
-  font-weight: 500;
-  margin-left: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow for depth */
-}
-
-.place-badge i {
-  font-size: 0.7rem;
-}
-
+/* 본문 스타일 개선 */
 .post-content {
   color: var(--text-color);
   height: auto !important;
   overflow: visible !important;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  margin: 0 auto;
+  max-width: 720px;
+  padding: 1.5rem 1rem;
+  margin-bottom: 2rem;
+}
+
+.post-content p {
+  margin-bottom: 1.2rem;
 }
 
 .post-content img {
   max-width: 100%;
   height: auto;
-  display: block;
-  object-fit: contain;
-  margin: 1.5rem auto;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* 이미지 섹션 스타일 */
 .post-images-section {
-  border-top: 1px solid var(--border-color); /* 테두리 복원 */
+  border-top: 1px solid var(--border-color);
   padding-top: 1.5rem;
   margin-top: 1.5rem;
+  max-width: 720px;
+  margin: 1.5rem auto;
 }
 
 .post-image-container {
@@ -135,6 +175,7 @@
   text-align: center;
   display: flex;
   justify-content: center;
+  position: relative; /* 명시적으로 position 설정 */
 }
 
 .post-image {
@@ -143,47 +184,68 @@
   display: block;
   object-fit: contain;
   margin-bottom: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  /* preview-image 클래스와 구분하기 위한 명시적 스타일 */
+  width: auto;
 }
+
+/* 기존 post-actions 관련 스타일을 모두 제거하고 간단하게 유지합니다 */
 
 .post-actions {
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border-color); /* 테두리 복원 */
-  position: relative;
-  clear: both;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
 }
 
-/* 수정 버튼 스타일 */
-.post-actions .edit-btn {
-  background-color: white;
-  color: var(--text-color);
-  border-color: var(--border-color);
+/* 수정/삭제 버튼 관련 복잡한 스타일 제거 */
+.post-detail-container .post-actions .edit-btn,
+.post-detail-container .post-actions .delete-btn {
+  /* 이 스타일 블록 전체 제거 */
 }
 
-.post-actions .edit-btn:hover {
-  /* 호버 시 색상 변경 방지 */
-  background-color: white;
-  color: var(--text-color);
-  border-color: var(--border-color);
+.post-detail-container .post-actions .edit-btn {
+  /* 이 스타일 블록 전체 제거 */
 }
 
-/* 삭제 버튼 스타일 */
-.post-actions .delete-btn {
-  background-color: white;
-  color: #dc3545;
-  border-color: #dc3545;
+.post-detail-container .post-actions .edit-btn:hover {
+  /* 이 스타일 블록 전체 제거 */
 }
 
-.post-actions .delete-btn:hover {
-  /* 호버 시 색상 변경 방지 */
+.post-detail-container .post-actions .delete-btn {
+  /* 이 스타일 블록 전체 제거 */
+}
+
+.post-detail-container .post-actions .delete-btn:hover {
+  /* 이 스타일 블록 전체 제거 */
+}
+
+/* 목록으로 버튼 스타일 */
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border-radius: 4px;
   background-color: white;
-  color: #dc3545;
-  border-color: #dc3545;
+  color: #6c757d;
+  border-color: #d1d5db;
+  transition: all 0.2s ease;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.back-button:hover {
+  background-color: #f8f9fa;
+  color: #495057;
+  border-color: #adb5bd;
 }
 
 @media (max-width: 768px) {
   .post-detail-container {
     padding: 1.5rem;
+    border-radius: 0;
+    box-shadow: none;
   }
 
   .post-title {
@@ -199,14 +261,33 @@
     margin-top: 0.5rem;
   }
 
+  .post-content {
+    padding: 1rem 0;
+    font-size: 1rem;
+  }
+
   .post-actions {
-    flex-direction: column;
-    gap: 1rem;
+    flex-direction: row; /* 가로 정렬 유지 */
   }
 
   .post-actions > div {
-    width: 100%;
+    width: auto; /* 자동 너비 */
     display: flex;
-    justify-content: space-between;
+    gap: 8px; /* 버튼 사이 간격 유지 */
   }
+
+  .place-info-card .card-body {
+    padding: 0.75rem;
+  }
+
+  .view-place-btn {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+/* 삭제 버튼이 상세 페이지에 영향을 주지 않도록 명시적 선택자 사용 */
+.write-post-container .remove-image-btn,
+.edit-post-container .remove-image-btn {
+  display: flex;
 }

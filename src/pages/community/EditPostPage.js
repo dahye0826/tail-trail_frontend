@@ -1,10 +1,11 @@
+"use client"
+
 // 게시글 수정 페이지
 import { useNavigate, useParams } from "react-router-dom"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 import { useEffect, useState, useRef } from "react"
 import axios from "axios"
-
 
 function EditPostPage() {
   const { id } = useParams() // URL 파라미터에서 게시글 ID 추출
@@ -56,7 +57,7 @@ function EditPostPage() {
     if (selectedItemRef.current) {
       selectedItemRef.current.scrollIntoView({
         behavior: "smooth", // 부드럽게 이동
-        block: "nearest",   // 가장 가까운 위치에 맞춰줌
+        block: "nearest", // 가장 가까운 위치에 맞춰줌
       })
     }
   }, [selectedResultIndex])
@@ -66,7 +67,9 @@ function EditPostPage() {
     if (!searchTerm.trim()) return setSearchResults([])
     setIsSearching(true)
     try {
-      const response = await axios.get(`http://localhost:9000/api/places/search?keyword=${encodeURIComponent(searchTerm)}`)
+      const response = await axios.get(
+        `http://localhost:9000/api/places/search?keyword=${encodeURIComponent(searchTerm)}`,
+      )
       setSearchResults(response.data)
       setSelectedResultIndex(-1)
     } catch (error) {
@@ -280,13 +283,13 @@ function EditPostPage() {
                         <div className="list-group search-results-scrollable" ref={searchResultsRef}>
                           {searchResults.map((place, index) => (
                             <button
-                            key={place.placeId}
-                            type="button"
-                            className={`list-group-item list-group-item-action ${selectedResultIndex === index ? "active" : ""}`}
-                            onClick={() => handlePlaceSelect(place)}
-                            onMouseEnter={() => setSelectedResultIndex(index)}
-                            ref={selectedResultIndex === index ? selectedItemRef : null}
-                          >
+                              key={place.placeId}
+                              type="button"
+                              className={`list-group-item list-group-item-action ${selectedResultIndex === index ? "active" : ""}`}
+                              onClick={() => handlePlaceSelect(place)}
+                              onMouseEnter={() => setSelectedResultIndex(index)}
+                              ref={selectedResultIndex === index ? selectedItemRef : null}
+                            >
                               <div className="d-flex w-100 justify-content-between">
                                 <h6 className="mb-1">{place.placeName}</h6>
                               </div>
@@ -319,17 +322,19 @@ function EditPostPage() {
                     </label>
                     <input
                       type="file"
-                      className="form-control"
+                      className="form-control file-input"
                       id="postImages"
                       accept="image/*"
                       multiple
                       onChange={handleImageChange}
+                      placeholder="이미지를 선택해 주세요"
                     />
                   </div>
 
                   {/* 기존 이미지 표시 - 배열 체크 추가 */}
                   {Array.isArray(existingImages) && existingImages.length > 0 && (
                     <div className="mb-3">
+                      <label className="form-label">기존 이미지</label>
                       <div className="d-flex flex-wrap gap-2">
                         {existingImages.map((imageUrl, index) => (
                           <div key={index} className="position-relative">
@@ -356,6 +361,7 @@ function EditPostPage() {
                   {/* 새로 추가한 이미지 표시 */}
                   {images.length > 0 && (
                     <div className="mb-3">
+                      <label className="form-label">추가한 이미지</label>
                       <div className="d-flex flex-wrap gap-2">
                         {images.map((image, index) => (
                           <div key={index} className="position-relative">
@@ -379,15 +385,15 @@ function EditPostPage() {
                     </div>
                   )}
 
-                  <div className="d-flex justify-content-between mt-4">
+                  <div className="d-flex justify-content-between mt-4 button-group">
                     <button
                       type="button"
-                      className="btn btn-outline-secondary"
+                      className="btn btn-outline-secondary cancel-btn"
                       onClick={() => navigate(`/community/post/${id}`)}
                     >
                       취소
                     </button>
-                    <button type="submit" className="btn btn-primary">
+                    <button type="submit" className="btn btn-primary submit-btn">
                       게시글 수정
                     </button>
                   </div>
