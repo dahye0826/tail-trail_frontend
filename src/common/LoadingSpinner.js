@@ -1,3 +1,5 @@
+// 3. 공통 컴포넌트 구현 (로딩, 에러 처리)
+
 // src/components/common/LoadingSpinner.js
 import React from 'react';
 

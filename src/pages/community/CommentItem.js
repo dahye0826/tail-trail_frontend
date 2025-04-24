@@ -1,14 +1,17 @@
+// 파일 상단 부분만 수정
 import { useState } from "react"
-import { commentAPI } from "../../services/api" // 중앙화된 API 사용
+import { commentAPI } from "../../services/api"  // 경로 수정됨
+import { useAuth } from '../../contexts/AuthContext'  // AuthContext 경로도 확인
 import "./CommentSection.css"
 
-function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser }) {
+function CommentItem({ comment, onCommentUpdated, onCommentDeleted }) {
   const [isEditing, setIsEditing] = useState(false)
   const [editedContent, setEditedContent] = useState(comment.content)
   const [isDeleting, setIsDeleting] = useState(false)
+  const { user } = useAuth();
 
-  // 댓글 작성자인지 확인
-  const isAuthor = currentUser && currentUser.id === comment.userId
+  // 댓글 작성자인지 확인 (userId 또는 id 필드 확인)
+  const isAuthor = user && (user.id === comment.userId || user.userId === comment.userId);
 
   const handleUpdateComment = async() => {
     if (!editedContent.trim()) {
@@ -16,10 +19,13 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
       return
     }
     try {
-      // 중앙화된 API 사용
-      const response = await commentAPI.updateComment(comment.commentId, editedContent)
-      onCommentUpdated(response.data)
-      setIsEditing(false)
+      const response = await commentAPI.updateComment(comment.commentId, editedContent);
+      if (response.data && response.data.success) {
+        onCommentUpdated(response.data.data);
+        setIsEditing(false);
+      } else {
+        alert("댓글 수정에 실패했습니다.");
+      }
     } catch (err) {
       console.error("댓글 수정 실패:", err)
       alert("댓글 수정에 실패했습니다.")
@@ -38,9 +44,12 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
     
     try {
       setIsDeleting(true)
-      // 중앙화된 API 사용
-      await commentAPI.deleteComment(comment.commentId)
-      onCommentDeleted(comment.commentId)
+      const response = await commentAPI.deleteComment(comment.commentId);
+      if (response.data && response.data.success) {
+        onCommentDeleted(comment.commentId);
+      } else {
+        alert("댓글 삭제에 실패했습니다.");
+      }
     } catch (err) {
       console.error("댓글 삭제 오류:", err)
       alert("댓글 삭제에 실패했습니다.")
@@ -109,4 +118,4 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
   )
 }
 
-export default CommentItem
+export default CommentItem;

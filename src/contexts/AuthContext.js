@@ -1,6 +1,7 @@
-// src/contexts/AuthContext.js 생성
+// src/contexts/AuthContext.js
 import { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { authAPI } from '../services/api';
 
 const AuthContext = createContext();
 
@@ -36,42 +37,47 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // 로그인 처리
-  const login = (userData) => {
-    localStorage.setItem("isLoggedIn", "true");
-    localStorage.setItem("userId", userData.userId);
-    localStorage.setItem("userName", userData.userName);
-    localStorage.setItem("userEmail", userData.email);
-    localStorage.setItem("userRole", userData.role);
-    
-    if (userData.profile) {
-      localStorage.setItem("userProfile", userData.profile);
+  const login = async (email, password) => {
+    try {
+      const response = await authAPI.login(email, password);
+      
+      if (response.data && response.data.success) {
+        const userData = response.data.data;
+        
+        setIsLoggedIn(true);
+        setUser({
+          id: userData.userId,
+          name: userData.userName,
+          email: userData.email,
+          role: userData.role,
+          profile: userData.profile
+        });
+        
+        navigate("/mypage");
+        return true;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error("로그인 오류:", error);
+      return false;
     }
-    
-    setIsLoggedIn(true);
-    setUser({
-      id: userData.userId,
-      name: userData.userName,
-      email: userData.email,
-      role: userData.role,
-      profile: userData.profile
-    });
-    
-    navigate("/mypage");
   };
 
   // 로그아웃 처리
-  const logout = () => {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userRole");
-    localStorage.removeItem("userProfile");
-    
-    setIsLoggedIn(false);
-    setUser(null);
-    
-    navigate("/");
+  const logout = async () => {
+    try {
+      await authAPI.logout();
+      
+      setIsLoggedIn(false);
+      setUser(null);
+      
+      navigate("/");
+      return true;
+    } catch (error) {
+      console.error("로그아웃 오류:", error);
+      return false;
+    }
   };
 
   return (
