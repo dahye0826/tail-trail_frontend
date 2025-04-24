@@ -1,5 +1,3 @@
-// 1. API 호출 중앙화 - api.js
-
 // src/services/api.js
 import axios from 'axios';
 
@@ -14,7 +12,21 @@ const api = axios.create({
   }
 });
 
-// 요청 인터셉터 - 응답 형식 확인
+// 토큰 처리를 위한 인터셉터 추가
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// 응답 인터셉터 - 응답 형식 확인
 api.interceptors.response.use(
   (response) => {
     // BaseResponse 형식인 경우
@@ -67,6 +79,8 @@ export const authAPI = {
     localStorage.removeItem('userEmail');
     localStorage.removeItem('userRole');
     localStorage.removeItem('userProfile');
+    localStorage.removeItem('token');
+    localStorage.removeItem('authToken');
     return Promise.resolve();
   }
 };
@@ -75,22 +89,41 @@ export const authAPI = {
 export const userAPI = {
   getProfile: (userId) => api.get(`/users/${userId}`),
   
-  getUserStats: (userId) => {
-    // 여러 API 호출을 통합하여 사용자 통계 가져오기
-    const postsPromise = api.get(`/users/${userId}/posts?page=1&size=1`);
-    const visitedPromise = api.get(`/users/${userId}/visited-places?page=1&size=1`);
-    const favoritesPromise = api.get(`/favorites?userId=${userId}&page=1&size=1`);
-    
-    return Promise.all([postsPromise, visitedPromise, favoritesPromise])
-      .then(([postsRes, visitedRes, favoritesRes]) => {
-        return {
-          data: {
-            posts: postsRes.data.data?.totalElements || 0,
-            visited_places: visitedRes.data.data?.totalElements || 0,
-            favorites: favoritesRes.data.data?.totalElements || 0
-          }
-        };
-      });
+  getUserStats: async (userId) => {
+    try {
+      // 1. 게시글 수 조회
+      const postsRes = await api.get(`/users/${userId}/posts?page=1&size=1`);
+      
+      // 2. 방문 이력 수 조회 - 올바른 엔드포인트 사용
+      const visitedRes = await api.get(`/visited-place/mypage?userId=${userId}&page=1&size=1`);
+      
+      // 3. 즐겨찾기 수 조회
+      const favoritesRes = await api.get(`/favorites?userId=${userId}&page=1&size=1`);
+      
+      // 디버깅을 위한 로깅
+      console.log("Posts response:", postsRes.data);
+      console.log("Visited response:", visitedRes.data);
+      console.log("Favorites response:", favoritesRes.data);
+      
+      // 백엔드 응답 구조에 맞게 데이터 추출
+      return {
+        data: {
+          postCount: postsRes.data?.totalItems || 0,
+          visitedCount: visitedRes.data?.totalItems || 0,
+          favoriteCount: favoritesRes.data?.totalItems || 0
+        }
+      };
+    } catch (error) {
+      console.error("통계 가져오기 오류:", error);
+      // 오류가 발생해도 UI가 깨지지 않도록 기본값 제공
+      return {
+        data: {
+          postCount: 0,
+          visitedCount: 0,
+          favoriteCount: 0
+        }
+      };
+    }
   },
   
   updateProfile: (userId, userData) => api.put(`/users/${userId}`, userData)
@@ -158,11 +191,12 @@ export const commentAPI = {
   deleteComment: (commentId) => api.delete(`/comments/${commentId}`)
 };
 
-// 방문 이력 관련 API
+// 방문 이력 관련 API - 엔드포인트 수정
 export const visitedAPI = {
   getMyVisitedPlaces: async (userId, page = 1, size = 5) => {
     try {
-      const response = await api.get(`/visited-places/mypage`, {
+      // 'visited-places' -> 'visited-place'로 수정
+      const response = await api.get(`/visited-place/mypage`, {
         params: { userId, page, size }
       });
       return response;
@@ -172,31 +206,44 @@ export const visitedAPI = {
     }
   },
   
-  getPlaceReviews: (placeId) => api.get(`/visited-places/reviews`, {
+  getPlaceReviews: (placeId) => api.get(`/visited-place/reviews`, {
     params: { placeId }
   }),
   
-  addVisitedPlace: (visitData) => api.post(`/visited-places`, visitData),
+  addVisitedPlace: (visitData) => api.post(`/visited-place`, visitData),
   
-  updateVisitedPlace: (visitId, visitData) => api.put(`/visited-places/${visitId}`, visitData),
+  updateVisitedPlace: (visitId, visitData) => api.put(`/visited-place/${visitId}`, visitData),
   
-  deleteVisitedPlace: (visitId) => api.delete(`/visited-places/${visitId}`)
+  deleteVisitedPlace: (visitId) => api.delete(`/visited-place/${visitId}`)
 };
 
-// 즐겨찾기 관련 API
+// 즐겨찾기 관련 API - 애플리케이션 실제 사용 방식에 맞게 수정
 export const favoriteAPI = {
+  // 즐겨찾기 목록 가져오기
   getFavorites: (userId, page = 1, size = 10) => api.get(`/favorites`, {
     params: { userId, page, size }
   }),
 
-  addFavorite: (userId, placeId) => api.post(`/favorites`, null, {
-    params: { userId, placeId }
-  }),
+  // 즐겨찾기 추가 - PlaceListPage.js에서 사용하는 방식과 일치시킴
+  addFavorite: (placeId) => {
+    const token = localStorage.getItem("token") || localStorage.getItem("authToken");
+    return api.post(`/user/favorites/${placeId}`, {}, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    });
+  },
 
-  removeFavorite: (userId, placeId) => api.delete(`/favorites`, {
-    params: { userId, placeId }
-  }),
+  // 즐겨찾기 삭제 - PlaceListPage.js에서 사용하는 방식과 일치시킴
+  removeFavorite: (placeId) => {
+    const token = localStorage.getItem("token") || localStorage.getItem("authToken");
+    return api.delete(`/user/favorites/${placeId}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    });
+  },
 
+  // userId 사용 방식 지원
+  removeUserFavorite: (userId, placeId) => api.delete(`/favorites/${userId}/${placeId}`),
+
+  // 즐겨찾기 확인
   checkFavorite: (userId, placeId) => api.get(`/favorites/check`, {
     params: { userId, placeId }
   })

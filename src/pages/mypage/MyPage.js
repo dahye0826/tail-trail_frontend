@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { FaPen, FaUser } from "react-icons/fa"
@@ -7,8 +6,7 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import "./MyPageStyles.css"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
-import { userAPI } from "../../services/api"  // api.js에서 userAPI 가져오기
-
+import { userAPI } from "../../services/api"  // api.js에서 userAPI만 가져옵니다
 
 const MyPage = () => {
   const navigate = useNavigate();
@@ -44,41 +42,76 @@ const MyPage = () => {
         setIsLoggedIn(loginStatus);
         
         if (!loginStatus) {
+          console.log("로그인 상태 아님, 리다이렉트");
           navigate("/login");
           return;
         }
         
         const userId = localStorage.getItem("userId");
         if (!userId) {
+          console.log("사용자 ID 없음, 리다이렉트");
           navigate("/login");
           return;
         }
         
-        // API를 통해 사용자 프로필 및 통계 정보 가져오기
-        const profileResponse = await userAPI.getProfile(userId);
+        console.log("사용자 데이터 로딩 시작, userId:", userId);
+        
+// 사용자 프로필 정보 가져오기
+const profileResponse = await userAPI.getProfile(userId);
+console.log("프로필 응답:", profileResponse);
+        
+if (profileResponse.data) {
+  setUserData({
+    userName: profileResponse.data.userName || "",
+    email: profileResponse.data.email || "",
+    userPhone: profileResponse.data.userPhone || "",
+    userAddress: profileResponse.data.userAddress || "",
+    birthdate: profileResponse.data.birthdate || "",
+    profile: profileResponse.data.profile || "",
+    petName: profileResponse.data.petName || "",
+    type: profileResponse.data.type || "",
+    breed: profileResponse.data.breed || "",
+    petAge: profileResponse.data.petAge || "",
+    role: profileResponse.data.role || "user"
+  });
+}
+
+// userAPI.getUserStats 호출 및 데이터 처리
+try {
+  const statsResponse = await userAPI.getUserStats(userId);
+  console.log("통계 응답:", statsResponse);
+  
+  if (statsResponse.data) {
+    // 변경된 속성명에 맞게 데이터 설정
+    setStats({
+      posts: statsResponse.data.postCount || 0,
+      visited_places: statsResponse.data.visitedCount || 0,
+      favorites: statsResponse.data.favoriteCount || 0
+    });
+    console.log("통계 설정 완료:", statsResponse.data);
+  }
+} catch (err) {
+  console.error("통계 데이터 가져오기 오류:", err);
+  // 오류 발생 시 기본값으로 설정
+  setStats({
+    posts: 0,
+    visited_places: 0,
+    favorites: 0
+  });
+}
+        
+        // 기존 api.js의 집계 기능을 사용하여 사용자 활동 통계 가져오기
         const statsResponse = await userAPI.getUserStats(userId);
+        console.log("통계 응답:", statsResponse);
         
-        // 프로필 정보 설정
-        setUserData({
-          userName: profileResponse.data.userName || "",
-          email: profileResponse.data.email || "",
-          userPhone: profileResponse.data.userPhone || "",
-          userAddress: profileResponse.data.userAddress || "",
-          birthdate: profileResponse.data.birthdate || "",
-          profile: profileResponse.data.profile || "",
-          petName: profileResponse.data.petName || "",
-          type: profileResponse.data.type || "",
-          breed: profileResponse.data.breed || "",
-          petAge: profileResponse.data.petAge || "",
-          role: profileResponse.data.role || "user"
-        });
-        
-        // 통계 정보 설정
-        setStats({
-          posts: statsResponse.data.posts || 0,
-          visited_places: statsResponse.data.visited_places || 0,
-          favorites: statsResponse.data.favorites || 0
-        });
+        if (statsResponse.data) {
+          // api.js의 응답 구조에 맞게 데이터 추출
+          setStats({
+            posts: statsResponse.data.postCount || 0,
+            visited_places: statsResponse.data.visitedCount || 0,
+            favorites: statsResponse.data.favoriteCount || 0
+          });
+        }
         
         setLoading(false);
       } catch (err) {
@@ -93,6 +126,7 @@ const MyPage = () => {
     
     // 테스트용 더미 데이터 함수
     const provideMockData = () => {
+      console.log("더미 데이터 사용");
       setUserData({
         userName: "김반려",
         email: "pet@example.com",
@@ -117,11 +151,13 @@ const MyPage = () => {
     fetchUserData();
   }, [navigate]);
 
+  // JSX는 변경 없이 동일하게 유지
   return (
     <>
       <Navbar isLoggedIn={isLoggedIn} />
 
       <div className="mypage-background">
+        {/* 이하 기존 JSX 코드와 동일 */}
         <div className="container py-5">
           <div className="row">
             <div className="col-lg-3 col-md-4 mb-4">

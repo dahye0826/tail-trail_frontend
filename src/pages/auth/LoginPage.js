@@ -2,7 +2,7 @@
 "use client"
 
 import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useLocation  } from "react-router-dom"
 import "bootstrap-icons/font/bootstrap-icons.css"
 import "bootstrap/dist/css/bootstrap.min.css"
 import "./AuthPages.css"
@@ -18,6 +18,12 @@ const LoginPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   const navigate = useNavigate()
+  
+  const location = useLocation();
+  
+  // 이전 페이지 정보를 가져오거나 기본값으로 홈('/')을 사용
+  const from = location.state?.from || "/";
+
 
   const handleSubmit = async (e) => {
     e.preventDefault()
