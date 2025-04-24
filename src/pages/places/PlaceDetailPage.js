@@ -55,7 +55,11 @@ function PlaceDetailPage() {
           rating: review.rating,
           comment: review.reviewContent,
         })) || [],
-      images: [placeData.placeImage || "/placeholder.svg?height=400&width=800"],
+        images: [
+          placeData.placeImage
+            ? `http://localhost:9000${placeData.placeImage}`
+            : "/placeholder.svg?height=400&width=800"
+        ],
       lat: placeData.latitude || 37.5665,
       lng: placeData.longitude || 126.978,
       lastUpdated: placeData.lastUpdated || null,
@@ -183,11 +187,12 @@ function PlaceDetailPage() {
           {/* Place header and image */}
           <div className="row mb-4">
             <div className="col">
-              <img
-                src={place.images[0] || "/placeholder.svg"}
-                alt={place.name}
-                className="img-fluid rounded shadow-sm"
-              />
+            <img
+              src={place.images[0] || "/placeholder.svg"}
+              alt={place.name}
+              className="img-fluid rounded shadow-sm"
+              onError={(e) => {e.target.src = "/placeholder.svg?height=400&width=800"}}
+            />
             </div>
           </div>
 

@@ -291,22 +291,6 @@ function PlaceListPage() {
     [petSizeDisplay, petSizeFilter],
   )
 
-  const getCategoryLabel = useCallback(
-    (place) => {
-      if (categoryFilter && !subCategoryFilter) {
-        if (categoryFilter === "숙박업소") {
-          return place.industrySub === "호텔" ? "호텔" : "펜션"
-        }
-        return categoryFilter
-      }
-
-      if (subCategoryFilter) return subCategoryFilter
-
-      return place.industrySub || place.industryMain || "기타"
-    },
-    [categoryFilter, subCategoryFilter],
-  )
-
   const getCategoryBadgeClass = useCallback((categoryLabel) => {
     switch (categoryLabel) {
       case "카페":
@@ -382,7 +366,6 @@ function PlaceListPage() {
   }, [currentPage, totalPages, handlePageChange])
 
   const renderPlaceCard = (place) => {
-    const categoryLabel = getCategoryLabel(place)
     const isFavorited = favorites.includes(place.placeId)
 
     const handleCardClick = () => {
@@ -399,11 +382,13 @@ function PlaceListPage() {
           aria-label={`${place.placeName} - ${place.city} ${place.district}`}
         >
           <div className="card-img-container">
-            <img
-              src={place.placeImage || "/assets/default-pet-place.jpg"}
-              className="card-img-top"
-              alt={place.placeName}
-            />
+          <img
+            src={place.placeImage ? `http://localhost:9000${place.placeImage}` : "/assets/default-pet-place.jpg"}
+             className="card-img-top"
+            alt={place.placeName}
+            loading="lazy"
+            onError={(e) => {e.target.src = "/assets/default-pet-place.jpg"}}
+          />
             {isLoggedIn && (
               <button
                 className="btn-favorite"
@@ -415,7 +400,7 @@ function PlaceListPage() {
             )}
           </div>
           <div className="card-body">
-            <span className={`badge ${getCategoryBadgeClass(categoryLabel)}`}>{categoryLabel}</span>
+            <span className={`badge ${getCategoryBadgeClass(place.industryMain)}`}>{place.industryMain}</span>
             <h5 className="card-title mt-2">{place.placeName}</h5>
             <p className="card-text">
               <i className="bi bi-geo-alt me-1"></i> {place.city} {place.district}
