@@ -53,83 +53,121 @@ const VisitedPlacesPage = () => {
     loadVisitedPlaces();
   }, [currentPage]);
 
-  const loadVisitedPlaces = async () => {
-    try {
-      // 로컬 스토리지에서 사용자 ID 직접 가져오기
-      const userId = localStorage.getItem("userId");
-      const loginStatus = localStorage.getItem("isLoggedIn") === "true";
+  // VisitedPlacesPage.js의 loadVisitedPlaces 함수 수정
+const loadVisitedPlaces = async () => {
+  try {
+    // 로컬 스토리지에서 사용자 ID 직접 가져오기
+    const userId = localStorage.getItem("userId");
+    const loginStatus = localStorage.getItem("isLoggedIn") === "true";
+    
+    console.log("로그인 상태:", loginStatus, "사용자 ID:", userId);
+    
+    if (!loginStatus || !userId) {
+      setError("로그인이 필요합니다");
+      navigate("/login");
+      return;
+    }
+    
+    setIsLoggedIn(true);
+    setLoading(true);
+    
+    // userId로 직접 API 호출
+    console.log(`API 호출 시작: userId=${userId}, page=${currentPage}, size=${pageSize}`);
+    const response = await visitedAPI.getMyVisitedPlaces(userId, currentPage, pageSize);
+    console.log("방문 이력 API 응답:", response);
+    
+    // 백엔드 응답 구조 확인 및 데이터 추출
+    if (response && response.data) {
+      // 응답 구조 전체 로깅 (디버깅용)
+      console.log("방문 이력 응답 구조:", response.data);
       
-      console.log("로그인 상태:", loginStatus, "사용자 ID:", userId);
+      // 응답 데이터에서 visitedPlaces 배열 추출 (다양한 API 응답 구조 지원)
+      let visitedData = [];
       
-      if (!loginStatus || !userId) {
-        setError("로그인이 필요합니다");
-        navigate("/login");
-        return;
+      if (Array.isArray(response.data)) {
+        // 데이터가 바로 배열인 경우
+        visitedData = response.data;
+      } else if (response.data.data && Array.isArray(response.data.data)) {
+        // BaseResponse 구조에서 data 필드에 배열이 있는 경우
+        visitedData = response.data.data;
+      } else if (response.data.visitedPlaces && Array.isArray(response.data.visitedPlaces)) {
+        // visitedPlaces 필드에 배열이 있는 경우
+        visitedData = response.data.visitedPlaces;
+      } else if (response.data.content && Array.isArray(response.data.content)) {
+        // Spring Data 페이징 응답 구조인 경우
+        visitedData = response.data.content;
       }
       
-      setIsLoggedIn(true);
-      setLoading(true);
+      console.log("추출된 방문 이력 데이터:", visitedData);
       
-      // userId로 직접 API 호출
-      console.log(`API 호출 시작: userId=${userId}, page=${currentPage}, size=${pageSize}`);
-      const response = await visitedAPI.getMyVisitedPlaces(userId, currentPage, pageSize);
-      console.log("방문 이력 API 응답:", response);
-      
-      // 백엔드 응답 구조 확인 및 데이터 추출
-      if (response && response.data) {
-        console.log("응답 데이터 구조:", Object.keys(response.data));
+      if (visitedData.length > 0) {
+        setVisitedPlaces(visitedData);
         
-        // 방문 이력 데이터 추출 (백엔드 응답 구조에 맞춤)
-        const visitedData = response.data.visitedPlaces || [];
-        console.log("방문 이력 데이터:", visitedData);
+        // 페이징 정보 설정 (다양한 API 응답 구조 지원)
+        let totalPagesValue = 1;
+        let totalItemsValue = visitedData.length;
         
-        if (visitedData.length > 0) {
-          setVisitedPlaces(visitedData);
-          setTotalPages(response.data.totalPages || 1);
-          setTotalItems(response.data.totalItems || visitedData.length);
-          
-          // 이미 장소 정보가 포함되어 있는 경우
-          const placeDetailsMap = {};
-          visitedData.forEach(visit => {
-            if (visit.placeId) {
-              placeDetailsMap[visit.placeId] = {
-                placeId: visit.placeId,
-                placeName: visit.placeName,
-                placeImage: visit.placeImage,
-                city: visit.city,
-                district: visit.district,
-                roadAddress: visit.address,
-                petRestrictions: visit.petRestrictions,
-                description: visit.description,
-                latitude: visit.latitude,
-                longitude: visit.longitude
-              };
-            }
-          });
-          
-          setPlaceDetails(placeDetailsMap);
-        } else {
-          setVisitedPlaces([]);
-          setTotalPages(0);
-          setTotalItems(0);
+        if (response.data.totalPages) {
+          totalPagesValue = response.data.totalPages;
+        } else if (response.data.data && response.data.data.totalPages) {
+          totalPagesValue = response.data.data.totalPages;
         }
+        
+        if (response.data.totalItems) {
+          totalItemsValue = response.data.totalItems;
+        } else if (response.data.data && response.data.data.totalItems) {
+          totalItemsValue = response.data.data.totalItems;
+        } else if (response.data.totalElements) {
+          totalItemsValue = response.data.totalElements;
+        }
+        
+        setTotalPages(totalPagesValue);
+        setTotalItems(totalItemsValue);
+        
+        // 이미 장소 정보가 포함되어 있는 경우
+        const placeDetailsMap = {};
+        visitedData.forEach(visit => {
+          if (visit.placeId) {
+            placeDetailsMap[visit.placeId] = {
+              placeId: visit.placeId,
+              placeName: visit.placeName || "장소명 없음",
+              placeImage: visit.placeImage || null,
+              city: visit.city || "",
+              district: visit.district || "",
+              roadAddress: visit.address || visit.roadAddress || "",
+              petRestrictions: visit.petRestrictions || "",
+              description: visit.description || "",
+              latitude: visit.latitude || 37.5665,
+              longitude: visit.longitude || 126.978
+            };
+          }
+        });
+        
+        setPlaceDetails(placeDetailsMap);
       } else {
-        console.log("응답에 데이터가 없습니다");
+        console.log("방문 이력 데이터가 없습니다");
         setVisitedPlaces([]);
         setTotalPages(0);
         setTotalItems(0);
       }
-      
-      setLoading(false);
-    } catch (err) {
-      console.error("방문 이력 로딩 오류:", err);
-      if (err.response) {
-        console.error("오류 상태:", err.response.status);
-        console.error("오류 데이터:", err.response.data);
-      }
-      setError("방문 이력을 불러오는데 실패했습니다.");
-      setLoading(false);
-      
+    } else {
+      console.log("응답에 데이터가 없습니다");
+      setVisitedPlaces([]);
+      setTotalPages(0);
+      setTotalItems(0);
+    }
+    
+    setLoading(false);
+  } catch (err) {
+    console.error("방문 이력 로딩 오류:", err);
+    if (err.response) {
+      console.error("오류 상태:", err.response.status);
+      console.error("오류 데이터:", err.response.data);
+    }
+    setError("방문 이력을 불러오는데 실패했습니다.");
+    setLoading(false);
+    
+    
       // 테스트용 더미 데이터
       const mockVisitedPlaces = [
         {

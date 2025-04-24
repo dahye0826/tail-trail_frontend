@@ -94,28 +94,56 @@ export const userAPI = {
       // 1. 게시글 수 조회
       const postsRes = await api.get(`/users/${userId}/posts?page=1&size=1`);
       
-      // 2. 방문 이력 수 조회 - 올바른 엔드포인트 사용
-      const visitedRes = await api.get(`/visited-place/mypage?userId=${userId}&page=1&size=1`);
+      // 2. 방문 이력 수 조회 - 백엔드 엔드포인트와 일치시킴
+      const visitedRes = await api.get(`/visited-place/mypage`, {
+        params: { userId, page: 1, size: 1 }
+      });
       
       // 3. 즐겨찾기 수 조회
-      const favoritesRes = await api.get(`/favorites?userId=${userId}&page=1&size=1`);
+      const favoritesRes = await api.get(`/favorites`, {
+        params: { userId, page: 1, size: 1 }
+      });
       
-      // 디버깅을 위한 로깅
+      // 응답 구조 확인 및 로깅
       console.log("Posts response:", postsRes.data);
       console.log("Visited response:", visitedRes.data);
       console.log("Favorites response:", favoritesRes.data);
       
-      // 백엔드 응답 구조에 맞게 데이터 추출
-      return {
+      // 방문 이력 데이터 추출 - 다양한 응답 구조 지원
+      let visitedCount = 0;
+      
+      if (visitedRes.data) {
+        if (visitedRes.data.totalItems !== undefined) {
+          visitedCount = visitedRes.data.totalItems;
+        } else if (visitedRes.data.totalElements !== undefined) {
+          visitedCount = visitedRes.data.totalElements;
+        } else if (Array.isArray(visitedRes.data)) {
+          visitedCount = visitedRes.data.length;
+        } else if (visitedRes.data.data && visitedRes.data.data.totalItems !== undefined) {
+          visitedCount = visitedRes.data.data.totalItems;
+        } else if (visitedRes.data.visitedPlaces && Array.isArray(visitedRes.data.visitedPlaces)) {
+          visitedCount = visitedRes.data.visitedPlaces.length;
+        }
+      }
+      
+      // 포스트 및 즐겨찾기 데이터 추출
+      let postCount = postsRes.data?.totalItems || 0;
+      let favoriteCount = favoritesRes.data?.totalItems || 0;
+      
+      // 최종 결과 반환
+      const result = {
         data: {
-          postCount: postsRes.data?.totalItems || 0,
-          visitedCount: visitedRes.data?.totalItems || 0,
-          favoriteCount: favoritesRes.data?.totalItems || 0
+          postCount,
+          visitedCount,
+          favoriteCount
         }
       };
+      
+      console.log("최종 통계 결과:", result);
+      return result;
     } catch (error) {
       console.error("통계 가져오기 오류:", error);
-      // 오류가 발생해도 UI가 깨지지 않도록 기본값 제공
+      // 오류 발생시 기본값 제공
       return {
         data: {
           postCount: 0,
@@ -199,6 +227,10 @@ export const visitedAPI = {
       const response = await api.get(`/visited-place/mypage`, {
         params: { userId, page, size }
       });
+      
+      // 응답 로깅 추가
+      console.log("방문 이력 API 응답:", response.data);
+      
       return response;
     } catch (error) {
       console.error('방문 이력 가져오기 오류:', error);
@@ -217,33 +249,45 @@ export const visitedAPI = {
   deleteVisitedPlace: (visitId) => api.delete(`/visited-place/${visitId}`)
 };
 
-// 즐겨찾기 관련 API - 애플리케이션 실제 사용 방식에 맞게 수정
+// 즐겨찾기 관련 API - 수정
 export const favoriteAPI = {
-  // 즐겨찾기 목록 가져오기
   getFavorites: (userId, page = 1, size = 10) => api.get(`/favorites`, {
     params: { userId, page, size }
   }),
 
-  // 즐겨찾기 추가 - PlaceListPage.js에서 사용하는 방식과 일치시킴
-  addFavorite: (placeId) => {
-    const token = localStorage.getItem("token") || localStorage.getItem("authToken");
-    return api.post(`/user/favorites/${placeId}`, {}, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
+  // 즐겨찾기 추가 - 백엔드 요구사항에 맞게 수정
+  addFavorite: (placeId, userId = null) => {
+    // 사용자 ID가 없으면 로컬 스토리지에서 가져오기
+    if (!userId) {
+      userId = localStorage.getItem("userId");
+    }
+    
+    if (!userId) {
+      return Promise.reject(new Error("사용자 ID를 찾을 수 없습니다"));
+    }
+    
+    // 직접 요청 수행 - 숫자형으로 변환
+    return api.post(`/favorites`, {
+      userId: Number(userId),
+      placeId: Number(placeId)
     });
   },
 
-  // 즐겨찾기 삭제 - PlaceListPage.js에서 사용하는 방식과 일치시킴
-  removeFavorite: (placeId) => {
-    const token = localStorage.getItem("token") || localStorage.getItem("authToken");
-    return api.delete(`/user/favorites/${placeId}`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
-    });
+  // 즐겨찾기 삭제 - 백엔드 요구사항에 맞게 수정
+  removeFavorite: (placeId, userId = null) => {
+    // 사용자 ID가 없으면 로컬 스토리지에서 가져오기
+    if (!userId) {
+      userId = localStorage.getItem("userId");
+    }
+    
+    if (!userId) {
+      return Promise.reject(new Error("사용자 ID를 찾을 수 없습니다"));
+    }
+    
+    // 직접 요청 수행
+    return api.delete(`/favorites/${userId}/${placeId}`);
   },
 
-  // userId 사용 방식 지원
-  removeUserFavorite: (userId, placeId) => api.delete(`/favorites/${userId}/${placeId}`),
-
-  // 즐겨찾기 확인
   checkFavorite: (userId, placeId) => api.get(`/favorites/check`, {
     params: { userId, placeId }
   })
