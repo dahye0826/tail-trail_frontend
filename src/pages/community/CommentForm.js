@@ -105,8 +105,8 @@ function CommentForm({ postId, onCommentAdded, isLoggedIn, userId,commentUsers =
         {isMentionOpen && commentUsers.length > 0 && (
           <div className="mention-dropdown-menu">
             {commentUsers.map((user, index) => (
-              <div key={index} className="mention-dropdown-item" onClick={() => handleMentionSelect(user)}>
-                <i className="bi bi-person-circle me-2"></i>@{user}
+              <div key={index} className="mention-dropdown-item" onClick={() => handleMentionSelect(user.userName || user)}>
+                <i className="bi bi-person-circle me-2"></i>@{user.userName || user}
               </div>
             ))}
           </div>

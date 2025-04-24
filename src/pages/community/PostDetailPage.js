@@ -9,7 +9,7 @@ import Footer from "../../components/Footer"
 import CommentSection from "../../pages/community/CommentSection"
 import LoadingSpinner from "../../common/LoadingSpinner"
 import "./PostDetailPage.css"
-import { postAPI } from "../../services/api"
+
 
 function PostDetailPage() {
   const [post, setPost] = useState(null)
@@ -19,15 +19,31 @@ function PostDetailPage() {
   const navigate = useNavigate()
   const hasFetched = useRef(false)
   const [currentUser, setCurrentUser] = useState(null)
-  
-  
+
+ 
   const isMyPost = currentUser && post && Number(currentUser.userId) === post.userId
 
   useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem("user"))
-    setCurrentUser(userData)
-    setIsLoggedIn(userData !== null)
+    const userId = localStorage.getItem("userId")
+    const userName = localStorage.getItem("userName")
+    const userEmail = localStorage.getItem("userEmail")
+  
+    if (userId && userName) {
+      const userData = {
+        userId: Number(userId),
+        userName,
+        email: userEmail
+      }
+      setCurrentUser(userData)
+      setIsLoggedIn(true)
+      console.log("✅ 현재 로그인한 사용자:", userData.userName)
+    } else {
+      setCurrentUser(null)
+      setIsLoggedIn(false)
+      console.log("❌ 로그인 안 됨")
+    }
   }, [])
+  
 
   useEffect(() => {
     const fetchPostDetail = async () => {
@@ -35,7 +51,7 @@ function PostDetailPage() {
         if (hasFetched.current) return // 이미 실행했으면 중단
         hasFetched.current = true // 처음 실행일 경우 true로 변경
 
-        const response = await postAPI.getPostById(id)
+        const response= await axios.get(`http://localhost:9000/api/community/${id}`)
         console.log("응답 데이터:", response.data)
 
         setPost(response.data)
@@ -78,7 +94,7 @@ function PostDetailPage() {
   }
 
   //로딩중이면 스피너만 보여줌
-  if (loading) {
+  if (loading || !post) {
     return (
       <>
         <Navbar isLoggedIn={isLoggedIn} />

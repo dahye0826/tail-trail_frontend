@@ -28,6 +28,7 @@ function EditPostPage() {
   const searchResultsRef = useRef(null)
   const selectedItemRef = useRef(null)
 
+
   // 게시글 데이터 불러오기
   useEffect(() => {
     const fetchPost = async () => {
@@ -128,12 +129,14 @@ function EditPostPage() {
       alert("제목과 내용은 필수입니다.")
       return
     }
+    const userId = localStorage.getItem("userId")
 
     const formData = new FormData()
     formData.append("postTitle", title)
     formData.append("postContent", content)
     if (selectedLocation && selectedLocation.id) {
       formData.append("placeId", selectedLocation.id)
+      formData.append("userId",userId)
     }
     formData.append("remainImages", JSON.stringify(Array.isArray(existingImages) ? existingImages : []))
     images.forEach((image) => formData.append("postImages", image))

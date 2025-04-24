@@ -11,8 +11,14 @@ function CommentSection({ postId, isLoggedIn, postAuthor }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [commentUsers, setCommentUsers] = useState([])
-  const storedUser = localStorage.getItem("user");
-  const currentUser = storedUser ? JSON.parse(storedUser) : {};
+
+
+  const userId = localStorage.getItem("userId")
+const userName = localStorage.getItem("userName")
+
+const currentUser = userId && userName
+  ? { userId: Number(userId), userName }
+  : null
 
   // 댓글 목록 불러오기
   useEffect(() => {
@@ -32,15 +38,6 @@ function CommentSection({ postId, isLoggedIn, postAuthor }) {
           // 현재 로그인한 사용자와 게시글 작성자 추가
           const allUsers = [...uniqueUsers]
 
-          // 현재 사용자가 있고 목록에 없으면 추가
-          if (currentUser && !allUsers.includes(currentUser)) {
-            allUsers.push(currentUser)
-          }
-
-          // 게시글 작성자가 있고 목록에 없으면 추가
-          if (postAuthor && !allUsers.includes(postAuthor)) {
-            allUsers.push(postAuthor)
-          }
 
           setCommentUsers(allUsers)
           setError(null)
@@ -50,8 +47,8 @@ function CommentSection({ postId, isLoggedIn, postAuthor }) {
         if (isMounted) {
           // 에러 발생 시에도 기본 사용자 목록 제공
           const allUsers = []
-          if (currentUser) {
-            allUsers.push(currentUser)
+          if (currentUser?.userName) {
+            allUsers.push(currentUser.userName)
           }
           if (postAuthor) {
             allUsers.push(postAuthor)
@@ -76,7 +73,13 @@ function CommentSection({ postId, isLoggedIn, postAuthor }) {
 
   // 댓글 추가 처리
   const handleCommentAdded = (newComment) => {
-    setComments((prevComments) => [newComment, ...prevComments])
+    console.log("🆕 댓글 추가됨:", newComment)
+    setComments((prevComments) => {
+      // 이미 같은 commentId가 있는지 확인
+      const alreadyExists = prevComments.some(c => c.commentId === newComment.commentId)
+      if (alreadyExists) return prevComments // 있으면 추가 안 함
+      return [newComment, ...prevComments]   // 없으면 추가
+    })
 
     // 새 사용자 추가 (아직 목록에 없는 경우)
     if (newComment.userName && !commentUsers.includes(newComment.userName)) {
@@ -87,15 +90,20 @@ function CommentSection({ postId, isLoggedIn, postAuthor }) {
   // 댓글 수정 처리
   const handleCommentUpdated = (updatedComment) => {
     setComments((prevComments) =>
-      prevComments.map((comment) => (comment.id === updatedComment.id ? updatedComment : comment)),
-    )
-  }
+      prevComments.map((comment) =>
+        comment.commentId === updatedComment.commentId ? updatedComment : comment
+      )
+    )}
 
   // 댓글 삭제 처리
   const handleCommentDeleted = (commentId) => {
-    setComments((prevComments) => prevComments.filter((comment) => comment.id !== commentId))
-  }
+    setComments((prevComments) =>
+      prevComments.filter((comment) => {
 
+        return Number(comment.commentId) !== Number(commentId)
+      })
+    )
+  }
   // useMemo를 사용하여 commentUsers 안정화
   const memoizedCommentUsers = useMemo(() => commentUsers, [commentUsers])
 
@@ -109,8 +117,8 @@ function CommentSection({ postId, isLoggedIn, postAuthor }) {
       <CommentForm
         postId={postId}
         onCommentAdded={handleCommentAdded}
-        userId={currentUser.userId}
-        isLoggedIn={true}
+        userId={currentUser?.userId}
+        isLoggedIn={isLoggedIn}
         commentUsers={memoizedCommentUsers}
       />
 

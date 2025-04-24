@@ -19,11 +19,22 @@ function PostListPage() {
   const [totalPages, setTotalPages] = useState(1)
   const [issearching, setIsSearching] = useState(false)
 
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"))
+    console.log("현재 로그인한 사용자 (이 페이지):", user?.userName || "비로그인 상태")
+  }, [])
+  
   const navigate = useNavigate()
 
+
   useEffect(() => {
-    const loggedIn = localStorage.getItem("isLoggedIn") === "true"
+    const userId = localStorage.getItem("userId")
+    const userName = localStorage.getItem("userName")
+    const loggedIn = localStorage.getItem("isLoggedIn") === "true" && !!userId
+  
     setIsLoggedIn(loggedIn)
+  
+    console.log("✅ 현재 로그인한 사용자:", userName || "비로그인 상태")
   }, [])
 
        const handleSearch = async () => {

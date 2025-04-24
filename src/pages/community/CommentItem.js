@@ -8,9 +8,11 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
   const [isEditing, setIsEditing] = useState(false)
   const [editedContent, setEditedContent] = useState(comment.content)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [comments, setComments]= useState([])
 
   // 댓글 작성자인지 확인
-  const isAuthor = currentUser === comment.userName
+  const isAuthor = currentUser?.userId === comment.userId
+
 
   // 댓글 수정 처리
   const handleUpdateComment = async () => {
@@ -22,7 +24,9 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
     try {
       const response = await axios.put(`http://localhost:9000/api/comments/${comment.commentId}`, {
         content: editedContent,
+        userId: currentUser?.userId,
       })
+      console.log("commentId 확인:", comment.commentId)
 
       onCommentUpdated(response.data)
       setIsEditing(false)
@@ -34,14 +38,17 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
 
   // 댓글 삭제 처리
   const handleDeleteComment = async () => {
-    if (!window.confirm("정말 이 댓글을 삭제하시겠습니까?")) {
-      return
-    }
-
+    if (!window.confirm("정말 이 댓글을 삭제하시겠습니까?")) return
+  
     try {
       setIsDeleting(true)
-      await axios.delete(`http://localhost:9000/api/comments/${comment.commentid}`)
-      onCommentDeleted(comment.id)
+  
+      // 서버에서 댓글 삭제
+      await axios.delete(`http://localhost:9000/api/comments/${comment.commentId}`)
+  
+      // UI에서 상태 제거 (부모에서 props로 받은 함수 호출)
+      onCommentDeleted(comment.commentId)
+  
     } catch (error) {
       console.error("댓글 삭제 오류:", error)
       alert("댓글 삭제에 실패했습니다.")
@@ -112,7 +119,7 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
             <div className="comment-date">{formatDate(comment.createdAt)}</div>
           </div>
         </div>
-        {/* {isAuthor && !isEditing && ( */}
+        {isAuthor && !isEditing && (
           <div className="comment-actions">
             <button className="btn btn-sm btn-link" onClick={() => setIsEditing(true)}>
               수정
@@ -121,7 +128,7 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
               {isDeleting ? "삭제 중..." : "삭제"}
             </button>
           </div>
-        {/* )} */}
+       )}
       </div>
 
       {isEditing ? (

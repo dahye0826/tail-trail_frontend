@@ -29,6 +29,19 @@ function WritePostPage() {
   const searchResultsRef = useRef(null)
   const selectedItemRef = useRef(null)
 
+
+useEffect(() => {
+  const userId = localStorage.getItem("userId")
+  const userName = localStorage.getItem("userName")
+
+  if (userId && userName) {
+    setIsLoggedIn(true)
+    console.log("✅ 현재 로그인 사용자:", userName)
+  } else {
+    setIsLoggedIn(false)
+    console.log("❌ 비로그인 상태")
+  }
+}, [])
   const navigate = useNavigate()
 
   // 선택된 결과 항목이 보이도록 자동 스크롤 처리
@@ -135,10 +148,12 @@ function WritePostPage() {
       alert("제목과 내용은 필수입니다.")
       return
     }
+    const userId = localStorage.getItem("userId")
 
     const formData = new FormData()
     formData.append("postTitle", title)
     formData.append("postContent", content)
+    formData.append("userId", userId) 
 
     images.forEach((image) => {
       formData.append("postImages", image)
