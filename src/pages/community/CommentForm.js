@@ -32,15 +32,19 @@ function CommentForm({ postId, onCommentAdded, isLoggedIn, userId,commentUsers =
 
   // 멘션 선택 처리
   const handleMentionSelect = (userName) => {
-    const newContent = `@${userName} ` + content;
+
+    const mention = `@${userName} `;
+    const contentWithoutOldMention = content.replace(/^@([\uAC00-\uD7A3\w]+)\s+/, "");
+
+    const newContent = mention + contentWithoutOldMention;
     setContent(newContent);
   
     setTimeout(()=>{
       if(textareaRef.current){
         textareaRef.current.focus();
         textareaRef.current.setSelectionRange(
-          `@${userName} `.length,
-          `@${userName} `.length
+          mention.length,
+          mention.length
         )
       }
     },0);
@@ -99,7 +103,7 @@ function CommentForm({ postId, onCommentAdded, isLoggedIn, userId,commentUsers =
           onClick={toggleMentionDropdown}
           disabled={!isLoggedIn}
         >
-          맨션{isMentionOpen ? "▲" : "▼"}
+          멘션{isMentionOpen ? "▲" : "▼"}
         </button>
 
         {isMentionOpen && commentUsers.length > 0 && (

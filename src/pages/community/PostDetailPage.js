@@ -10,29 +10,29 @@ import CommentSection from "../../pages/community/CommentSection"
 import LoadingSpinner from "../../common/LoadingSpinner"
 import "./PostDetailPage.css"
 
-
 function PostDetailPage() {
   const [post, setPost] = useState(null)
   const [loading, setLoading] = useState(true)
   const [isLoggedIn, setIsLoggedIn] = useState(false) // 실제 로그인 상태로 변경 필요
+  const [showReportDropdown, setShowReportDropdown] = useState(false)
   const { id } = useParams()
   const navigate = useNavigate()
   const hasFetched = useRef(false)
   const [currentUser, setCurrentUser] = useState(null)
+  const reportDropdownRef = useRef(null)
 
- 
   const isMyPost = currentUser && post && Number(currentUser.userId) === post.userId
 
   useEffect(() => {
     const userId = localStorage.getItem("userId")
     const userName = localStorage.getItem("userName")
     const userEmail = localStorage.getItem("userEmail")
-  
+
     if (userId && userName) {
       const userData = {
         userId: Number(userId),
         userName,
-        email: userEmail
+        email: userEmail,
       }
       setCurrentUser(userData)
       setIsLoggedIn(true)
@@ -43,7 +43,20 @@ function PostDetailPage() {
       console.log("❌ 로그인 안 됨")
     }
   }, [])
-  
+
+  // 드롭다운 외부 클릭 시 닫기
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (reportDropdownRef.current && !reportDropdownRef.current.contains(event.target)) {
+        setShowReportDropdown(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
 
   useEffect(() => {
     const fetchPostDetail = async () => {
@@ -51,7 +64,7 @@ function PostDetailPage() {
         if (hasFetched.current) return // 이미 실행했으면 중단
         hasFetched.current = true // 처음 실행일 경우 true로 변경
 
-        const response= await axios.get(`http://localhost:9000/api/community/${id}`)
+        const response = await axios.get(`http://localhost:9000/api/community/${id}`)
         console.log("응답 데이터:", response.data)
 
         setPost(response.data)
@@ -93,6 +106,28 @@ function PostDetailPage() {
     }
   }
 
+  // 신고 처리
+  const handleReport = async (reason) => {
+    // 여기에 신고 API 호출 로직 추가
+    try {
+      const response = await axios.post("http://localhost:9000/api/report",{
+        targetId: post.postId,
+        targetType: "POST",
+        userId:currentUser.userId,
+        reason:reason
+      }) 
+
+      alert(`게시글이 '${reason}' 사유로 신고되었습니다.`)
+      setShowReportDropdown(false)
+     }
+
+ 
+    catch(err) {
+      console.log("신고 오류", err)
+      alert("신고 처리 중 오류가 발생하였습니다")
+     }
+  }
+
   //로딩중이면 스피너만 보여줌
   if (loading || !post) {
     return (
@@ -108,10 +143,10 @@ function PostDetailPage() {
 
   const locationInfo = post
     ? {
-        id: post.placeId, // placeId도 체크
-        name: post.placeName || "이름 없음", // placeName도 체크
-        address: post.placeAddress || "주소 없음", // 다양한 필드명 체크
-      }
+      id: post.placeId, // placeId도 체크
+      name: post.placeName || "이름 없음", // placeName도 체크
+      address: post.placeAddress || "주소 없음", // 다양한 필드명 체크
+    }
     : null
 
   return (
@@ -142,6 +177,38 @@ function PostDetailPage() {
                     )}
                   </div>
                 </div>
+              </div>
+
+              <div className="d-flex align-items-center">
+                {/* 작성자가 아니고 로그인한 경우에만 신고 버튼 표시 */}
+                {!isMyPost && isLoggedIn && (
+                  <div className="report-dropdown-container" ref={reportDropdownRef}>
+                    <button
+                      className="btn btn-sm btn-link text-secondary report-btn"
+                      onClick={() => setShowReportDropdown(!showReportDropdown)}
+                      title="게시글 신고"
+                    >
+                      <i className="bi bi-flag"></i> 신고
+                    </button>
+                    {showReportDropdown && (
+                      <div className="report-dropdown">
+                        <div className="report-dropdown-header">신고 사유 선택</div>
+                        <div className="report-dropdown-item" onClick={() => handleReport("영리 목적/홍보성")}>
+                          영리 목적/홍보성
+                        </div>
+                        <div className="report-dropdown-item" onClick={() => handleReport("욕설/인신공격")}>
+                          욕설/인신공격
+                        </div>
+                        <div className="report-dropdown-item" onClick={() => handleReport("스팸")}>
+                          스팸
+                        </div>
+                        <div className="report-dropdown-item" onClick={() => handleReport("기타")}>
+                          기타
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>

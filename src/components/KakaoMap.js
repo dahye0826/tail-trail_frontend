@@ -55,6 +55,11 @@ const KakaoMap = ({
           initialCoords = { lat: initialLocation.lat, lng: initialLocation.lng }
         }
 
+        if (!container) {
+          console.error("지도를 렌더링할 DOM 요소가 없습니다.");
+          return;
+        }
+
         const options = {
           center: new window.kakao.maps.LatLng(initialCoords.lat, initialCoords.lng),
           level: defaultLevel || 3,

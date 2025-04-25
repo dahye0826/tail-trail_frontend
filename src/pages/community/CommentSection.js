@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect, useMemo } from "react"
 import axios from "axios"
 import CommentItem from "./CommentItem"
@@ -73,9 +71,8 @@ const currentUser = userId && userName
 
   // 댓글 추가 처리
   const handleCommentAdded = (newComment) => {
-    console.log("🆕 댓글 추가됨:", newComment)
     setComments((prevComments) => {
-      // 이미 같은 commentId가 있는지 확인
+      // 이�� 같은 commentId가 있는지 확인
       const alreadyExists = prevComments.some(c => c.commentId === newComment.commentId)
       if (alreadyExists) return prevComments // 있으면 추가 안 함
       return [newComment, ...prevComments]   // 없으면 추가

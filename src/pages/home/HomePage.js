@@ -35,7 +35,7 @@ const HomePage = () => {
           id: post.postId,
           title: post.title,
           content: post.content,
-          username: post.username,
+          userName: post.userName,
           createdAt: post.createdAt.split("T")[0],
         }))
 
@@ -199,7 +199,7 @@ const HomePage = () => {
                           </p>
                           <div className="card-meta">
                             <span className="author">
-                              <i className="bi bi-person-circle me-1"></i> {post.username}
+                              <i className="bi bi-person-circle me-1"></i> {post.userName}
                             </span>
                             <span className="date">{post.createdAt}</span>
                           </div>

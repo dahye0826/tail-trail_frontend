@@ -1,8 +1,8 @@
 :root {
   --primary-color: #4ecdc4;
   --secondary-color: #a5e1e9;
-  --accent-color: #2a9d8f;
-  --text-color: #2c3e50;
+  --accent-color: #1ddac3;
+  --text-color: #000000;
   --light-bg: #f0f9fa;
   --border-color: #d1eeef;
 }
@@ -32,16 +32,8 @@
 }
 
 .post-list-item {
-  /* transition 효과 제거 */
   background-color: white;
   margin-bottom: 0.5rem;
-}
-
-.post-list-item:hover {
-  /* transform 효과 제거 */
-  transform: none;
-  /* 그림자 효과 제거 */
-  box-shadow: none;
 }
 
 .btn-primary {
@@ -55,13 +47,19 @@
 .btn-primary:hover {
   background-color: var(--accent-color);
   border-color: var(--accent-color);
-  transform: none;
-  box-shadow: none;
 }
 
 .btn-outline-secondary {
   color: var(--text-color);
   border-color: var(--border-color);
+}
+
+/* 이 부분이 충돌할 수 있으므로 더 구체적인 선택자로 덮어쓰기 */
+.post-detail-container .post-actions .btn-outline-secondary {
+  width: 80px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .btn-outline-secondary:hover {

@@ -18,6 +18,7 @@ import HomePage from "./pages/home/HomePage"
 import MapViewPage from "./pages/map/MapViewPage"
 import FavoritesPage from "./pages/mypage/FavoritesPage"
 import VisitedPlacesPage from "./pages/mypage/VisitedPlacesPage"
+import ReportManagementPage from "./pages/admin/ReportManagementPage"
 
 function AppRouter() {
   return (
@@ -38,7 +39,8 @@ function AppRouter() {
           <Route path="/mypage/edit-profile" element={<ProfileEditPage />} />
           <Route path="/map" element={<MapViewPage />} />
           <Route path="/mypage/favorites" element={<FavoritesPage />} />
-          <Route path="/mypage/visited" element={<VisitedPlacesPage />} />     
+          <Route path="/mypage/visited" element={<VisitedPlacesPage />} /> 
+          <Route path="/mypage/admin/report" element={<ReportManagementPage/>}/>    
         </Routes>
       </AuthProvider>
     </BrowserRouter>

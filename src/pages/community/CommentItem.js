@@ -8,11 +8,11 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
   const [isEditing, setIsEditing] = useState(false)
   const [editedContent, setEditedContent] = useState(comment.content)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [comments, setComments]= useState([])
+  const [comments, setComments] = useState([])
+  const [showReportDropdown, setShowReportDropdown] = useState(false)
 
   // 댓글 작성자인지 확인
   const isAuthor = currentUser?.userId === comment.userId
-
 
   // 댓글 수정 처리
   const handleUpdateComment = async () => {
@@ -39,16 +39,15 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
   // 댓글 삭제 처리
   const handleDeleteComment = async () => {
     if (!window.confirm("정말 이 댓글을 삭제하시겠습니까?")) return
-  
+
     try {
       setIsDeleting(true)
-  
+
       // 서버에서 댓글 삭제
       await axios.delete(`http://localhost:9000/api/comments/${comment.commentId}`)
-  
+
       // UI에서 상태 제거 (부모에서 props로 받은 함수 호출)
       onCommentDeleted(comment.commentId)
-  
     } catch (error) {
       console.error("댓글 삭제 오류:", error)
       alert("댓글 삭제에 실패했습니다.")
@@ -77,34 +76,45 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
 
   // 멘션 형식 처리 (@userName)
   const formatMentions = (text) => {
-    // @userName 패턴을 찾아 하이라이트
-    const mentionRegex = /@(\w+)/g
-    const parts = []
-    let lastIndex = 0
-    let match
+    const mentionRegex = /^@([\uAC00-\uD7A3\w]+)\s+/ // 맨 앞에 @username + 공백까지
 
-    while ((match = mentionRegex.exec(text)) !== null) {
-      // 멘션 앞 텍스트 추가
-      if (match.index > lastIndex) {
-        parts.push(text.substring(lastIndex, match.index))
-      }
+    const match = text.match(mentionRegex)
 
-      // 멘션 부분 추가 (스타일링 적용)
-      parts.push(
-        <span key={match.index} className="mention-highlight">
-          {match[0]}
+    if (match) {
+      const mention = match[0] // "@userName "
+      const remainingText = text.slice(mention.length) // 나머지 텍스트만 남김
+
+      return [
+        <span key="mention" className="mention-highlight">
+          {mention.trim()}
         </span>,
-      )
-
-      lastIndex = match.index + match[0].length
+        " ",
+        remainingText,
+      ]
     }
 
-    // 남은 텍스트 추가
-    if (lastIndex < text.length) {
-      parts.push(text.substring(lastIndex))
-    }
+    // 멘션이 없으면 원래 텍스트 그대로 리턴
+    return text
+  }
 
-    return parts.length > 0 ? parts : text
+  // 신고 처리
+  const handleReport = async (reason) => {
+   
+     try {
+      const response = await axios.post("http://localhost:9000/api/report",{
+        targetId: comment.commentId,
+        targetType: "COMMENT",
+        userId:currentUser.userId,
+        reason:reason
+      }) 
+
+    alert(`댓글이 '${reason}' 사유로 신고되었습니다.`)
+    setShowReportDropdown(false)
+  }
+  catch(err) {
+    console.log("신고 오류", err)
+    alert("신고 처리 중 오류가 발생하였습니다")
+   }
   }
 
   return (
@@ -119,16 +129,45 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
             <div className="comment-date">{formatDate(comment.createdAt)}</div>
           </div>
         </div>
-        {isAuthor && !isEditing && (
-          <div className="comment-actions">
-            <button className="btn btn-sm btn-link" onClick={() => setIsEditing(true)}>
-              수정
-            </button>
-            <button className="btn btn-sm btn-link text-danger" onClick={handleDeleteComment} disabled={isDeleting}>
-              {isDeleting ? "삭제 중..." : "삭제"}
-            </button>
-          </div>
-       )}
+        <div className="comment-actions">
+          {isAuthor && !isEditing && (
+            <>
+              <button className="btn btn-sm btn-link" onClick={() => setIsEditing(true)}>
+                수정
+              </button>
+              <button className="btn btn-sm btn-link text-danger" onClick={handleDeleteComment} disabled={isDeleting}>
+                {isDeleting ? "삭제 중..." : "삭제"}
+              </button>
+            </>
+          )}
+          {!isAuthor && currentUser && (
+            <div className="report-dropdown-container">
+              <button
+                className="btn btn-sm btn-link text-secondary report-btn"
+                onClick={() => setShowReportDropdown(!showReportDropdown)}
+              >
+                <i className="bi bi-flag"></i>
+              </button>
+              {showReportDropdown && (
+                <div className="report-dropdown">
+                  <div className="report-dropdown-header">신고 사유 선택</div>
+                  <div className="report-dropdown-item" onClick={() => handleReport("영리 목적/홍보성")}>
+                    영리 목적/홍보성
+                  </div>
+                  <div className="report-dropdown-item" onClick={() => handleReport("욕설/인신공격")}>
+                    욕설/인신공격
+                  </div>
+                  <div className="report-dropdown-item" onClick={() => handleReport("스팸")}>
+                    스팸
+                  </div>
+                  <div className="report-dropdown-item" onClick={() => handleReport("기타")}>
+                    기타
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {isEditing ? (
