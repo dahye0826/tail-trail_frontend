@@ -347,21 +347,42 @@ const VisitedPlacesPage = () => {
 
             {/* 페이지네이션 */}
             {totalPages > 1 && (
-              <nav className="mt-4">
+              <nav className="mt-4" aria-label="방문 이력 페이지네이션">
                 <ul className="pagination justify-content-center">
-                  {Array.from({ length: totalPages }, (_, i) => (
-                    <li
-                      key={`page-${i + 1}`}
-                      className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}
+                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                    <button
+                      className="page-link"
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      disabled={currentPage === 1}
                     >
-                      <button
-                        className="page-link"
-                        onClick={() => setCurrentPage(i + 1)}
+                      이전
+                    </button>
+                  </li>
+                  {Array.from({ length: totalPages }).map((_, index) => {
+                    const pageNumber = index + 1;
+                    return (
+                      <li
+                        key={`page-${pageNumber}`}
+                        className={`page-item ${currentPage === pageNumber ? 'active' : ''}`}
                       >
-                        {i + 1}
-                      </button>
-                    </li>
-                  ))}
+                        <button
+                          className="page-link"
+                          onClick={() => setCurrentPage(pageNumber)}
+                        >
+                          {pageNumber}
+                        </button>
+                      </li>
+                    );
+                  })}
+                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                    <button
+                      className="page-link"
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      다음
+                    </button>
+                  </li>
                 </ul>
               </nav>
             )}

@@ -36,12 +36,8 @@ const KakaoMap = ({
 
     script.onload = () => {
       window.kakao.maps.load(() => {
-        if (!mapContainerRef.current) return
-
-        if (!container) {
-          console.error("지도를 렌더링할 DOM 요소가 없습니다.");
-          return;
-        }
+        const mapContainer = mapContainerRef.current
+        if (!mapContainer) return
 
         const options = {
           center: new window.kakao.maps.LatLng(
@@ -51,7 +47,7 @@ const KakaoMap = ({
           level: defaultLevel || 3,
         }
 
-        const kakaoMap = new window.kakao.maps.Map(mapContainerRef.current, options)
+        const kakaoMap = new window.kakao.maps.Map(mapContainer, options)
         setMap(kakaoMap)
 
         // 초기 위치에 마커 표시
