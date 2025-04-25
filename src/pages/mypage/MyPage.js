@@ -7,6 +7,7 @@ import "./MyPageStyles.css"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 import { userAPI } from "../../services/api"  // api.js에서 userAPI만 가져옵니다
+import { visitedAPI } from "../../services/api"  // api.js에서 visitedAPI만 가져옵니다
 
 const MyPage = () => {
   const navigate = useNavigate();
@@ -56,59 +57,38 @@ const MyPage = () => {
         
         console.log("사용자 데이터 로딩 시작, userId:", userId);
         
-// 사용자 프로필 정보 가져오기
-const profileResponse = await userAPI.getProfile(userId);
-console.log("프로필 응답:", profileResponse);
+        // 사용자 프로필 정보 가져오기
+        const profileResponse = await userAPI.getProfile(userId);
+        console.log("프로필 응답:", profileResponse);
         
-if (profileResponse.data) {
-  setUserData({
-    userName: profileResponse.data.userName || "",
-    email: profileResponse.data.email || "",
-    userPhone: profileResponse.data.userPhone || "",
-    userAddress: profileResponse.data.userAddress || "",
-    birthdate: profileResponse.data.birthdate || "",
-    profile: profileResponse.data.profile || "",
-    petName: profileResponse.data.petName || "",
-    type: profileResponse.data.type || "",
-    breed: profileResponse.data.breed || "",
-    petAge: profileResponse.data.petAge || "",
-    role: profileResponse.data.role || "user"
-  });
-}
-
-// userAPI.getUserStats 호출 및 데이터 처리
-try {
-  const statsResponse = await userAPI.getUserStats(userId);
-  console.log("통계 응답:", statsResponse);
-  
-  if (statsResponse.data) {
-    // 변경된 속성명에 맞게 데이터 설정
-    setStats({
-      posts: statsResponse.data.postCount || 0,
-      visited_places: statsResponse.data.visitedCount || 0,
-      favorites: statsResponse.data.favoriteCount || 0
-    });
-    console.log("통계 설정 완료:", statsResponse.data);
-  }
-} catch (err) {
-  console.error("통계 데이터 가져오기 오류:", err);
-  // 오류 발생 시 기본값으로 설정
-  setStats({
-    posts: 0,
-    visited_places: 0,
-    favorites: 0
-  });
-}
+        if (profileResponse.data) {
+          setUserData({
+            userName: profileResponse.data.userName || "",
+            email: profileResponse.data.email || "",
+            userPhone: profileResponse.data.userPhone || "",
+            userAddress: profileResponse.data.userAddress || "",
+            birthdate: profileResponse.data.birthdate || "",
+            profile: profileResponse.data.profile || "",
+            petName: profileResponse.data.petName || "",
+            type: profileResponse.data.type || "",
+            breed: profileResponse.data.breed || "",
+            petAge: profileResponse.data.petAge || "",
+            role: profileResponse.data.role || "user"
+          });
+        }
         
-        // 기존 api.js의 집계 기능을 사용하여 사용자 활동 통계 가져오기
+        // 방문 이력 수 가져오기
+        const visitedResponse = await visitedAPI.getMyVisitedPlaces(userId, 1, 1);
+        const visitedCount = visitedResponse?.data?.totalElements || 0;
+        
+        // 기타 통계 데이터 가져오기
         const statsResponse = await userAPI.getUserStats(userId);
         console.log("통계 응답:", statsResponse);
         
         if (statsResponse.data) {
-          // api.js의 응답 구조에 맞게 데이터 추출
           setStats({
             posts: statsResponse.data.postCount || 0,
-            visited_places: statsResponse.data.visitedCount || 0,
+            visited_places: visitedCount,
             favorites: statsResponse.data.favoriteCount || 0
           });
         }
