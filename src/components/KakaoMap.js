@@ -1,7 +1,6 @@
 "use client"
 import { useEffect, useRef, useState } from "react"
 import "./KakaoMap.css"
-import PropTypes from 'prop-types'
 
 const KakaoMap = ({
   initialLocation,
@@ -14,9 +13,9 @@ const KakaoMap = ({
   showRegisteredPlaces = true,
   selectedPlace,
   showInfoCard = true,
-  useCluster = true
+  useCluster = true,
 }) => {
-  const mapContainerRef = useRef(null)
+  const mapRef = useRef(null)
   const [map, setMap] = useState(null)
   const [searchKeyword, setSearchKeyword] = useState("")
   const [searchResults, setSearchResults] = useState([])
@@ -36,40 +35,38 @@ const KakaoMap = ({
 
     script.onload = () => {
       window.kakao.maps.load(() => {
-        const mapContainer = mapContainerRef.current
-        if (!mapContainer) return
+        const container = mapRef.current
+
+        // 서울 좌표 (기준점)
+        const seoulCoords = { lat: 37.5665, lng: 126.978 }
+
+        // 초기 위치 설정 로직
+        let initialCoords = { lat: seoulCoords.lat, lng: seoulCoords.lng }
+
+        // markerPositions가 있으면 첫 번째 마커 위치 사용
+        if (markerPositions && markerPositions.length > 0) {
+          console.log("마커 위치 데이터:", markerPositions)
+          initialCoords = {
+            lat: Number(markerPositions[0].lat),
+            lng: Number(markerPositions[0].lng),
+          }
+        } else if (initialLocation && initialLocation.lat && initialLocation.lng) {
+          // initialLocation이 제공된 경우 해당 위치 사용
+          initialCoords = { lat: initialLocation.lat, lng: initialLocation.lng }
+        }
+
+        if (!container) {
+          console.error("지도를 렌더링할 DOM 요소가 없습니다.");
+          return;
+        }
 
         const options = {
-          center: new window.kakao.maps.LatLng(
-            initialLocation?.lat || 37.5665,
-            initialLocation?.lng || 126.978
-          ),
+          center: new window.kakao.maps.LatLng(initialCoords.lat, initialCoords.lng),
           level: defaultLevel || 3,
         }
 
-        const kakaoMap = new window.kakao.maps.Map(mapContainer, options)
+        const kakaoMap = new window.kakao.maps.Map(container, options)
         setMap(kakaoMap)
-
-        // 초기 위치에 마커 표시
-        if (initialLocation && initialLocation.lat && initialLocation.lng) {
-          const initialMarkerPosition = new window.kakao.maps.LatLng(initialLocation.lat, initialLocation.lng)
-
-          const marker = new window.kakao.maps.Marker({
-            position: initialMarkerPosition,
-            map: kakaoMap,
-          })
-
-          // 마커 클릭 시 선택된 장소 정보 설정
-          window.kakao.maps.event.addListener(marker, "click", () => {
-            setSelectedLocation(initialLocation)
-            setSelectedMarker({ marker })
-            kakaoMap.setCenter(initialMarkerPosition)
-          })
-
-          // 초기에 선택된 장소 정보 설정
-          setSelectedLocation(initialLocation)
-          setSelectedMarker({ marker })
-        }
 
         // 클러스터러 생성 및 설정
         if (useCluster) {
@@ -104,7 +101,40 @@ const KakaoMap = ({
             ],
           })
 
+          // 클러스터 클릭 이벤트 처리
+          window.kakao.maps.event.addListener(clusterer, "clusterclick", (cluster) => {
+            // 클러스터 클릭 시 해당 영역으로 지도 확대
+            const level = kakaoMap.getLevel() - 1
+            kakaoMap.setLevel(level, { anchor: cluster.getCenter() })
+          })
+
           clustererRef.current = clusterer
+        }
+
+        // 지도 클릭 시 선택된 장소 정보 초기화
+        window.kakao.maps.event.addListener(kakaoMap, "click", () => {
+          setSelectedLocation(null)
+        })
+
+        // 초기 위치에 마커 표시
+        if (initialLocation && initialLocation.lat && initialLocation.lng) {
+          const initialMarkerPosition = new window.kakao.maps.LatLng(initialLocation.lat, initialLocation.lng)
+
+          const marker = new window.kakao.maps.Marker({
+            position: initialMarkerPosition,
+            map: kakaoMap,
+          })
+
+          // 마커 클릭 시 선택된 장소 정보 설정
+          window.kakao.maps.event.addListener(marker, "click", () => {
+            setSelectedLocation(initialLocation)
+            setSelectedMarker({ marker })
+            kakaoMap.setCenter(initialMarkerPosition)
+          })
+
+          // 초기에 선택된 장소 정보 설정
+          setSelectedLocation(initialLocation)
+          setSelectedMarker({ marker })
         }
       })
     }
@@ -128,11 +158,8 @@ const KakaoMap = ({
       if (clustererRef.current) {
         clustererRef.current.clear()
       }
-
-      // 스크립트 제거
-      document.head.removeChild(script)
     }
-  }, [initialLocation, defaultLevel, useCluster])
+  }, [initialLocation, defaultLevel, onLocationSelect, useCluster])
 
   // 마커 생성 및 클러스터러에 추가
   useEffect(() => {
@@ -300,25 +327,7 @@ const KakaoMap = ({
   }
 
   return (
-    <div
-      ref={mapContainerRef}
-      style={{
-        width: "100%",
-        height: height,
-        position: "relative",
-      }}
-    >
-      {error && (
-        <div className="error-message">
-          {error}
-        </div>
-      )}
-      {loading && (
-        <div className="loading-spinner">
-          로딩 중...
-        </div>
-      )}
-
+    <div className="kakao-map-container">
       {showSearchBar && (
         <div className="map-search-container">
           <div className="input-group">
@@ -371,6 +380,7 @@ const KakaoMap = ({
 
       <div
         id="kakao-map"
+        ref={mapRef}
         style={{
           width: "100%",
           height: height || "400px",
@@ -408,24 +418,6 @@ const KakaoMap = ({
       )}
     </div>
   )
-}
-
-KakaoMap.propTypes = {
-  initialLocation: PropTypes.shape({
-    lat: PropTypes.number,
-    lng: PropTypes.number,
-    name: PropTypes.string
-  }),
-  markerPositions: PropTypes.array,
-  height: PropTypes.string,
-  showSearchBar: PropTypes.bool,
-  onLocationSelect: PropTypes.func,
-  defaultLevel: PropTypes.number,
-  readOnly: PropTypes.bool,
-  showRegisteredPlaces: PropTypes.bool,
-  selectedPlace: PropTypes.object,
-  showInfoCard: PropTypes.bool,
-  useCluster: PropTypes.bool
 }
 
 export default KakaoMap
