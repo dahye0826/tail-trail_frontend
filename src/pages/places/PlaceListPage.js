@@ -8,6 +8,7 @@ import "./PlaceListPage.css"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 import axios from "axios"
+import { favoriteAPI } from "../../services/api"
 
 const API_BASE_URL = "http://localhost:9000/api"
 
@@ -75,7 +76,7 @@ function PlaceListPage() {
         const token = localStorage.getItem("token")
         if (token) {
           setIsLoggedIn(true)
-          await fetchFavorites(token)
+          await fetchFavorites()
         }
       } catch (error) {
         console.error("Error fetching initial data:", error)
@@ -86,16 +87,18 @@ function PlaceListPage() {
   }, [])
 
   // Fetch user favorites
-  const fetchFavorites = async (token) => {
+  const fetchFavorites = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/user/favorites`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (response.data) {
-        setFavorites(response.data.map((fav) => fav.placeId))
+      const userId = localStorage.getItem("userId")
+      if (!userId) return
+
+      const response = await favoriteAPI.getFavorites(userId, 1, 1000)
+      if (response && response.data) {
+        const favoritesData = response.data.content || response.data
+        setFavorites(favoritesData.map(fav => fav.placeId))
       }
     } catch (error) {
-      console.error("Error fetching favorites:", error)
+      console.error("즐겨찾기 로드 오류:", error)
     }
   }
 
@@ -228,35 +231,24 @@ function PlaceListPage() {
       }
 
       try {
-        const token = localStorage.getItem("token")
+        const userId = localStorage.getItem("userId")
         const isFavorited = favorites.includes(placeId)
 
-        // Move updateFavorites inside the try block
-        const updateFavorites = async () => {
-          if (isFavorited) {
-            await axios.delete(`${API_BASE_URL}/user/favorites/${placeId}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            })
-            setFavorites(favorites.filter((id) => id !== placeId))
-          } else {
-            await axios.post(
-              `${API_BASE_URL}/user/favorites/${placeId}`,
-              {},
-              {
-                headers: { Authorization: `Bearer ${token}` },
-              },
-            )
-            setFavorites([...favorites, placeId])
-          }
+        if (isFavorited) {
+          // 즐겨찾기 삭제
+          await favoriteAPI.removeFavorite(placeId, userId)
+          setFavorites(favorites.filter((id) => id !== placeId))
+        } else {
+          // 즐겨찾기 추가
+          await favoriteAPI.addFavorite(placeId, userId)
+          setFavorites([...favorites, placeId])
         }
-
-        await updateFavorites()
       } catch (error) {
-        console.error("Error toggling favorite:", error)
+        console.error("즐겨찾기 처리 오류:", error)
         alert("즐겨찾기 업데이트 중 오류가 발생했습니다.")
       }
     },
-    [isLoggedIn, navigate, location, favorites],
+    [isLoggedIn, navigate, location, favorites]
   )
 
   const handleResetFilters = () => {
