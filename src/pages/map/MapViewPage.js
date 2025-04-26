@@ -1,5 +1,6 @@
-// MapViewPage.js - PlaceListPage 방식으로 지역/카테고리 옵션 설정 (도로명 주소에서 시(city)만 추출)
+"use client"
 
+// MapViewPage.js - PlaceListPage 방식으로 지역/카테고리 옵션 설정 (도로명 주소에서 시(city)만 추출)
 
 import axios from "axios"
 import { useState, useEffect } from "react"
@@ -11,7 +12,7 @@ import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 import KakaoMap from "../../components/KakaoMap"
 
-const API_BASE_URL = "http://localhost:9000/api";
+const API_BASE_URL = "http://localhost:9000/api"
 
 function MapViewPage() {
   const [places, setPlaces] = useState([])
@@ -21,10 +22,25 @@ function MapViewPage() {
   const [searchKeyword, setSearchKeyword] = useState("")
   const [regionFilter, setRegionFilter] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("")
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+  const [sidebarVisible, setSidebarVisible] = useState(true)
   const navigate = useNavigate()
 
   const [cities, setCities] = useState([])
   const [categories, setCategories] = useState([])
+
+  // 화면 크기 변경 감지
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768)
+      if (window.innerWidth > 768) {
+        setSidebarVisible(true)
+      }
+    }
+
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
 
   useEffect(() => {
     const fetchPlaces = async () => {
@@ -36,7 +52,7 @@ function MapViewPage() {
         const citySet = new Set()
         const categorySet = new Set()
 
-        const formattedPlaces = raw.map(place => {
+        const formattedPlaces = raw.map((place) => {
           const city = place.roadAddress?.split(" ")[0] || ""
           if (city) citySet.add(city)
           if (place.industrySub) categorySet.add(place.industrySub)
@@ -49,7 +65,7 @@ function MapViewPage() {
             category: place.industrySub || "기타",
             lat: Number(place.latitude),
             lng: Number(place.longitude),
-            description: place.description || "상세 정보 없음"
+            description: place.description || "상세 정보 없음",
           }
         })
 
@@ -81,6 +97,9 @@ function MapViewPage() {
 
   const handlePlaceSelect = (place) => {
     setSelectedPlace(place)
+    if (isMobile) {
+      setSidebarVisible(false)
+    }
   }
 
   const handleViewDetail = (placeId) => {
@@ -97,61 +116,65 @@ function MapViewPage() {
     setCategoryFilter("")
   }
 
+  const toggleSidebar = () => {
+    setSidebarVisible(!sidebarVisible)
+  }
+
   return (
     <>
       <Navbar isLoggedIn={isLoggedIn} />
 
       <div className="map-view-background">
         <div className="container-fluid py-4">
-          <div className="row">
-            <div className="col-md-4 col-lg-3">
+          <div className="row map-view-row">
+            <div className={`col-md-4 col-lg-3 sidebar-col ${isMobile && !sidebarVisible ? "d-none" : ""}`}>
               <div className="sidebar-container">
                 <div className="sidebar-header">
                   <h4 className="sidebar-title">함께 가는 지도</h4>
                 </div>
 
                 <div className="filter-section">
-                  <div className="input-group mb-3">
+                  <div className="input-group">
                     <input
                       type="text"
-                      className="form-control"
+                      className="sidebar-search-input"
                       placeholder="장소 검색..."
                       value={searchKeyword}
                       onChange={(e) => setSearchKeyword(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
-                    <button className="btn btn-primary" type="button" onClick={handleSearch}>
+                    <button className="sidebar-search-btn" type="button" onClick={handleSearch}>
                       <i className="bi bi-search"></i>
                     </button>
                   </div>
 
-                  <div className="mb-3">
-                    <select
-                      className="form-select"
-                      value={regionFilter}
-                      onChange={(e) => setRegionFilter(e.target.value)}
-                    >
-                      <option value="">지역 선택</option>
-                      {cities.map((city, index) => (
-                        <option key={index} value={city}>{city}</option>
-                      ))}
-                    </select>
-                  </div>
+                  <select
+                    className="sidebar-filter-select"
+                    value={regionFilter}
+                    onChange={(e) => setRegionFilter(e.target.value)}
+                  >
+                    <option value="">지역 선택</option>
+                    {cities.map((city, index) => (
+                      <option key={index} value={city}>
+                        {city}
+                      </option>
+                    ))}
+                  </select>
 
-                  <div className="mb-3">
-                    <select
-                      className="form-select"
-                      value={categoryFilter}
-                      onChange={(e) => setCategoryFilter(e.target.value)}
-                    >
-                      <option value="">카테고리 선택</option>
-                      {categories.map((category, index) => (
-                        <option key={index} value={category}>{category}</option>
-                      ))}
-                    </select>
-                  </div>
+                  <select
+                    className="sidebar-filter-select"
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                  >
+                    <option value="">카테고리 선택</option>
+                    {categories.map((category, index) => (
+                      <option key={index} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
 
-                  <button className="btn btn-outline-secondary w-100 mb-3" onClick={handleResetFilters}>
+                  <button className="sidebar-reset-btn" onClick={handleResetFilters}>
                     필터 초기화
                   </button>
                 </div>
@@ -179,11 +202,11 @@ function MapViewPage() {
                           className={`place-list-item ${selectedPlace?.id === place.id ? "active" : ""}`}
                           onClick={() => handlePlaceSelect(place)}
                         >
-                          <h5 className="place-name">{place.name || "이름 없음"}</h5>
-                          <p className="place-address">
+                          <div className="place-name">{place.name || "이름 없음"}</div>
+                          <div className="place-address">
                             <i className="bi bi-geo-alt me-1"></i>
                             {place.address || "주소 없음"}
-                          </p>
+                          </div>
                           <span className="place-category">{place.category}</span>
                         </div>
                       ))}
@@ -193,7 +216,7 @@ function MapViewPage() {
               </div>
             </div>
 
-            <div className="col-md-8 col-lg-9">
+            <div className={`col-md-8 col-lg-9 map-col ${isMobile && sidebarVisible ? "d-none" : ""}`}>
               <div className="map-container">
                 {loading ? (
                   <div className="text-center py-5">
@@ -219,6 +242,7 @@ function MapViewPage() {
                     showSearchBar={false}
                     defaultLevel={selectedPlace ? 3 : 7}
                     showInfoCard={true}
+                    onLocationSelect={handlePlaceSelect}
                   />
                 )}
               </div>
@@ -227,9 +251,14 @@ function MapViewPage() {
         </div>
       </div>
 
+      {isMobile && (
+        <button className="sidebar-toggle" onClick={toggleSidebar}>
+          <i className={`bi ${sidebarVisible ? "bi-map" : "bi-list"}`}></i>
+        </button>
+      )}
+
       <Footer />
     </>
   )
 }
-
-export default MapViewPage;
+export default MapViewPage

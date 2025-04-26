@@ -8,7 +8,6 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
   const [isEditing, setIsEditing] = useState(false)
   const [editedContent, setEditedContent] = useState(comment.content)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [comments, setComments] = useState([])
   const [showReportDropdown, setShowReportDropdown] = useState(false)
 
   // 댓글 작성자인지 확인
@@ -26,7 +25,6 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
         content: editedContent,
         userId: currentUser?.userId,
       })
-      console.log("commentId 확인:", comment.commentId)
 
       onCommentUpdated(response.data)
       setIsEditing(false)
@@ -98,32 +96,17 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
   }
 
   // 신고 처리
-  const handleReport = async (reason) => {
-   
-     try {
-      const response = await axios.post("http://localhost:9000/api/report",{
-        targetId: comment.commentId,
-        targetType: "COMMENT",
-        userId:currentUser.userId,
-        reason:reason
-      }) 
-
+  const handleReport = (reason) => {
+    // 여기에 신고 API 호출 로직 추가
     alert(`댓글이 '${reason}' 사유로 신고되었습니다.`)
     setShowReportDropdown(false)
-  }
-  catch(err) {
-    console.log("신고 오류", err)
-    alert("신고 처리 중 오류가 발생하였습니다")
-   }
   }
 
   return (
     <div className="comment-item">
       <div className="comment-header">
         <div className="d-flex align-items-center">
-          <div className="comment-avatar">
-            <i className="bi bi-person-circle"></i>
-          </div>
+          <div className="comment-avatar">{comment.userName ? comment.userName.charAt(0) : "?"}</div>
           <div className="ms-2">
             <div className="comment-author">{comment.userName}</div>
             <div className="comment-date">{formatDate(comment.createdAt)}</div>

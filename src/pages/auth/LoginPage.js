@@ -47,14 +47,17 @@ const LoginPage = () => {
           localStorage.setItem("userProfile", response.data.profile)
         }
 
-        // 마이페이지로 리다이렉트
-        navigate("/mypage")
+        if (response.data.role === "admin") {
+          navigate("/admin")
+        } else {
+          navigate("/mypage")
+        }
       } else {
         setError(response.data.message || "로그인에 실패했습니다.")
       }
     } catch (err) {
       console.error("로그인 오류:", err)
-      setError("로그인에 실패했습니다. 서버 연결을 확인해주세요.")
+      setError("로그인에 실패했습니다. 로그인을 다시 시도해주세요")
     } finally {
       setLoading(false)
     }

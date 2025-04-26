@@ -4,23 +4,25 @@ function Footer() {
   return (
     <footer className="footer mt-5 py-4">
       <div className="container">
-        <div className="row">
-          <div className="col-lg-5 mb-4 mb-lg-0">
-            <h5 className="footer-title">
+        <div className="row justify-content-between">
+          {/* 로고 섹션 */}
+          <div className="col-lg-4 mb-4 mb-lg-0 text-center text-lg-start">
+            <div className="logo-container">
               <img
-                src={process.env.PUBLIC_URL + "/images/logo.png" || "/placeholder.svg"}
+                src={process.env.PUBLIC_URL + "/images/weblogo.png" || "/placeholder.svg"}
                 alt="이음길"
-                className="footer-logo me-2"
-                style={{ height: "35px", width: "auto", display: "inline-block" }}
+                className="footer-logo"
+                style={{
+                  height: "180px",
+                  width: "auto",
+                  marginLeft: "20px",
+                  marginTop: "15px",
+                }}
               />
-              이음길
-            </h5>
-            <p className="footer-description mt-3">
-              반려동물의 시간은 우리와 달라 더 소중합니다. 이곳은 그 특별한 순간들을 담아두는 공간입니다. 함께한 추억을
-              기록하고, 누군가와 나눠주세요. 그 기억들이 또 다른 따뜻함이 되어 퍼져나갈 거예요.
-            </p>
+            </div>
           </div>
 
+          {/* 바로가기 섹션 */}
           <div className="col-lg-3 mb-4 mb-lg-0">
             <h5 className="footer-subtitle">바로가기</h5>
             <ul className="footer-links">
@@ -39,7 +41,6 @@ function Footer() {
                   <i className="bi bi-people me-2"></i>커뮤니티
                 </a>
               </li>
-
               <li>
                 <a href="/mypage">
                   <i className="bi bi-person-circle me-2"></i>마이페이지
@@ -48,7 +49,8 @@ function Footer() {
             </ul>
           </div>
 
-          <div className="col-lg-4 mb-4 mb-lg-0">
+          {/* 문의하기 섹션 */}
+          <div className="col-lg-3 mb-4 mb-lg-0">
             <h5 className="footer-subtitle">문의하기</h5>
             <ul className="footer-contact">
               <li>
@@ -64,6 +66,7 @@ function Footer() {
           </div>
         </div>
 
+        {/* 하단 저작권 및 링크 */}
         <div className="footer-bottom mt-4 pt-3">
           <div className="row">
             <div className="col-md-6 mb-2 mb-md-0">

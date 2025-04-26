@@ -1,0 +1,209 @@
+/* 관리자 페이지 컨테이너 */
+.admin-page-container {
+  display: flex;
+  min-height: 600px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+/* 사이드바 스타일 */
+.admin-sidebar {
+  width: 250px;
+  background-color: #f8f9fa;
+  border-right: 1px solid #e9ecef;
+  padding: 20px 0;
+}
+
+.admin-title {
+  padding: 0 20px 15px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #343a40;
+}
+
+.admin-menu-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-menu-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-menu-item:hover {
+  background-color: #e9ecef;
+  color: #212529;
+}
+
+.admin-menu-item.active {
+  background-color: #e7f5ff;
+  color: #228be6;
+  border-left: 3px solid #228be6;
+}
+
+.admin-menu-item i {
+  margin-right: 10px;
+  font-size: 1.1rem;
+}
+
+/* 콘텐츠 영역 */
+.admin-content {
+  flex: 1;
+  padding: 25px;
+  overflow-y: auto;
+  background-color: #fff;
+}
+
+/* 섹션 스타일 */
+.admin-section {
+  width: 100%;
+}
+
+.admin-section-header {
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.admin-section-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 5px;
+}
+
+.admin-section-header p {
+  color: #6c757d;
+  margin: 0;
+}
+
+.admin-section-body {
+  padding: 10px 0;
+}
+
+/* 카드 그리드 */
+.admin-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+/* 카드 스타일 */
+.admin-card {
+  background-color: #fff;
+  border-radius: 10px;
+  border: 1px solid #e9ecef;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.admin-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.admin-card-header {
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  align-items: center;
+}
+
+.admin-card-header i {
+  font-size: 1.5rem;
+  margin-right: 10px;
+  color: #228be6;
+}
+
+.admin-card-header h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+  color: #343a40;
+}
+
+.admin-card-body {
+  padding: 15px;
+}
+
+.admin-stat-row {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 15px;
+}
+
+.admin-stat {
+  text-align: center;
+}
+
+.admin-stat-value {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #343a40;
+}
+
+.admin-stat-label {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.admin-card-desc {
+  margin: 0;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.admin-card-footer {
+  padding: 10px 15px;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  text-align: right;
+}
+
+/* 플레이스홀더 (사용자 관리용) */
+.admin-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 0;
+  color: #adb5bd;
+}
+
+.admin-placeholder i {
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
+
+.admin-placeholder p {
+  font-size: 1.1rem;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .admin-page-container {
+    flex-direction: column;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .admin-card-grid {
+    grid-template-columns: 1fr;
+  }
+}

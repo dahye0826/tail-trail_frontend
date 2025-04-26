@@ -18,7 +18,7 @@ import HomePage from "./pages/home/HomePage"
 import MapViewPage from "./pages/map/MapViewPage"
 import FavoritesPage from "./pages/mypage/FavoritesPage"
 import VisitedPlacesPage from "./pages/mypage/VisitedPlacesPage"
-import ReportManagementPage from "./pages/admin/ReportManagementPage"
+import AdminPage from "./pages/admin/AdminPage";
 
 function AppRouter() {
   return (
@@ -40,7 +40,7 @@ function AppRouter() {
           <Route path="/map" element={<MapViewPage />} />
           <Route path="/mypage/favorites" element={<FavoritesPage />} />
           <Route path="/mypage/visited" element={<VisitedPlacesPage />} /> 
-          <Route path="/mypage/admin/report" element={<ReportManagementPage/>}/>    
+          <Route path="/admin" element={<AdminPage />} />   
         </Routes>
       </AuthProvider>
     </BrowserRouter>

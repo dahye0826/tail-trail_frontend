@@ -1,9 +1,8 @@
 "use client"
 
 import axios from "axios"
-
 import { useState, useEffect, useRef } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, useLocation } from "react-router-dom"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 import CommentSection from "../../pages/community/CommentSection"
@@ -13,14 +12,14 @@ import "./PostDetailPage.css"
 function PostDetailPage() {
   const [post, setPost] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [isLoggedIn, setIsLoggedIn] = useState(false) // 실제 로그인 상태로 변경 필요
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [showReportDropdown, setShowReportDropdown] = useState(false)
   const { id } = useParams()
   const navigate = useNavigate()
+  const location = useLocation() // 현재 위치 정보 가져오기
   const hasFetched = useRef(false)
   const [currentUser, setCurrentUser] = useState(null)
   const reportDropdownRef = useRef(null)
-
   const isMyPost = currentUser && post && Number(currentUser.userId) === post.userId
 
   useEffect(() => {
@@ -36,13 +35,11 @@ function PostDetailPage() {
       }
       setCurrentUser(userData)
       setIsLoggedIn(true)
-      console.log("✅ 현재 로그인한 사용자:", userData.userName)
     } else {
       setCurrentUser(null)
       setIsLoggedIn(false)
-      console.log("❌ 로그인 안 됨")
     }
-  }, [])
+  }, [location])
 
   // 드롭다운 외부 클릭 시 닫기
   useEffect(() => {
@@ -79,10 +76,6 @@ function PostDetailPage() {
     fetchPostDetail()
   }, [id])
 
-  const handleGoBack = () => {
-    navigate("/community")
-  }
-
   const handlePlaceClick = () => {
     if (post?.placeId) {
       navigate(`/places/place/${post.placeId}`)
@@ -91,6 +84,10 @@ function PostDetailPage() {
 
   const handleEditClick = () => {
     navigate(`/community/edit/${id}`)
+  }
+
+  const handleGoBack = () => {
+    navigate("/community")
   }
 
   const handleDeleteClick = async () => {
@@ -108,24 +105,29 @@ function PostDetailPage() {
 
   // 신고 처리
   const handleReport = async (reason) => {
-    // 여기에 신고 API 호출 로직 추가
+    if (post.isReported) {
+      // 추가: 이미 신고된 경우
+      alert("이미 신고하셨습니다!")
+      return // 여기서 바로 함수 종료
+    }
+
     try {
-      const response = await axios.post("http://localhost:9000/api/report",{
+      const response = await axios.post("http://localhost:9000/api/report", {
         targetId: post.postId,
         targetType: "POST",
-        userId:currentUser.userId,
-        reason:reason
-      }) 
+        userId: currentUser.userId,
+        reason: reason,
+      })
 
       alert(`게시글이 '${reason}' 사유로 신고되었습니다.`)
       setShowReportDropdown(false)
-     }
 
- 
-    catch(err) {
+      // 신고 완료 후 post 상태에 표시해두기
+      setPost((prevPost) => ({ ...prevPost, isReported: true }))
+    } catch (err) {
       console.log("신고 오류", err)
       alert("신고 처리 중 오류가 발생하였습니다")
-     }
+    }
   }
 
   //로딩중이면 스피너만 보여줌
@@ -141,36 +143,30 @@ function PostDetailPage() {
     )
   }
 
-  const locationInfo = post
-    ? {
-      id: post.placeId, // placeId도 체크
-      name: post.placeName || "이름 없음", // placeName도 체크
-      address: post.placeAddress || "주소 없음", // 다양한 필드명 체크
-    }
-    : null
-
   return (
     <>
       <Navbar isLoggedIn={isLoggedIn} />
       <div className="container mt-4 mb-5">
         <div className="post-detail-container">
           <div className="post-header">
-            <button className="btn btn-outline-secondary back-button mb-4" onClick={handleGoBack}>
-              <i className="bi bi-arrow-left me-2"></i> 목록으로
-            </button>
+            <div className="d-flex justify-content-between align-items-center mb-4">
+              <button className="btn back-button" onClick={handleGoBack}>
+                <i className="bi bi-arrow-left me-2"></i> 목록으로
+              </button>
+            </div>
+
             <h1 className="post-title">{post.title}</h1>
             <div className="post-meta">
               <div className="d-flex align-items-center">
-                <div className="author-avatar">
-                  <i className="bi bi-person-circle"></i>
-                </div>
+                <div className="user-initial-avatar">{post.userName.charAt(0)}</div>
                 <div className="ms-2">
                   <div className="author-name">{post.userName}</div>
-                  <div className="post-date" style={{ color: "#000000" }}>
+                  <div className="post-date">
                     {post.createdAt}
                     {post.updatedAt !== post.createdAt && <span className="ms-2">(수정됨)</span>}
-                    {(post.place?.placeName || post.placeName) && (
-                      <span className="place-badge" onClick={handlePlaceClick} style={{ cursor: "pointer" }}>
+                    {/* 장소 태그를 날짜 옆으로 이동 */}
+                    {post.placeName && (
+                      <span className="place-badge ms-2" onClick={handlePlaceClick} style={{ cursor: "pointer" }}>
                         <i className="bi bi-geo-alt-fill me-1"></i>
                         {post.placeName}
                       </span>
@@ -213,16 +209,16 @@ function PostDetailPage() {
             </div>
           </div>
 
-          {/* 내용 먼저 표시 */}
+          {/* 본문 내용 표시 - 처리 없이 그대로 표시 */}
           <div className="post-content mt-4">
             <div dangerouslySetInnerHTML={{ __html: post.content }}></div>
           </div>
 
-          {/* 이미지를 별도 섹션으로 분리 */}
+          {/* 첨부 이미지 표시 */}
           {post.imageUrls && post.imageUrls.length > 0 && (
             <div className="post-images-section mt-4 mb-4">
               {post.imageUrls.map((image, index) => (
-                <div key={index} className="post-image-container mb-3">
+                <div key={index} className="mb-5">
                   <img
                     src={image.startsWith("http") ? image : `http://localhost:9000${image}`}
                     alt={`게시글 이미지 ${index + 1}`}
