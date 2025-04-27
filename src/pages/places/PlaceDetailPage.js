@@ -21,6 +21,7 @@ function PlaceDetailPage() {
   const [visitHistory, setVisitHistory] = useState(null)
   const [showReviewForm, setShowReviewForm] = useState(false)
   const [mapContainerReady, setMapContainerReady] = useState(false)
+  const [isFavorite, setIsFavorite] = useState(false)
   const [newReview, setNewReview] = useState({
     rating: 5,
     note: "",
@@ -31,6 +32,7 @@ function PlaceDetailPage() {
   const navigate = useNavigate()
   const reviewRef = useRef(null)
   const location = useLocation()
+  const [averageRating, setAverageRating] = useState(0);
 
   // Format incoming place data
   const formatPlaceData = useCallback((placeData) => {
@@ -182,14 +184,95 @@ function PlaceDetailPage() {
     }
   }
 
-  useEffect(() => {
-    const loginStatus = localStorage.getItem("isLoggedIn") === "true"
-    setIsLoggedIn(loginStatus)
-    
-    if (loginStatus) {
-      loadVisitHistory()
+  // 즐겨찾기 상태 체크 함수
+  const checkFavoriteStatus = useCallback(async () => {
+    const userId = localStorage.getItem("userId")
+    if (!userId) {
+      setIsFavorite(false)
+      return
     }
-  }, [loadVisitHistory])
+    
+    try {
+      const response = await axios.get(`${API_BASE_URL}/favorites`, {
+        params: { 
+          userId: Number(userId),
+          placeId: Number(id),
+          page: 1,
+          size: 1
+        }
+      })
+      
+      // 응답 데이터 구조 확인 후 로깅
+      console.log("즐겨찾기 상태 응답:", response.data)
+      
+      // favorites 배열이 있고 길이가 0보다 크면 즐겨찾기된 상태
+      const isFavorited = response.data.favorites && response.data.favorites.length > 0
+      setIsFavorite(isFavorited)
+      
+    } catch (error) {
+      console.error("즐겨찾기 상태 확인 실패:", error)
+      setIsFavorite(false)
+    }
+  }, [id])
+
+  // 로그인 상태 체크
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      const loginStatus = localStorage.getItem("isLoggedIn") === "true"
+      setIsLoggedIn(loginStatus)
+      
+      if (loginStatus) {
+        checkFavoriteStatus()
+        loadVisitHistory()
+      } else {
+        setIsFavorite(false)
+      }
+    }
+
+    checkLoginStatus()
+    // 로그인 상태 변경 감지
+    window.addEventListener('storage', checkLoginStatus)
+    
+    return () => {
+      window.removeEventListener('storage', checkLoginStatus)
+    }
+  }, [checkFavoriteStatus, loadVisitHistory])
+
+  // 즐겨찾기 토글 함수
+  const toggleFavorite = async () => {
+    if (!isLoggedIn) {
+      alert("로그인이 필요한 서비스입니다.")
+      navigate("/login")
+      return
+    }
+
+    const userId = localStorage.getItem("userId")
+    if (!userId) {
+      alert("로그인이 필요한 서비스입니다.")
+      navigate("/login")
+      return
+    }
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/favorites/toggle`, null, {
+        params: {
+          userId: Number(userId),
+          placeId: Number(id)
+        }
+      })
+      
+      console.log("즐겨찾기 토글 응답:", response.data)
+      
+      if (response.data.success) {
+        setIsFavorite(response.data.isAdded)
+        const message = response.data.isAdded ? "즐겨찾기에 추가되었습니다." : "즐겨찾기가 해제되었습니다."
+        alert(message)
+      }
+    } catch (error) {
+      console.error("즐겨찾기 처리 실패:", error)
+      alert("즐겨찾기 처리 중 오류가 발생했습니다.")
+    }
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -413,6 +496,55 @@ function PlaceDetailPage() {
     }
   }, [place, mapContainerRef.current]);
 
+  // 이미지 섹션에 즐겨찾기 버튼 추가
+  const renderImageSection = () => (
+    <div className="row mb-4">
+      <div className="col">
+        <div className="position-relative">
+          <img
+            src={place.images[0] || "/placeholder.svg"}
+            alt={place.name}
+            className="img-fluid rounded shadow-sm"
+            onError={(e) => {e.target.src = "/placeholder.svg?height=400&width=800"}}
+          />
+          <button 
+            className={`btn-favorite ${isFavorite ? 'active' : ''}`}
+            onClick={toggleFavorite}
+            aria-label={isFavorite ? "즐겨찾기 해제" : "즐겨찾기 추가"}
+          >
+            <i className={`bi ${isFavorite ? 'bi-heart-fill' : 'bi-heart'}`}></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+
+  // 평균 별점 조회
+  const fetchAverageRating = useCallback(async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/visited-place/places/${id}/average-rating`);
+      setAverageRating(response.data);
+    } catch (error) {
+      console.error('평균 별점 조회 실패:', error);
+    }
+  }, [id]);
+
+  // 컴포넌트 마운트 시 평균 별점 조회
+  useEffect(() => {
+    fetchAverageRating();
+  }, [fetchAverageRating]);
+
+  // 카테고리와 별점 표시 컴포넌트
+  const renderCategoryAndRating = () => (
+    <div className="category-rating-container">
+      <span className="category-badge">{place.category}</span>
+      <div className="rating-display">
+        {renderStars(averageRating)}
+        <span className="rating-count">({averageRating ? averageRating.toFixed(1) : '0.0'})</span>
+      </div>
+    </div>
+  );
+
   if (loading) {
     return (
       <>
@@ -443,43 +575,33 @@ function PlaceDetailPage() {
           {/* Place header and image */}
           {!loading && place && (
             <>
-              <div className="row mb-4">
-                <div className="col">
-                  <img
-                    src={place.images[0] || "/placeholder.svg"}
-                    alt={place.name}
-                    className="img-fluid rounded shadow-sm"
-                    onError={(e) => {e.target.src = "/placeholder.svg?height=400&width=800"}}
-                  />
-                </div>
-              </div>
-
+              {renderImageSection()}
               <div className="row mb-3">
                 <div className="col">
-                  <h3 className="mb-1">{place.name}</h3>
-                  <p className="text-muted mb-1">{place.address}</p>
+                  <div className="d-flex justify-content-between align-items-start">
+                    <div>
+                      {renderCategoryAndRating()}
+                      <h3 className="mb-1">{place.name}</h3>
+                      <p className="text-muted mb-1">{place.address}</p>
+                    </div>
+                  </div>
                   <p className="text-muted mb-3" style={{ fontSize: "15px" }}>
                     {place.description}
                   </p>
                   <div className="mb-3">
-                    <span className="badge category-badge">{place.category}</span>
-                    <span className="rating-display ms-2">
-                      {renderStars(place.rating)} <span className="rating-text">({place.rating})</span>
-                    </span>
+                    {/* Pet size icons */}
+                    {renderPetSizeIcons(place.petSizeCategories)}
+
+                    {place.amenities?.length > 0 && (
+                      <div className="amenities mb-3">
+                        {place.amenities.map((amenity, index) => (
+                          <span key={index} className="badge amenity-badge">
+                            {amenity}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
-
-                  {/* Pet size icons */}
-                  {renderPetSizeIcons(place.petSizeCategories)}
-
-                  {place.amenities?.length > 0 && (
-                    <div className="amenities mb-3">
-                      {place.amenities.map((amenity, index) => (
-                        <span key={index} className="badge amenity-badge">
-                          {amenity}
-                        </span>
-                      ))}
-                    </div>
-                  )}
                 </div>
               </div>
 

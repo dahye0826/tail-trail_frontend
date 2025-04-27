@@ -627,10 +627,11 @@
 
 /* 방문 이력 페이지 스타일 */
 .visited-places-list .card {
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s ease-in-out;
+  overflow: hidden;
 }
 
 .visited-places-list .card:hover {
@@ -703,4 +704,50 @@
   .visited-places-list .visit-note {
     font-size: 0.9rem;
   }
+}
+
+/* 방문 이력 보기 버튼 스타일 */
+.view-btn-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 10px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover .view-btn-container {
+  opacity: 1;
+}
+
+.view-btn {
+  display: inline-block;
+  padding: 6px 16px;
+  background-color: var(--primary-color);  /* 민트색 배경 */
+  color: white !important;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.view-btn:hover {
+  background-color: var(--accent-color);  /* 호버시 더 진한 민트색 */
+  color: white !important;
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+/* 방문 이력 카드 이미지 컨테이너 */
+.place-image-container {
+  position: relative;
+  overflow: hidden;
+  height: 200px;
+}
+
+.place-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
