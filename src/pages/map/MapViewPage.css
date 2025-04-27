@@ -29,12 +29,12 @@
 }
 
 /* 사이드바 스타일 */
-.sidebar-container {
+.sidebar-containermap {
   background-color: var(--sidebar-bg);
   border-radius: var(--sidebar-radius);
   box-shadow: var(--sidebar-shadow);
   padding: 24px 20px;
-  height: calc(100vh - 150px);
+  height: calc(101vh - 140px);
   overflow-y: auto;
   border: 1px solid var(--border-color);
   display: flex;
@@ -223,7 +223,6 @@
 /* 지도 컨테이너 스타일 */
 .map-container {
   position: relative;
-  height: calc(100vh - 150px);
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -283,7 +282,7 @@
     flex-basis: 100%;
   }
 
-  .sidebar-container {
+  .sidebar-containermap {
     height: 350px;
     min-width: 100%;
     max-width: 100%;
