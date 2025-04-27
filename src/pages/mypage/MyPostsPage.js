@@ -114,7 +114,7 @@ const MyPostsPage = () => {
       <div className="mypage-background">
         <div className="container py-5">
           <div className="row">
-            <div className="col-lg-3 col-md-4 mb-4">
+            <div className="col-auto mb-4">
               <div className="sidebar-container">
                 <div className="sidebar-header">
                   <h5 className="sidebar-title">마이페이지</h5>
@@ -149,7 +149,7 @@ const MyPostsPage = () => {
               </div>
             </div>
 
-            <div className="col-lg-9 col-md-8">
+            <div className="col">
               <div className="mypage-content-container">
                 <div className="mb-4">
                   <h2 className="mypage-title">내가 쓴 글</h2>

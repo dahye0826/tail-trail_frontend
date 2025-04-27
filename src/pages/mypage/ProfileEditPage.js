@@ -2,7 +2,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useLocation } from "react-router-dom"
 import { FaUser, FaDog, FaKey, FaMapMarkerAlt, FaPhoneAlt } from "react-icons/fa"
 import axios from "axios"
 import "bootstrap-icons/font/bootstrap-icons.css"
@@ -33,6 +33,10 @@ const ProfileEditPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   
   const navigate = useNavigate()
+  const location = useLocation()
+  const params = new URLSearchParams(location.search)
+  const defaultTab = params.get("tab") || "info"
+  const [activeTab, setActiveTab] = useState(defaultTab)
 
   useEffect(() => {
     // 로그인 상태 확인
@@ -168,7 +172,7 @@ const ProfileEditPage = () => {
       <div className="mypage-background">
         <div className="container py-5">
           <div className="row">
-            <div className="col-lg-3 col-md-4 mb-4">
+            <div className="col-auto mb-4">
               <div className="sidebar-container">
                 <div className="sidebar-header">
                   <h5 className="sidebar-title">마이페이지</h5>
@@ -204,7 +208,7 @@ const ProfileEditPage = () => {
               </div>
             </div>
 
-            <div className="col-lg-9 col-md-8">
+            <div className="col">
               <div className="mypage-content-container">
                 <div className="mb-4">
                   <h2 className="mypage-title">개인정보 수정</h2>

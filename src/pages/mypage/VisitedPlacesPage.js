@@ -11,119 +11,119 @@ import KakaoMap from "../../components/KakaoMap"
 import { useReview } from "../../hooks/useReview"
 import axios from "axios"
 
-const API_BASE_URL = "http://localhost:9000/api"
+const API_BASE_URL = "http://localhost:9000/api" // API 서버 주소
 
+// 방문 이력 관광지 페이지 컴포넌트 정의
 const VisitedPlacesPage = () => {
-  const navigate = useNavigate()
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [visitedPlaces, setVisitedPlaces] = useState([])
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(0)
-  const [totalItems, setTotalItems] = useState(0)
-  const [showMap, setShowMap] = useState(false)
-  const [selectedPlace, setSelectedPlace] = useState(null)
-  const pageSize = 10
-  const { submitReview } = useReview()
-  const mapContainerRef = useRef(null)
-  const [editingVisit, setEditingVisit] = useState(null)
-  const [showEditModal, setShowEditModal] = useState(false)
-  const [editRating, setEditRating] = useState(0)
-  const [editNote, setEditNote] = useState("")
-  const [mapKey, setMapKey] = useState(0)
+  const navigate = useNavigate() // 페이지 이동을 위한 함수
+  const [isLoggedIn, setIsLoggedIn] = useState(false) // 로그인 상태 저장
+  const [loading, setLoading] = useState(true) // 로딩 상태 저장
+  const [error, setError] = useState(null) // 오류 상태 저장
+  const [visitedPlaces, setVisitedPlaces] = useState([]) // 방문 장소 목록 저장
+  const [currentPage, setCurrentPage] = useState(1) // 현재 페이지 번호
+  const [totalPages, setTotalPages] = useState(0) // 전체 페이지 수
+  const [totalItems, setTotalItems] = useState(0) // 전체 아이템 수
+  const [showMap, setShowMap] = useState(false) // 지도 표시 여부
+  const [selectedPlace, setSelectedPlace] = useState(null) // 선택된 장소 정보
+  const pageSize = 10 // 한 페이지당 보여줄 아이템 수
+  const mapContainerRef = useRef(null) // 지도 컨테이너 참조
+  const [mapKey, setMapKey] = useState(0) // 지도 컴포넌트 리렌더링을 위한 키
 
-  // 장소 클릭 처리
+  // 장소 클릭시 해당 장소 상세 페이지로 이동하는 함수
   const handlePlaceClick = useCallback((placeId) => {
-    if (placeId) {
-      navigate(`/places/place/${placeId}`)
+    if (placeId) { // placeId가 있으면
+      navigate(`/places/place/${placeId}`) // 장소 상세 페이지로 이동
     }
-  }, [navigate])
+  }, [navigate]) // navigate 함수가 변경될 때만 함수 재생성
 
-  // 방문 이력 로드
+  // 방문 이력 데이터를 서버에서 불러오는 함수
   const loadVisitedPlaces = useCallback(async () => {
     try {
-      const userId = localStorage.getItem("userId")
-      if (!userId) {
-        navigate("/login")
+      const userId = localStorage.getItem("userId") // 로컬 스토리지에서 사용자 ID 가져오기
+      if (!userId) { // 사용자 ID가 없으면
+        navigate("/login") // 로그인 페이지로 이동
         return
       }
 
-      setLoading(true)
-      setError(null)
+      setLoading(true) // 로딩 상태 시작
+      setError(null) // 오류 상태 초기화
 
+      // 서버에 방문 이력 데이터 요청
       const response = await axios.get(`${API_BASE_URL}/visited-place/mypage`, {
-        params: {
-          userId: Number(userId),
-          page: currentPage - 1,
-          size: pageSize
+        params: { // 요청 파라미터
+          userId: Number(userId), // 사용자 ID
+          page: currentPage - 1, // 페이지 번호 (서버는 0부터 시작)
+          size: pageSize // 페이지 크기
         }
       })
 
-      console.log("API 응답:", response.data)
+      console.log("API 응답:", response.data) // 응답 데이터 콘솔에 출력
 
-      if (response.data && response.data.content) {
+      if (response.data && response.data.content) { // 응답 데이터가 있으면
+        // 응답 데이터를 적절한 형태로 변환
         const updatedContent = response.data.content.map(visit => {
-          // visit 객체의 기본 구조 확인
+          // visit 객체의 기본 구조 설정
           const visitData = {
-            visitId: visit.visit_id,
-            userId: visit.user_id,
-            placeId: visit.place_id,
-            visitDate: visit.visit_date,
-            rating: visit.rating,
-            note: visit.note,
-            createdAt: visit.created_at,
-            place: visit.place
+            visitId: visit.visit_id, // 방문 ID
+            userId: visit.user_id, // 사용자 ID
+            placeId: visit.place_id, // 장소 ID
+            visitDate: visit.visit_date, // 방문 날짜
+            rating: visit.rating, // 평점
+            note: visit.note, // 메모
+            createdAt: visit.created_at, // 생성 시간
+            place: visit.place // 장소 정보
           }
 
-          // placeId가 1650인 경우 특별 처리
+          // placeId가 1650인 경우 특별 처리 (WOOF라는 특별한 장소)
           if (visitData.placeId === 1650) {
             return {
-              ...visitData,
-              place: {
-                ...visitData.place,
-                placeId: 1650,
-                placeName: 'WOOF'
+              ...visitData, // 기존 데이터 유지
+              place: { // place 객체 업데이트
+                ...visitData.place, // 기존 place 데이터 유지
+                placeId: 1650, // 장소 ID
+                placeName: 'WOOF' // 장소 이름 강제 설정
               }
             }
           }
 
-          return visitData
+          return visitData // 일반 장소는 그대로 반환
         })
         
-        setVisitedPlaces(updatedContent)
-        setTotalItems(response.data.totalElements || 0)
-        setTotalPages(response.data.totalPages || 0)
-      } else {
-        setVisitedPlaces([])
-        setTotalItems(0)
-        setTotalPages(0)
+        // 상태 업데이트
+        setVisitedPlaces(updatedContent) // 방문 장소 목록 설정
+        setTotalItems(response.data.totalElements || 0) // 전체 아이템 수 설정
+        setTotalPages(response.data.totalPages || 0) // 전체 페이지 수 설정
+      } else { // 데이터가 없으면
+        // 빈 상태로 초기화
+        setVisitedPlaces([]) // 방문 장소 목록 비우기
+        setTotalItems(0) // 전체 아이템 수 0으로 설정
+        setTotalPages(0) // 전체 페이지 수 0으로 설정
       }
-    } catch (error) {
-      console.error("방문 이력 로드 오류:", error.response || error)
-      setError("방문 이력을 불러오는데 실패했습니다.")
-    } finally {
-      setLoading(false)
+    } catch (error) { // 오류 발생시
+      console.error("방문 이력 로드 오류:", error.response || error) // 오류 로그 출력
+      setError("방문 이력을 불러오는데 실패했습니다.") // 오류 메시지 설정
+    } finally { // 성공이든 실패든 항상 실행
+      setLoading(false) // 로딩 상태 종료
     }
-  }, [currentPage, navigate])
+  }, [currentPage, navigate]) // currentPage나 navigate가 변경될 때만 함수 재생성
 
-  // 컴포넌트 마운트 시 방문 이력 로드
+  // 컴포넌트가 처음 로드될 때 실행되는 효과
   useEffect(() => {
-    const loginStatus = localStorage.getItem("isLoggedIn") === "true"
-    setIsLoggedIn(loginStatus)
-    if (loginStatus) {
-      loadVisitedPlaces()
-    } else {
-      navigate("/login")
+    const loginStatus = localStorage.getItem("isLoggedIn") === "true" // 로그인 상태 확인
+    setIsLoggedIn(loginStatus) // 로그인 상태 설정
+    if (loginStatus) { // 로그인 되어 있으면
+      loadVisitedPlaces() // 방문 이력 로드
+    } else { // 로그인 안되어 있으면
+      navigate("/login") // 로그인 페이지로 이동
     }
-  }, [loadVisitedPlaces, navigate])
+  }, [loadVisitedPlaces, navigate]) // loadVisitedPlaces나 navigate가 변경될 때 재실행
 
-  // 별점 렌더링
+  // 별점을 별 모양으로 표시하는 함수
   const renderStars = (rating) => {
     return (
       <div className="rating-stars">
         {[...Array(5)].map((_, index) => (
-          <span key={index} className="star">
+          <span key={`star-${index}-${rating}`} className="star">
             {index + 1 <= Math.floor(rating) ? "★" : "☆"}
           </span>
         ))}
@@ -132,210 +132,159 @@ const VisitedPlacesPage = () => {
     )
   }
 
-  // 지역 뱃지 렌더링
+  // 지역 뱃지를 표시하는 함수
   const renderRegionBadge = (city) => {
     return (
-      <span className="region-badge">
+      <span key={`region-${city}`} className="region-badge">
         {city}
       </span>
     )
   }
 
-  // 지도 보기 버튼 처리
+  // 지도 보기 버튼 클릭 처리 함수
   const handleMapView = (place) => {
-    if (!place || !place.latitude || !place.longitude) {
-      alert("위치 정보가 없는 장소입니다.")
+    if (!place || !place.latitude || !place.longitude) { // 위치 정보가 없으면
+      alert("위치 정보가 없는 장소입니다.") // 알림 표시
       return
     }
-    setSelectedPlace(place)
-    setShowMap(true)
-    setMapKey(prev => prev + 1)
+    setSelectedPlace(place) // 선택된 장소 설정
+    setShowMap(true) // 지도 표시 활성화
+    setMapKey(prev => prev + 1) // 지도 컴포넌트 강제 리렌더링을 위한 키 증가
   }
 
-  // 지도 닫기 처리
+  // 지도 닫기 처리 함수
   const handleCloseMap = () => {
-    setShowMap(false)
-    setSelectedPlace(null)
+    setShowMap(false) // 지도 표시 비활성화
+    setSelectedPlace(null) // 선택된 장소 초기화
   }
 
-  // 방문 기록 수정
-  const handleEditClick = (visit) => {
-    setEditingVisit(visit)
-    setEditRating(visit.rating)
-    setEditNote(visit.note || "")
-    setShowEditModal(true)
-  }
-
-  // 방문 기록 수정 저장
-  const handleSaveEdit = async () => {
-    try {
-      const userId = localStorage.getItem("userId")
-      if (!userId) {
-        navigate("/login")
-        return
-      }
-
-      const response = await axios.put(`${API_BASE_URL}/visited-place/${editingVisit.visitId}`, {
-        visit_id: editingVisit.visitId,
-        user_id: Number(userId),
-        place_id: editingVisit.placeId,
-        visit_date: editingVisit.visitDate,
-        rating: editRating,
-        note: editNote
-      })
-
-      if (response.status === 200) {
-        const updatedVisitedPlaces = visitedPlaces.map(visit =>
-          visit.visitId === editingVisit.visitId
-            ? { 
-                ...visit, 
-                rating: editRating, 
-                note: editNote,
-                place: visit.placeId === 1650 
-                  ? { ...visit.place, placeName: 'WOOF' }
-                  : visit.place
-              }
-            : visit
-        )
-        setVisitedPlaces(updatedVisitedPlaces)
-        setShowEditModal(false)
-        setEditingVisit(null)
-        alert("방문 기록이 수정되었습니다.")
-      }
-    } catch (error) {
-      console.error("방문 기록 수정 실패:", error)
-      alert("방문 기록 수정에 실패했습니다. 다시 시도해주세요.")
-    }
-  }
-
-  // 방문 기록 삭제
-  const handleDelete = async (visitId) => {
-    if (window.confirm("방문 기록을 삭제하시겠습니까?")) {
-      try {
-        const response = await axios.delete(`${API_BASE_URL}/visited-place/${visitId}`)
-        if (response.status === 200) {
-          // 삭제된 항목 제거
-          const updatedVisitedPlaces = visitedPlaces.filter(visit => visit.visitId !== visitId)
-          setVisitedPlaces(updatedVisitedPlaces)
-        }
-      } catch (error) {
-        console.error("방문 기록 삭제 실패:", error)
-        alert("방문 기록 삭제에 실패했습니다.")
-      }
-    }
-  }
-
-  // 장소 이름 표시 함수
+  // 장소 이름 표시 함수 (WOOF 특별 케이스 처리)
   const getPlaceName = useCallback((visit) => {
-    if (visit.placeId === 1650) {
-      return 'WOOF'
+    if (visit.placeId === 1650) { // placeId가 1650이면
+      return 'WOOF' // WOOF 이름 반환
     }
-    return visit.place?.placeName || '장소 정보 없음'
+    return visit.place?.placeName || '장소 정보 없음' // 일반 장소는 placeName 반환 (없으면 '장소 정보 없음')
   }, [])
 
+  // 컴포넌트 렌더링
   return (
     <>
-      <Navbar isLoggedIn={isLoggedIn} />
-      <div className="container py-5">
-        <div className="row">
-          {/* 사이드바 */}
-          <div className="col-lg-3 mb-4">
-            <div className="list-group">
-              <Link to="/mypage" className="list-group-item list-group-item-action">
-                <i className="bi bi-person-circle me-2"></i>내 정보
-              </Link>
-              <Link to="/mypage/posts" className="list-group-item list-group-item-action">
-                <i className="bi bi-pencil-square me-2"></i>내가 쓴 글
-              </Link>
-              <Link to="/mypage/visited" className="list-group-item list-group-item-action active">
-                <i className="bi bi-star me-2"></i>방문이력관광지
-              </Link>
-              <Link to="/mypage/favorites" className="list-group-item list-group-item-action">
-                <i className="bi bi-heart me-2"></i>즐겨찾기
-              </Link>
+      <Navbar isLoggedIn={isLoggedIn} /> {/* 상단 네비게이션 바 */}
+      <div className="mypage-background">
+        <div className="container py-5">
+          <div className="row">
+            <div className="col-lg-3 col-md-4 mb-4">
+              <div className="sidebar-container">
+                <div className="sidebar-header">
+                  <h5 className="sidebar-title">마이페이지</h5>
+                </div>
+                <ul className="sidebar-menu">
+                  <li className="sidebar-menu-item">
+                    <Link to="/mypage" className="sidebar-menu-link">
+                      <i className="bi bi-person-circle me-2"></i>내 정보
+                    </Link>
+                  </li>
+                  <li className="sidebar-menu-item">
+                    <Link to="/mypage/posts" className="sidebar-menu-link">
+                      <i className="bi bi-pencil-square me-2"></i>내가 쓴 글
+                    </Link>
+                  </li>
+                  <li className="sidebar-menu-item active">
+                    <Link to="/mypage/visited" className="sidebar-menu-link">
+                      <i className="bi bi-star me-2"></i>방문이력관광지
+                    </Link>
+                  </li>
+                  <li className="sidebar-menu-item">
+                    <Link to="/mypage/favorites" className="sidebar-menu-link">
+                      <i className="bi bi-bookmark-heart me-2"></i>즐겨찾기
+                    </Link>
+                  </li>
+                  <li className="sidebar-menu-item">
+                    <Link to="/mypage/edit-profile" className="sidebar-menu-link">
+                      <i className="bi bi-gear me-2"></i>개인정보 수정
+                    </Link>
+                  </li>
+                </ul>
+              </div>
             </div>
-          </div>
+            <div className="col-lg-9 col-md-8">
+              <div className="mypage-content-container">
+                <div className="mb-4">
+                  <h2 className="mypage-title">방문이력관광지</h2>
+                  <p className="mypage-subtitle">내가 방문한 반려동물 동반 관광지를 확인하세요.</p>
+                </div>
 
-          {/* 메인 컨텐츠 */}
-          <div className="col-lg-9">
-            <h2 className="mb-4">방문이력관광지</h2>
             
-            {error && (
+            {error && ( // 오류가 있으면
               <div className="alert alert-danger" role="alert">
-                {error}
+                {error} {/* 오류 메시지 표시 */}
               </div>
             )}
 
-            {loading ? (
+            {loading ? ( // 로딩 중이면
               <div className="text-center py-5">
                 <div className="spinner-border text-primary" role="status">
-                  <span className="visually-hidden">로딩 중...</span>
+                  <span className="visually-hidden">로딩 중...</span> {/* 로딩 스피너 */}
                 </div>
               </div>
-            ) : visitedPlaces.length === 0 ? (
+            ) : visitedPlaces.length === 0 ? ( // 방문 장소가 없으면
               <div className="text-center py-5">
-                <i className="bi bi-star display-1 text-muted"></i>
-                <p className="mt-3">방문한 관광지가 없습니다.</p>
+                <i className="bi bi-star display-1 text-muted"></i> {/* 별 아이콘 */}
+                <p className="mt-3">방문한 관광지가 없습니다.</p> {/* 안내 메시지 */}
                 <Link to="/places" className="btn btn-primary mt-2">
-                  장소 둘러보기
+                  장소 둘러보기 {/* 장소 둘러보기 버튼 */}
                 </Link>
               </div>
-            ) : (
+            ) : ( // 방문 장소가 있으면
               <div className="visited-places-list">
-                {visitedPlaces.map((visit) => (
-                  <div key={visit.visitId} className="card mb-3">
+                {visitedPlaces.map((visit) => ( // 방문 장소 목록 반복
+                  <div key={visit.visitId} className="card mb-3"> {/* 각 방문 장소 카드 */}
                     <div className="card-body">
                       <div className="place-info">
-                        {visit.place && visit.place.city && (
-                          <div className="mb-2">
-                            {renderRegionBadge(visit.place.city)}
+                        {visit.place && visit.place.city && ( // 도시 정보가 있으면
+                          <div className="mb-2" key={`region-${visit.visitId}-${visit.place.city}`}>
+                            {renderRegionBadge(visit.place.city)} {/* 지역 뱃지 표시 */}
                           </div>
                         )}
                         <div className="d-flex justify-content-between align-items-start mb-2">
                           <h5 className="place-name mb-0">
-                            {getPlaceName(visit)}
+                            {getPlaceName(visit)} {/* 장소 이름 표시 */}
                           </h5>
                           <div className="rating-container">
-                            {renderStars(visit.rating)}
+                            {renderStars(visit.rating)} {/* 별점 표시 */}
                           </div>
                         </div>
-                        {visit.place && (
+                        {visit.place && ( // 장소 정보가 있으면
                           <p className="place-address mb-2">
-                            <i className="bi bi-geo-alt me-2"></i>
-                            {visit.place.fullAddress || `${visit.place.city || ''} ${visit.place.district || ''}`}
+                            <i className="bi bi-geo-alt me-2"></i> {/* 위치 아이콘 */}
+                            {visit.place.fullAddress || `${visit.place.city || ''} ${visit.place.district || ''}`} {/* 주소 표시 */}
                           </p>
                         )}
-                        {visit.note && (
+                        {visit.note && ( // 메모가 있으면
                           <div className="visit-note mb-3">
-                            {visit.note}
+                            {visit.note} {/* 방문 노트 표시 */}
                           </div>
                         )}
                         <div className="d-flex justify-content-between align-items-center">
                           <div className="visit-date text-muted">
-                            <i className="bi bi-calendar3 me-2"></i>
-                            방문일: {new Date(visit.visitDate).toLocaleDateString()}
+                            <i className="bi bi-calendar3 me-2"></i> {/* 달력 아이콘 */}
+                            방문일: {new Date(visit.visitDate).toLocaleDateString()} {/* 방문 날짜 표시 */}
                           </div>
                           <div className="btn-group">
-                            {visit.place && (visit.place.latitude || visit.place.longitude) && (
+                            {visit.place && (visit.place.latitude || visit.place.longitude) && ( // 위치 정보가 있으면
                               <button
                                 className="btn btn-outline-secondary btn-sm me-2"
-                                onClick={() => handleMapView(visit.place)}
+                                onClick={() => handleMapView(visit.place)} // 지도 보기 처리
                               >
-                                <i className="bi bi-map me-1"></i>위치보기
+                                <i className="bi bi-map me-1"></i>위치보기 {/* 위치보기 버튼 */}
                               </button>
                             )}
-                            <button
-                              className="btn btn-outline-primary btn-sm me-2"
-                              onClick={() => handleEditClick(visit)}
+                            <Link
+                              to={`/places/place/${Number(visit.placeId)}`}
+                              className="btn btn-outline-primary btn-sm"
                             >
-                              <i className="bi bi-pencil me-1"></i>수정
-                            </button>
-                            <button
-                              className="btn btn-outline-danger btn-sm"
-                              onClick={() => handleDelete(visit.visitId)}
-                            >
-                              <i className="bi bi-trash me-1"></i>삭제
-                            </button>
+                              <i className="bi bi-eye me-1"></i>상세보기 {/* 상세보기 버튼 */}
+                            </Link>
                           </div>
                         </div>
                       </div>
@@ -346,143 +295,86 @@ const VisitedPlacesPage = () => {
             )}
 
             {/* 페이지네이션 */}
-            {totalPages > 1 && (
+            {totalPages > 1 && ( // 페이지가 여러 개면
               <nav className="mt-4" aria-label="방문 이력 페이지네이션">
-                <ul className="pagination justify-content-center">
-                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                <ul className="pagination justify-content-center"> {/* 중앙 정렬된 페이지네이션 */}
+                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}> {/* 현재 첫 페이지면 비활성화 */}
                     <button
                       className="page-link"
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage(currentPage - 1)} // 이전 페이지로 이동
+                      disabled={currentPage === 1} // 첫 페이지면 비활성화
                     >
-                      이전
+                      이전 {/* 이전 버튼 */}
                     </button>
                   </li>
-                  {Array.from({ length: totalPages }).map((_, index) => {
+                  {Array.from({ length: totalPages }).map((_, index) => { // 페이지 번호 반복
                     const pageNumber = index + 1;
                     return (
                       <li
                         key={`page-${pageNumber}`}
-                        className={`page-item ${currentPage === pageNumber ? 'active' : ''}`}
+                        className={`page-item ${currentPage === pageNumber ? 'active' : ''}`} // 현재 페이지면 활성화
                       >
                         <button
                           className="page-link"
-                          onClick={() => setCurrentPage(pageNumber)}
+                          onClick={() => setCurrentPage(pageNumber)} // 해당 페이지로 이동
                         >
-                          {pageNumber}
+                          {pageNumber} {/* 페이지 번호 */}
                         </button>
                       </li>
                     );
                   })}
-                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}> {/* 현재 마지막 페이지면 비활성화 */}
                     <button
                       className="page-link"
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      disabled={currentPage === totalPages}
+                      onClick={() => setCurrentPage(currentPage + 1)} // 다음 페이지로 이동
+                      disabled={currentPage === totalPages} // 마지막 페이지면 비활성화
                     >
-                      다음
+                      다음 {/* 다음 버튼 */}
                     </button>
                   </li>
                 </ul>
               </nav>
             )}
+              </div> {/* 현수정 */}
+            </div>
           </div>
         </div>
       </div>
-
-      {/* 수정 모달 */}
-      {showEditModal && (
-        <div className="modal show d-block" tabIndex="-1">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">방문 기록 수정</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setShowEditModal(false)}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <div className="mb-3">
-                  <label className="form-label">별점</label>
-                  <select
-                    className="form-select"
-                    value={editRating}
-                    onChange={(e) => setEditRating(Number(e.target.value))}
-                  >
-                    <option value="1">1점</option>
-                    <option value="2">2점</option>
-                    <option value="3">3점</option>
-                    <option value="4">4점</option>
-                    <option value="5">5점</option>
-                  </select>
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">방문 노트</label>
-                  <textarea
-                    className="form-control"
-                    rows="3"
-                    value={editNote}
-                    onChange={(e) => setEditNote(e.target.value)}
-                  ></textarea>
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setShowEditModal(false)}
-                >
-                  취소
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleSaveEdit}
-                >
-                  저장
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className="modal-backdrop show" onClick={() => setShowEditModal(false)}></div>
-        </div>
-      )}
+      
 
       {/* 지도 모달 */}
-      {showMap && selectedPlace && (
-        <div className="modal show d-block" tabIndex="-1">
-          <div className="modal-dialog modal-lg">
+      {showMap && selectedPlace && ( // 지도가 보이고 선택된 장소가 있으면
+        <div className="modal show d-block" tabIndex="-1"> {/* 모달 표시 */}
+          <div className="modal-dialog modal-lg"> {/* 큰 사이즈 모달 */}
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">{selectedPlace.placeName || 'WOOF'} 위치</h5>
-                <button type="button" className="btn-close" onClick={handleCloseMap}></button>
+                <h5 className="modal-title">{selectedPlace.placeName || 'WOOF'} 위치</h5> {/* 장소 이름 표시 */}
+                <button type="button" className="btn-close" onClick={handleCloseMap}></button> {/* 닫기 버튼 */}
               </div>
-              <div className="modal-body" style={{ height: '400px' }}>
+              <div className="modal-body" style={{ height: '400px' }}> {/* 고정 높이 지정 */}
                 <KakaoMap
-                  key={mapKey}
-                  initialLocation={{
-                    lat: Number(selectedPlace.latitude),
-                    lng: Number(selectedPlace.longitude),
-                    name: selectedPlace.placeName || 'WOOF'
+                  key={mapKey} // 강제 리렌더링을 위한 키
+                  initialLocation={{ // 초기 위치 설정
+                    lat: Number(selectedPlace.latitude), // 위도
+                    lng: Number(selectedPlace.longitude), // 경도
+                    name: selectedPlace.placeName || 'WOOF' // 장소 이름
                   }}
-                  height="400px"
-                  defaultLevel={3}
-                  showInfoCard={false}
-                  readOnly={true}
-                  useCluster={false}
+                  height="400px" // 지도 높이
+                  defaultLevel={3} // 기본 줌 레벨
+                  showInfoCard={false} // 정보 카드 표시 안함
+                  readOnly={true} // 읽기 전용
+                  useCluster={false} // 클러스터링 사용 안함
                 />
               </div>
             </div>
           </div>
-          <div className="modal-backdrop show" onClick={handleCloseMap}></div>
+          <div className="modal-backdrop show" onClick={handleCloseMap}></div> {/* 모달 바깥 영역 클릭시 닫기 */}
         </div>
       )}
 
-      <Footer />
+      <Footer /> {/* 하단 푸터 */}
     </>
   )
 }
 
-export default VisitedPlacesPage
+export default VisitedPlacesPage // 컴포넌트 내보내기

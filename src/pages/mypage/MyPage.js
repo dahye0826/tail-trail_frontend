@@ -140,7 +140,7 @@ const MyPage = () => {
         {/* 이하 기존 JSX 코드와 동일 */}
         <div className="container py-5">
           <div className="row">
-            <div className="col-lg-3 col-md-4 mb-4">
+            <div className="col-auto mb-4">
               <div className="sidebar-container">
                 <div className="sidebar-header">
                   <h5 className="sidebar-title">마이페이지</h5>
@@ -176,7 +176,7 @@ const MyPage = () => {
               </div>
             </div>
 
-            <div className="col-lg-9 col-md-8">
+            <div className="col">
               <div className="mypage-content-container">
                 {loading ? (
                   <div className="text-center py-5">

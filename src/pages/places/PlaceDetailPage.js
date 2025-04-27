@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
-import { useParams, useNavigate, Link } from "react-router-dom"
+import { useParams, useNavigate, Link, useLocation } from "react-router-dom"
 import axios from "axios"
 import "bootstrap-icons/font/bootstrap-icons.css"
 import "bootstrap/dist/css/bootstrap.min.css"
@@ -29,6 +29,8 @@ function PlaceDetailPage() {
   const mapContainerRef = useRef(null)
   const { id } = useParams()
   const navigate = useNavigate()
+  const reviewRef = useRef(null)
+  const location = useLocation()
 
   // Format incoming place data
   const formatPlaceData = useCallback((placeData) => {
@@ -206,6 +208,12 @@ function PlaceDetailPage() {
 
     fetchData()
   }, [id, formatPlaceData])
+
+  useEffect(() => {
+    if (location.hash === "#review" && reviewRef.current) {
+      reviewRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [location]);
 
   // Render stars for ratings
   const renderStars = (rating) => (
@@ -526,7 +534,7 @@ function PlaceDetailPage() {
               </div>
 
               {/* 방문 후기 섹션 */}
-              <div className="review-section mt-4">
+              <div className="review-section mt-4" ref={reviewRef}>
                 <h3 className="section-title mb-3">방문 후기</h3>
                 {renderReviewSection()}
               </div>

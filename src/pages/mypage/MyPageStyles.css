@@ -41,6 +41,10 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   overflow: hidden;
   border: 1px solid var(--border-color);
+  width: 10cm !important;
+  min-width: 7cm !important;
+  max-width: 18cm !important;
+  box-sizing: border-box;
 }
 
 .sidebar-header {
@@ -70,7 +74,7 @@
 
 .sidebar-menu-link {
   display: block;
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1.2rem;
   color: var(--text-color);
   text-decoration: none;
   transition: all 0.2s;
