@@ -56,8 +56,8 @@ const KakaoMap = ({
         }
 
         if (!container) {
-          console.error("지도를 렌더링할 DOM 요소가 없습니다.");
-          return;
+          console.error("지도를 렌더링할 DOM 요소가 없습니다.")
+          return
         }
 
         const options = {
@@ -189,15 +189,17 @@ const KakaoMap = ({
       window.kakao.maps.event.addListener(marker, "click", () => {
         console.log("마커 클릭됨:", position) // 디버깅용 로그 추가
 
-        // 선택된 장소 정보 설정
-        setSelectedLocation({
+        const locationInfo = {
           id: position.id,
           name: position.name,
           address: position.address || position.roadAddress,
           category: position.category,
           lat: Number(position.lat),
           lng: Number(position.lng),
-        })
+        }
+
+        // 선택된 장소 정보 설정
+        setSelectedLocation(locationInfo)
 
         // 선택한 마커 정보 저장
         setSelectedMarker({ marker })
@@ -207,7 +209,7 @@ const KakaoMap = ({
 
         // 선택한 장소 정보 전달
         if (onLocationSelect) {
-          onLocationSelect(position)
+          onLocationSelect(locationInfo)
         }
 
         // 선택된 장소 카드가 보이도록 스크롤
@@ -326,58 +328,17 @@ const KakaoMap = ({
     setSearchResults([])
   }
 
+  // 장소 정보 카드에서 상세보기 버튼 클릭 시
+  const handleDetail = () => {
+    const placeId = selectedPlace?.id || selectedLocation?.id
+    if (placeId) {
+      window.location.href = `/places/place/${placeId}`
+    }
+  }
+
   return (
-    <div className="kakao-map-container">
-      {showSearchBar && (
-        <div className="map-search-container">
-          <div className="input-group">
-            <input
-              type="text"
-              className="form-control"
-              placeholder="장소를 검색하세요"
-              value={searchKeyword}
-              onChange={(e) => setSearchKeyword(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            />
-            <button className="btn btn-primary search-btn" type="button" onClick={handleSearch}>
-              <i className="bi bi-search me-1"></i> 검색
-            </button>
-          </div>
-
-          {loading && (
-            <div className="search-loading">
-              <div className="spinner-border spinner-border-sm text-primary me-2" role="status">
-                <span className="visually-hidden">검색 중...</span>
-              </div>
-              <span>검색 중...</span>
-            </div>
-          )}
-
-          {error && <div className="search-error alert alert-danger py-2 mt-2">{error}</div>}
-
-          {searchResults.length > 0 && (
-            <div className="search-results-container">
-              <div className="search-results-header">
-                <small className="text-muted">검색 결과 ({searchResults.length})</small>
-              </div>
-              <ul className="list-group search-results">
-                {searchResults.map((result) => (
-                  <li
-                    key={result.id}
-                    className="list-group-item search-result-item"
-                    onClick={() => handleLocationSelect(result)}
-                  >
-                    <div className="search-result-name">{result.place_name}</div>
-                    <div className="search-result-address">{result.address_name}</div>
-                    {result.category_name && <div className="search-result-category">{result.category_name}</div>}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      )}
-
+    <div className="kakao-map-container" style={{ position: "relative" }}>
+      {/* 지도 */}
       <div
         id="kakao-map"
         ref={mapRef}
@@ -390,29 +351,24 @@ const KakaoMap = ({
         className="map-view"
       ></div>
 
-      {/* 선택된 장소 정보 카드 - showInfoCard가 true일 때만 표시 */}
-      {showInfoCard && selectedLocation && (
-        <div className="selected-place-card mt-3">
-          <div className="card border-primary">
-            <div className="card-header bg-primary text-white">
-              <h5 className="card-title mb-0">
-                <i className="bi bi-geo-alt-fill me-2"></i>
-                장소 정보
-              </h5>
-            </div>
-            <div className="card-body">
-              <h5 className="card-title"> {selectedLocation.name}</h5>
-              <p className="card-text">
-                <i className="bi bi-geo-alt me-1"></i>
-                {selectedLocation.address || selectedLocation.roadAddress}
-              </p>
-              {selectedLocation.category && <span className="badge bg-info me-2">{selectedLocation.category}</span>}
-              {selectedLocation.id && (
-                <a href={`/places/place/${selectedLocation.id}`} className="btn btn-primary mt-2">
-                  상세보기
-                </a>
-              )}
-            </div>
+      {/* 장소 정보 카드 */}
+      {showInfoCard && (selectedPlace || selectedLocation) && (
+        <div className="place-info-card">
+          <div className="place-info-title">
+            <i className="bi bi-geo-alt-fill place-info-icon" />
+            {(selectedPlace || selectedLocation).name}
+          </div>
+          <div className="place-info-address">
+            <i className="bi bi-geo-alt me-1 place-info-icon" />
+            {(selectedPlace || selectedLocation).address}
+          </div>
+          {(selectedPlace || selectedLocation).category && (
+            <div className="place-info-category">{(selectedPlace || selectedLocation).category}</div>
+          )}
+          <div className="place-info-btns">
+            <button className="place-info-btn" onClick={handleDetail}>
+              상세보기
+            </button>
           </div>
         </div>
       )}

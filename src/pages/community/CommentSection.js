@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect, useMemo } from "react"
 import axios from "axios"
 import CommentItem from "./CommentItem"
@@ -10,13 +12,10 @@ function CommentSection({ postId, isLoggedIn, postAuthor }) {
   const [error, setError] = useState(null)
   const [commentUsers, setCommentUsers] = useState([])
 
-
   const userId = localStorage.getItem("userId")
-const userName = localStorage.getItem("userName")
+  const userName = localStorage.getItem("userName")
 
-const currentUser = userId && userName
-  ? { userId: Number(userId), userName }
-  : null
+  const currentUser = userId && userName ? { userId: Number(userId), userName } : null
 
   // 댓글 목록 불러오기
   useEffect(() => {
@@ -28,14 +27,13 @@ const currentUser = userId && userName
 
         if (isMounted) {
           setComments(response.data)
-          console.log("로딩 시작");
+          console.log("로딩 시작")
 
           // 댓글 작성자 목록 추출 (멘션 제안용)
           const uniqueUsers = [...new Set(response.data.map((comment) => comment.userName).filter(Boolean))]
 
           // 현재 로그인한 사용자와 게시글 작성자 추가
           const allUsers = [...uniqueUsers]
-
 
           setCommentUsers(allUsers)
           setError(null)
@@ -56,7 +54,7 @@ const currentUser = userId && userName
         }
       } finally {
         if (isMounted) {
-          console.log("로딩끝");
+          console.log("로딩끝")
           setLoading(false)
         }
       }
@@ -73,9 +71,9 @@ const currentUser = userId && userName
   const handleCommentAdded = (newComment) => {
     setComments((prevComments) => {
       // 이�� 같은 commentId가 있는지 확인
-      const alreadyExists = prevComments.some(c => c.commentId === newComment.commentId)
-      if (alreadyExists) return prevComments // 있으면 추가 안 함
-      return [newComment, ...prevComments]   // 없으면 추가
+      const alreadyExists = prevComments.some((c) => c.commentId === newComment.commentId)
+      if (alreadyExists) return prevComments // 있으면 추가 ��� 함
+      return [newComment, ...prevComments] // 없으면 추가
     })
 
     // 새 사용자 추가 (아직 목록에 없는 경우)
@@ -87,18 +85,16 @@ const currentUser = userId && userName
   // 댓글 수정 처리
   const handleCommentUpdated = (updatedComment) => {
     setComments((prevComments) =>
-      prevComments.map((comment) =>
-        comment.commentId === updatedComment.commentId ? updatedComment : comment
-      )
-    )}
+      prevComments.map((comment) => (comment.commentId === updatedComment.commentId ? updatedComment : comment)),
+    )
+  }
 
   // 댓글 삭제 처리
   const handleCommentDeleted = (commentId) => {
     setComments((prevComments) =>
       prevComments.filter((comment) => {
-
         return Number(comment.commentId) !== Number(commentId)
-      })
+      }),
     )
   }
   // useMemo를 사용하여 commentUsers 안정화

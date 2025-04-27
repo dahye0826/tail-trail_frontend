@@ -253,10 +253,10 @@ h3 {
 
 /* 지도 컨테이너 높이 조정 */
 .map-container {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  margin-bottom: 2rem;
+  border-radius: 12px !important;
+  overflow: hidden  !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08)  !important;
+  margin-bottom: 2rem  !important;
 }
 
 /* 리뷰 폼 카드 스타일 개선 */
@@ -351,8 +351,10 @@ h3 {
 
 /* 모바일 대응 스타일 */
 @media (max-width: 768px) {
-  .place-detail-container {
-    padding: 1.5rem;
+  .map-container {
+    min-height: 300px !important;
+    max-height: 400px !important;
+    height: auto !important;
   }
 
   h3 {
@@ -393,7 +395,7 @@ h3 {
   background-color: #fff;
   border-radius: 12px;
   padding: 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
 }
 
 .review-content {

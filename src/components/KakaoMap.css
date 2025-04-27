@@ -108,61 +108,77 @@
   text-align: right;
 }
 
-/* 선택된 장소 카드 스타일 수정 */
-.selected-place-card {
-  transition: all 0.3s ease;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+/* 장소 정보 카드 */
+.place-info-card {
+  position: absolute;
+  left: 24px;
+  bottom: 24px;
+  width: 300px;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 20px 18px 18px 18px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.place-info-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #222;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.place-info-address {
+  font-size: 14px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 2px;
+}
+
+.place-info-category {
+  font-size: 14px;
+  color: #4ecdc4;
+  background: #e8f5f5;
+  border-radius: 999px;
+  padding: 2px 12px;
+  display: inline-block;
+  width: fit-content;
+  margin-bottom: 4px;
+}
+
+.place-info-icon {
+  color: #4ecdc4;
+  font-size: 18px;
+  margin-right: 4px;
+}
+
+.place-info-btns {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.place-info-btn {
+  background: #4ecdc4;
+  color: #fff;
+  border: none;
   border-radius: 8px;
-  overflow: hidden;
-}
-
-.selected-place-card .card {
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: 2px solid #4ecdc4;
-}
-
-.selected-place-card .card-header {
-  background-color: #4ecdc4;
-  color: white;
-  padding: 0.75rem 1rem;
-}
-
-.selected-place-card .card-title {
-  color: #2a9d8f;
+  padding: 8px 18px;
+  font-size: 15px;
   font-weight: 600;
-  margin-bottom: 0.75rem;
+  cursor: pointer;
+  transition: background 0.18s;
 }
-
-.selected-place-card .card-header .card-title {
-  color: white;
-  margin-bottom: 0;
-}
-
-.selected-place-card .card-text {
-  color: #6c757d;
-  margin-bottom: 1rem;
-}
-
-.selected-place-card .badge {
-  font-size: 0.8rem;
-  font-weight: 500;
-  padding: 0.35rem 0.65rem;
-  margin-right: 0.3rem;
-  margin-bottom: 0.3rem;
-  border-radius: 20px;
-}
-
-.selected-place-card .btn-primary {
-  background-color: #4ecdc4;
-  border-color: #4ecdc4;
-  transition: all 0.2s;
-}
-
-.selected-place-card .btn-primary:hover {
-  background-color: #2a9d8f;
-  border-color: #2a9d8f;
+.place-info-btn:hover {
+  background: #38b8ab;
 }
 
 /* 클러스터 스타일 */

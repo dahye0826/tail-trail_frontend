@@ -103,14 +103,14 @@ function CommentForm({ postId, onCommentAdded, isLoggedIn, userId,commentUsers =
           onClick={toggleMentionDropdown}
           disabled={!isLoggedIn}
         >
-          멘션{isMentionOpen ? "▲" : "▼"}
+          @언급하기{isMentionOpen ? "▲" : "▼"}
         </button>
 
         {isMentionOpen && commentUsers.length > 0 && (
           <div className="mention-dropdown-menu">
             {commentUsers.map((user, index) => (
               <div key={index} className="mention-dropdown-item" onClick={() => handleMentionSelect(user.userName || user)}>
-                <i className="bi bi-person-circle me-2"></i>@{user.userName || user}
+                @{user.userName || user}
               </div>
             ))}
           </div>
