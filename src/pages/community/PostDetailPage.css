@@ -34,10 +34,9 @@
   box-shadow: none;
   padding: 2rem;
   overflow: visible;
-  position: relative;
+  /* position: relative;  <-- 이거 지워야 돼 */
   border: none;
 }
-
 .post-title {
   color: var(--text-color);
   font-size: 1.8rem;
@@ -160,31 +159,23 @@
 }
 
 /* 본문 스타일 */
-.post-content {
-  color: var(--text-color);
-  height: auto !important;
-  overflow: visible !important;
+.post-contentdetail {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
   font-size: 1.1rem;
   line-height: 1.7;
-  margin: 0 auto;
-  max-width: 720px;
-  padding: 1.5rem 1rem;
-  margin-bottom: 2rem;
+  overflow: visible;
+  white-space: pre-line;
+  word-break: break-word;
 }
 
-.post-content p {
-  margin-bottom: 1.2rem;
-}
-
-/* 본문 내 이미지 스타일 - CSS로 적용 */
-.post-content img {
+.post-contentdetail img {
   display: block;
-  margin: 50px auto;
   max-width: 100%;
   height: auto;
-  clear: both; /* float 문제 방지 */
+  margin: 2rem auto;
 }
-
 /* 첨부 이미지 스타일 */
 .post-image {
   display: block;
@@ -194,7 +185,7 @@
 }
 
 /* 이미지 간 간격 확보 */
-.post-content img + img {
+.post-contentdetail img + img {
   margin-top: 80px; /* 이미지 간 간격 더 크게 */
 }
 
@@ -329,7 +320,7 @@
     margin-top: 0.5rem;
   }
 
-  .post-content {
+  .post-contentdetail {
     padding: 1rem 0;
     font-size: 1rem;
   }

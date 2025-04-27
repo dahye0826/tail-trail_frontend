@@ -210,8 +210,8 @@ function PostDetailPage() {
           </div>
 
           {/* 본문 내용 표시 - 처리 없이 그대로 표시 */}
-          <div className="post-content mt-4">
-            <div dangerouslySetInnerHTML={{ __html: post.content }}></div>
+          <div className="post-contentdetail">
+            <div  dangerouslySetInnerHTML={{ __html: post.content }}></div>
           </div>
 
           {/* 첨부 이미지 표시 */}

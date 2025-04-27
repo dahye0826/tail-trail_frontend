@@ -128,7 +128,7 @@ function MapViewPage() {
         <div className="container-fluid py-4">
           <div className="row map-view-row">
             <div className={`col-md-4 col-lg-3 sidebar-col ${isMobile && !sidebarVisible ? "d-none" : ""}`}>
-              <div className="sidebar-container">
+              <div className="sidebar-containermap">
                 <div className="sidebar-header">
                   <h4 className="sidebar-title">함께 가는 지도</h4>
                 </div>
