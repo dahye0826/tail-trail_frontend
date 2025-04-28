@@ -11,6 +11,8 @@ import axios from "axios"
 import { favoriteAPI } from "../../services/api"
 
 const API_BASE_URL = "http://localhost:9000/api"
+const ML_SERVER_URL = "http://localhost:9001"
+
 
 function PlaceListPage() {
   // State management
@@ -32,6 +34,8 @@ function PlaceListPage() {
   const [totalPages, setTotalPages] = useState(5)
   const [totalResults, setTotalResults] = useState(0)
   const [error, setError] = useState(null)
+  const [recommendedPlaces, setRecommendedPlaces] = useState([])
+  const [loadingRecommendations, setLoadingRecommendations] = useState(false)
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -61,8 +65,23 @@ function PlaceListPage() {
 
   // Initialize data and check login status
   useEffect(() => {
+    const checkLoginStatus = () => {
+      const userId = localStorage.getItem("userId");
+      console.log("Checking login status - UserId:", userId);
+      
+      // userId가 존재하면 로그인 상태로 간주
+      const loggedIn = !!userId;
+      console.log("Setting isLoggedIn to:", loggedIn);
+      setIsLoggedIn(loggedIn);
+      
+      return loggedIn;
+    };
+
     const fetchInitialData = async () => {
       try {
+        // 먼저 로그인 상태 확인
+        const isUserLoggedIn = checkLoginStatus();
+        
         // Load cities and categories
         const [citiesResponse, categoriesResponse] = await Promise.all([
           axios.get(`${API_BASE_URL}/places/cities`),
@@ -72,10 +91,8 @@ function PlaceListPage() {
         if (citiesResponse.data) setCities(citiesResponse.data)
         if (categoriesResponse.data) setCategories(categoriesResponse.data)
 
-        // Check login status and load favorites if logged in
-        const token = localStorage.getItem("token")
-        if (token) {
-          setIsLoggedIn(true)
+        // 로그인된 경우에만 즐겨찾기 로드
+        if (isUserLoggedIn) {
           await fetchFavorites()
         }
       } catch (error) {
@@ -85,6 +102,26 @@ function PlaceListPage() {
 
     fetchInitialData()
   }, [])
+
+  // 로그인 상태 변경 감지
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const userId = localStorage.getItem("userId");
+      const newLoginStatus = !!userId;
+      console.log("Storage changed - New login status:", newLoginStatus);
+      setIsLoggedIn(newLoginStatus);
+    };
+
+    // storage 이벤트 리스너 추가
+    window.addEventListener('storage', handleStorageChange);
+    
+    // 초기 로그인 상태 확인
+    handleStorageChange();
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   // Fetch user favorites
   const fetchFavorites = async () => {
@@ -207,6 +244,51 @@ function PlaceListPage() {
     })
     setPetSizeDisplay(sizeDisplayMap)
   }, [places, calculatePetSizeCategories])
+
+  // 추천 장소 로드
+  useEffect(() => {
+    console.log("Recommendation useEffect - isLoggedIn:", isLoggedIn);
+    const loadRecommendations = async () => {
+      const userId = localStorage.getItem("userId");
+      console.log("Current userId:", userId);
+      
+      if (!userId) {
+        console.log("No userId found, skipping recommendations");
+        return;
+      }
+
+      try {
+        console.log("Starting to load recommendations...");
+        setLoadingRecommendations(true);
+        
+        const response = await axios.post(`${ML_SERVER_URL}/recommend`, { userId });
+        console.log("Recommendation response:", response.data);
+
+        if (response.data && response.data.recommendedPlaceIds) {
+          const top3Ids = response.data.recommendedPlaceIds.slice(0, 3);
+          console.log("Top 3 recommended place IDs:", top3Ids);
+          
+          const placeDetailsPromises = top3Ids.map(placeId => 
+            axios.get(`${API_BASE_URL}/places/${placeId}`)
+          );
+          
+          const placeDetailsResponses = await Promise.all(placeDetailsPromises);
+          const placeDetails = placeDetailsResponses.map(response => response.data);
+          console.log("Place details:", placeDetails);
+          
+          setRecommendedPlaces(placeDetails);
+        }
+      } catch (error) {
+        console.error("추천 장소 로드 실패:", error);
+      } finally {
+        setLoadingRecommendations(false);
+      }
+    };
+
+    if (isLoggedIn) {
+      loadRecommendations();
+    }
+  }, [isLoggedIn]);
 
   // Event handlers
   const handleSearch = () => setCurrentPage(1)
@@ -374,13 +456,13 @@ function PlaceListPage() {
           aria-label={`${place.placeName} - ${place.city} ${place.district}`}
         >
           <div className="card-img-container">
-          <img
-            src={place.placeImage ? `http://localhost:9000${place.placeImage}` : "/assets/default-pet-place.jpg"}
-             className="card-img-top"
-            alt={place.placeName}
-            loading="lazy"
-            onError={(e) => {e.target.src = "/assets/default-pet-place.jpg"}}
-          />
+            <img
+              src={place.placeImage ? `http://localhost:9000${place.placeImage}` : "/assets/default-pet-place.jpg"}
+              className="card-img-top"
+              alt={place.placeName}
+              loading="lazy"
+              onError={(e) => { e.target.src = "/assets/default-pet-place.jpg" }}
+            />
             {isLoggedIn && (
               <button
                 className="btn-favorite"
@@ -420,10 +502,57 @@ function PlaceListPage() {
         <div className="container mt-4 mb-5">
           <div className="places-content-wrapper">
             {/* Header */}
-            <div className="place-header text-center">
-              <h2 className="mb-4">반려동물과 함께하는 장소</h2>
-              <p className="subtitle mb-5">반려동물과 함께 방문할 수 있는 다양한 장소를 찾아보세요.</p>
+            <div className="place-header">
+              <h2>반려동물과 함께하는 장소</h2>
+              <p className="subtitle">반려동물과 함께 방문할 수 있는 다양한 장소를 찾아보세요.</p>
             </div>
+
+            {/* 추천 장소 섹션 - 필터 컨테이너 위로 이동 */}
+            {isLoggedIn && (
+              <div className="recommended-section mb-4">
+                <h4 className="mb-3">좋아할만한 장소</h4>
+                <div className="row row-cols-1 row-cols-md-3 g-4">
+                  {loadingRecommendations ? (
+                    <div className="col-12 text-center">
+                      <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
+                    </div>
+                  ) : recommendedPlaces.length > 0 ? (
+                    recommendedPlaces.map((place) => (
+                      <div key={place.placeId} className="col">
+                        <div
+                          className="card h-100 place-card"
+                          onClick={() => handlePlaceClick(place.placeId)}
+                          style={{ cursor: "pointer" }}
+                        >
+                          <img
+                            src={place.placeImage ? `http://localhost:9000${place.placeImage}` : "/assets/default-pet-place.jpg"}
+                            className="card-img-top"
+                            alt={place.placeName}
+                            loading="lazy"
+                            onError={(e) => { e.target.src = "/assets/default-pet-place.jpg" }}
+                          />
+                          <div className="card-body">
+                            <span className={`badge ${getCategoryBadgeClass(place.industryMain)}`}>
+                              {place.industryMain}
+                            </span>
+                            <h5 className="card-title mt-2">{place.placeName}</h5>
+                            <p className="card-text">
+                              <i className="bi bi-geo-alt me-1"></i> {place.city} {place.district}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="col-12">
+                      <p className="text-center">추천할 장소가 없습니다.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Filters and search */}
             <div className="filter-container p-3 mb-4 rounded shadow-sm">

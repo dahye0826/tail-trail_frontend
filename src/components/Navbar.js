@@ -3,7 +3,7 @@
 import "./Navbar.css"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
-import { authAPI } from "../services/api"
+import { authAPI } from "./../services/api"
 
 function Navbar() {
   const location = useLocation()
