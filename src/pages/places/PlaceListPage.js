@@ -497,7 +497,7 @@ function PlaceListPage() {
   return (
     <>
       <Navbar isLoggedIn={isLoggedIn} />
-
+{/* /**zz */}
       <div className="places-background">
         <div className="container mt-4 mb-5">
           <div className="places-content-wrapper">
