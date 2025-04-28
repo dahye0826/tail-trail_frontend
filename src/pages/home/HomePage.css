@@ -292,6 +292,27 @@ body {
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
 }
 
+/* 리뷰 카드 스타일을 커뮤니티 카드와 유사하게 변경 */
+.review-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  height: 100%;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.review-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.review-card .card-body {
+  padding: 1.5rem;
+}
+
 /* 리뷰 제목 스타일 수정 */
 .review-title {
   color: var(--accent-color);
@@ -321,12 +342,12 @@ body {
 
 /* 리뷰 텍스트 스타일 수정 */
 .review-text {
-  font-style: italic;
+  font-style: normal;
   line-height: 1.5;
-  background-color: rgba(245, 245, 245, 0.5);
-  padding: 0.8rem;
-  border-radius: 8px;
-  border-left: 3px solid var(--primary-color);
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  border-left: none;
   font-size: 0.95rem;
   margin-bottom: 1rem;
   display: -webkit-box;
@@ -334,8 +355,8 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  height: 4.5rem;
-  color: #495057;
+  height: 4.2rem;
+  color: #6c757d;
 }
 
 .review-author {
@@ -374,6 +395,7 @@ body {
   background-color: white;
   position: relative;
   overflow: hidden;
+  padding: 3rem 0;
 }
 
 .community-content {
@@ -645,42 +667,8 @@ body {
   margin-top: 1rem;
 }
 
-.review-card {
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-  height: 100%;
-  border: 1px solid var(--border-color);
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.review-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
-}
-
-.review-card .card-body {
-  padding: 1.5rem;
-}
-
-.review-card-image {
-  height: 180px;
-  overflow: hidden;
-  position: relative;
-}
-
-.review-card-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
-}
-
-.review-card:hover .review-card-image img {
-  transform: scale(1.05);
-}
+/* 리뷰 카드 이미지 관련 스타일 제거 */
+/* .review-card-image 관련 스타일 삭제 */
 
 .placeholder-image {
   display: flex;
@@ -705,5 +693,124 @@ body {
   .review-section .text-center {
     flex-direction: column;
     align-items: flex-start !important;
+  }
+}
+
+/* 새로운 커뮤니티 카드 스타일 - 이미지 예시와 같은 형태 */
+.community-slider {
+  width: 100%;
+  overflow-x: auto;
+  padding: 10px 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+}
+
+.community-slider::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.community-cards-container {
+  display: flex;
+  gap: 20px;
+  padding: 10px 0;
+}
+
+.community-card-link {
+  text-decoration: none;
+  color: inherit;
+  min-width: 280px;
+  max-width: 280px;
+}
+
+.community-card-new {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  background-color: white;
+  transition: all 0.3s ease;
+}
+
+.community-card-new:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.community-card-image-container {
+  height: 180px;
+  overflow: hidden;
+  position: relative;
+}
+
+.community-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.community-card-new:hover .community-card-image {
+  transform: scale(1.05);
+}
+
+.community-card-no-image {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f0f0;
+  color: #adb5bd;
+}
+
+.community-card-no-image i {
+  font-size: 3rem;
+}
+
+.community-card-content {
+  padding: 15px;
+}
+
+.community-card-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  color: #333;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.community-card-text {
+  color: #666;
+  font-size: 0.9rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.more-link {
+  color: #666;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.more-link:hover {
+  color: var(--accent-color);
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+  .community-card-link {
+    min-width: 220px;
+    max-width: 220px;
+  }
+
+  .community-card-image-container {
+    height: 150px;
   }
 }
