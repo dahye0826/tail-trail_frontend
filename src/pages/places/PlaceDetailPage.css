@@ -26,8 +26,8 @@ body {
   border: 1px solid var(--border-color);
 }
 
-/* 모든 h3 태그에서 배경, 테두리, 패딩 제거하여 언더바 효과 없애기 */
-h3 {
+/* 기본 h3 스타일 수정 */
+h3:not(.section-titleplacedetail):not(.section-titlelocation):not(.section-titlereview) {
   color: var(--text-color);
   font-weight: 600;
   background-color: transparent;
@@ -106,9 +106,21 @@ h3 {
   border-radius: 20px;
 }
 
+/* 카테고리 배지 래퍼 추가 - 카테고리를 아래로 내리기 위한 스타일 */
+.category-badge-wrapper {
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+
+/* 카테고리 배지 스타일 수정 */
 .category-badge {
   background-color: var(--secondary-color);
   color: var(--text-color);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: inline-block;
 }
 
 .amenity-badge {
@@ -225,12 +237,11 @@ h3 {
 
 /* 후기 없음 영역 디자인 수정 */
 .no-reviews-container {
-  background-color: white;
-  border-radius: 12px;
-  padding: 2.5rem 1.5rem;
+  padding: 1.5rem;
   text-align: center;
   border: 1px dashed var(--border-color);
-  margin-bottom: 2rem;
+  border-radius: 8px;
+  background-color: #f8f9fa;
 }
 
 .no-reviews-icon {
@@ -254,9 +265,9 @@ h3 {
 /* 지도 컨테이너 높이 조정 */
 .map-container {
   border-radius: 12px !important;
-  overflow: hidden  !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08)  !important;
-  margin-bottom: 2rem  !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  margin-bottom: 2rem !important;
 }
 
 /* 리뷰 폼 카드 스타일 개선 */
@@ -277,7 +288,11 @@ h3 {
 }
 
 /* 섹션 제목 스타일 통일 */
-.section-title {
+.section-titleplacedetail,
+.section-titleplacename,
+.section-titleplaceinfo,
+.section-titleadditionalinfo,
+.section-titlelocation {
   color: var(--text-color);
   font-weight: 600;
   font-size: 1.5rem;
@@ -285,7 +300,16 @@ h3 {
   position: relative;
 }
 
-.section-title::after {
+/* 방문 후기 제목 스타일 - 밑줄을 글자 길이에만 맞추기 */
+.section-titlereview {
+  color: var(--text-color);
+  font-weight: 600;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.section-titlereview::after {
   content: "";
   position: absolute;
   bottom: -8px;
@@ -293,6 +317,32 @@ h3 {
   width: 100%;
   height: 2px;
   background-color: var(--primary-color);
+}
+
+.section-titleplacedetail::after,
+.section-titleplacename::after,
+.section-titleplaceinfo::after,
+.section-titleadditionalinfo::after,
+.section-titlelocation::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--primary-color);
+}
+
+/* 장소 이름 스타일 추가 조정 */
+.section-titleplacename {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+/* 장소 정보와 추가 정보 제목 크기 조정 */
+.section-titleplaceinfo,
+.section-titleadditionalinfo {
+  font-size: 1.3rem;
 }
 
 /* 주소 복사 아이콘 버튼 스타일 */
@@ -392,16 +442,34 @@ h3 {
 
 /* 방문 후기 섹션 스타일 */
 .review-section {
-  background-color: #fff;
+  background-color: white;
   border-radius: 12px;
   padding: 2rem;
-
 }
 
+/* 리뷰 컨텐츠 스타일 개선 - 다른 카드와 통일 */
 .review-content {
   background-color: #f8f9fa;
   border-radius: 8px;
   padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1rem;
+}
+
+.review-text-container {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid #e9ecef;
+  margin-top: 0.5rem;
+}
+
+.review-form {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 0;
+  border: 1px solid #e9ecef;
 }
 
 .review-text-container {
@@ -545,26 +613,19 @@ h3 {
   transform: scale(1.1);
 }
 
+/* 카테고리 컨테이너 수정 */
 .category-rating-container {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 8px;
   margin-bottom: 12px;
   background-color: #f8f9fa;
   padding: 8px 12px;
   border-radius: 8px;
-  display: inline-flex;
 }
 
-.category-rating-container .category-badge {
-  font-size: 0.9rem;
-  padding: 4px 8px;
-  background-color: var(--primary-color);
-  color: white;
-  border-radius: 4px;
-  margin: 0;
-}
-
+/* 별점 표시 컨테이너 수정 */
 .category-rating-container .rating-display {
   display: flex;
   align-items: center;
@@ -586,37 +647,208 @@ h3 {
 .review-item {
   background: #f8f9fa;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   padding: 1.5rem 1.2rem;
   margin-bottom: 1.5rem;
-  font-size: 1.3rem; /* 글자 크기 1.3배 */
+  font-size: 1.1rem;
   transition: box-shadow 0.2s;
+  position: relative;
 }
+
 .review-item:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
-.review-item .review-header {
+
+.review-header {
   display: flex;
   align-items: center;
-  gap: 1.2rem;
-  margin-bottom: 0.7rem;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
-.review-item .review-author {
+
+.user-initial-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.review-author-info {
+  flex: 1;
+}
+
+.review-author {
   font-weight: bold;
   color: #2d3a4b;
-}
-.review-item .review-rating {
-  color: #ffb400;
-  font-size: 1.1em;
-}
-.review-item .review-dates {
-  margin-left: auto;
-  font-size: 0.95em;
-  color: #888;
-}
-.review-item .review-content {
-  margin-top: 0.5rem;
   margin-bottom: 0.2rem;
-  line-height: 1.7;
-  color: #222;
+}
+
+.review-dates {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.review-rating {
+  font-size: 0.9rem;
+}
+
+.review-content-text {
+  margin: 0.5rem 0 1rem;
+  line-height: 1.6;
+}
+
+.review-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+/* 별점 선택 스타일 */
+.star-rating {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.star-icon {
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin-right: 0.25rem;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.star-icon:hover {
+  transform: scale(1.2);
+}
+
+.rating-text {
+  font-size: 1rem;
+  color: #6c757d;
+}
+
+/* 방문 후기 작성하기 버튼 스타일 */
+.review-write-btn {
+  margin: 0 auto;
+  display: block;
+  min-width: 200px;
+}
+
+/* 방문 후기 카드 컨테이너 스타일 */
+.review-card-container {
+  /* 기존 스타일 제거하고 info-card 스타일 상속 */
+}
+
+/* 후기 아이콘 스타일 */
+.no-reviews-icon {
+  font-size: 4rem;
+  color: var(--secondary-color);
+  margin-bottom: 1.5rem;
+}
+
+.no-reviews-icon i {
+  display: inline-block;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 장소 이름과 별점 나란히 배치 */
+.place-name-rating {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.place-rating {
+  display: flex;
+  align-items: center;
+}
+
+/* 카테고리 태그 스타일 - 선과 겹치지 않게 여백 추가 */
+.place-category {
+  color: var(--text-color);
+  font-size: 0.95rem;
+  margin-top: 20px;
+  padding: 4px 10px;
+  background-color: var(--secondary-color);
+  border-radius: 4px;
+  display: inline-block;
+}
+
+/* 리뷰 신고 관련 스타일 추가 */
+.review-rating-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.report-icon-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.report-icon {
+  color: #adb5bd;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.report-icon:hover {
+  color: #dc3545;
+}
+
+.reported-icon {
+  color: #dc3545;
+  font-size: 0.9rem;
+}
+
+.report-dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  width: 200px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  overflow: hidden;
+  border: 1px solid #e9ecef;
+}
+
+.report-dropdown-header {
+  padding: 10px 15px;
+  font-weight: 600;
+  border-bottom: 1px solid #e9ecef;
+  background-color: #f8f9fa;
+}
+
+.report-dropdown-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.report-dropdown-item:hover {
+  background-color: #f8f9fa;
+  color: #dc3545;
 }
