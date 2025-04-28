@@ -189,8 +189,8 @@ const ProfileEditPage = () => {
                     </Link>
                   </li>
                   <li className="sidebar-menu-item">
-                    <Link to="/mypage/rated" className="sidebar-menu-link">
-                      <i className="bi bi-star me-2"></i>별점 등록한 곳
+                    <Link to="/mypage/visited" className="sidebar-menu-link">
+                      <i className="bi bi-star me-2"></i>방문이력관광지
                     </Link>
                   </li>
                     {/* 여기에 즐겨찾기 항목 추가 */}
