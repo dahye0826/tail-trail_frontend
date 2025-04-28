@@ -281,7 +281,7 @@ function EditPostPage() {
 
                     {/* 검색 결과 표시 - 스크롤 가능한 컨테이너로 변경 */}
                     {searchResults.length > 0 && (
-                      <div className="search-results-container mb-3">
+                      <div className="search-results-containerpost mb-3">
                         <div className="search-results-header">
                           <small className="text-muted">검색 결과 ({searchResults.length})</small>
                         </div>

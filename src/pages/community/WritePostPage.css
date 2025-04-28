@@ -109,7 +109,7 @@
 }
 
 /* 검색 결과 스크롤 가능한 컨테이너 스타일 추가 */
-.search-results-container {
+.search-results-containerpost {
   position: relative;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -121,10 +121,11 @@
 }
 
 .search-results-header {
-  padding: 10px 15px;
-  background-color: var(--light-bg);
-  border-bottom: 1px solid #ccc;
-  font-weight: 500;
+  padding: 10px 15px !important;
+  background-color: var(--light-bg)!important;
+  border-bottom: 1px solid #ccc!important;
+  font-weight: 800;
+  font-size: 1.2rem;
 }
 
 .search-results-scrollable {
@@ -154,7 +155,7 @@
 .search-results-scrollable .list-group-item {
   border-left: none;
   border-right: none;
-  padding: 8px 12px;
+  padding: 15px 11px;
   transition: all 0.2s ease;
   border-bottom: 1px solid #f0f0f0;
 }
@@ -171,19 +172,27 @@
 .search-results-scrollable .list-group-item.active,
 .search-results-scrollable .list-group-item[data-selected="true"] {
   background-color: #d0f0eb;
-  border-left: 4px solid #00bfa5;
-  padding-left: 8px;
+  border-left: none;
+  padding-left: 6px;
 }
 
 .search-results-scrollable .list-group-item h6 {
-  font-size: 14px;
+  font-size: 17px;
   margin-bottom: 4px;
 }
 
 .search-results-scrollable .list-group-item p {
-  font-size: 12px;
+  font-size: 16px;
   color: #6c757d;
   margin-bottom: 0;
+}
+
+.list-group-item.active {
+  z-index: 2;
+  color: #00796b;
+  border-color: #ffffff;
+ 
+  
 }
 
 /* 파일 업로드 안내 문구 개선 */

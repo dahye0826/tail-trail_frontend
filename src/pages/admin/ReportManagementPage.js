@@ -1,4 +1,3 @@
-"use client"
 import axios from "axios"
 import { useState, useEffect } from "react"
 import "./ReportManagementPage.css"
@@ -19,7 +18,6 @@ function ReportManagement() {
     const fetchReports = async () => {
       try {
         setLoading(true)
-        // 실제 API 호출로 대체 필요
         const response = await axios.get("http://localhost:9000/api/report")
         setReports(response.data)
         setError(null)
@@ -63,12 +61,12 @@ function ReportManagement() {
           })
           break
 
-        case "REVIEW":
-          response = await axios.get(`http://localhost:9000/api/reviews/${report.targetId}`)
+        case "VISITEDPLACE":
+          response = await axios.get(`http://localhost:9000/api/visited-place/${report.targetId}`)
           setContentData({
             content: response.data.reviewContent,
             rating: response.data.rating,
-            author: response.data.memberName,
+            author: response.data.userName,
             createdAt: response.data.createdAt,
           })
           break
@@ -114,7 +112,6 @@ function ReportManagement() {
     }
 
     try {
-      // 실제 API 호출로 대체 필요
       await axios.put(`http://localhost:9000/api/report/${reportId}`, {
         status: action === "approve" ? "APPROVED" : "REJECTED",
       })
@@ -139,7 +136,7 @@ function ReportManagement() {
         } catch (deleteErr) {
           console.error("콘텐츠 삭제 오류:", deleteErr)
           alert("콘텐츠 삭제 중 오류가 발생했습니다.")
-          return // 삭제 실패 시 함수 종료
+          return 
         }
       }
 
@@ -176,7 +173,7 @@ function ReportManagement() {
         return "게시글"
       case "COMMENT":
         return "댓글"
-      case "VISTEDPLACE":
+      case "VISITEDPLACE":
         return "후기"
       default:
         return type
@@ -353,34 +350,6 @@ function ReportManagement() {
             </div>
             <div className="modal-body">{renderContentDetails()}</div>
             <div className="modal-footer">
-              <div className="action-buttons">
-                <button
-                  className="btn-approve"
-                  onClick={() =>
-                    handleProcessReport(
-                      selectedReport.reportId,
-                      "approve",
-                      selectedReport.targetType,
-                      selectedReport.targetId,
-                    )
-                  }
-                >
-                  승인 (콘텐츠 삭제)
-                </button>
-                <button
-                  className="btn-reject"
-                  onClick={() =>
-                    handleProcessReport(
-                      selectedReport.reportId,
-                      "reject",
-                      selectedReport.targetType,
-                      selectedReport.targetId,
-                    )
-                  }
-                >
-                  거부 (콘텐츠 유지)
-                </button>
-              </div>
               <button className="btn-secondary" onClick={handleCloseModal}>
                 닫기
               </button>

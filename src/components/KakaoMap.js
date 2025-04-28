@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react"
 import "./KakaoMap.css"
 
-const KakaoMap = ({
+function KakaoMap ({
   initialLocation,
   markerPositions = [],
   height = "400px",
@@ -14,7 +14,7 @@ const KakaoMap = ({
   selectedPlace,
   showInfoCard = true,
   useCluster = true,
-}) => {
+}) {
   const mapRef = useRef(null)
   const [map, setMap] = useState(null)
   const [searchKeyword, setSearchKeyword] = useState("")
@@ -31,7 +31,7 @@ const KakaoMap = ({
     script.src =
       "https://dapi.kakao.com/v2/maps/sdk.js?appkey=97c75dad0b53b5e0f179e360aea22433&libraries=services,clusterer,drawing&autoload=false"
     script.async = true
-    document.head.appendChild(script)
+    document.head.appendChild(script) //헤드안에 스크립트 추가
 
     script.onload = () => {
       window.kakao.maps.load(() => {
@@ -43,9 +43,8 @@ const KakaoMap = ({
         // 초기 위치 설정 로직
         let initialCoords = { lat: seoulCoords.lat, lng: seoulCoords.lng }
 
-        // markerPositions가 있으면 첫 번째 마커 위치 사용
+        // markerPositions은 지도안에 마커가 몇 개 있는지 확인하는 용도
         if (markerPositions && markerPositions.length > 0) {
-          console.log("마커 위치 데이터:", markerPositions)
           initialCoords = {
             lat: Number(markerPositions[0].lat),
             lng: Number(markerPositions[0].lng),
@@ -105,6 +104,7 @@ const KakaoMap = ({
           window.kakao.maps.event.addListener(clusterer, "clusterclick", (cluster) => {
             // 클러스터 클릭 시 해당 영역으로 지도 확대
             const level = kakaoMap.getLevel() - 1
+            //anchor:클러스터 중심
             kakaoMap.setLevel(level, { anchor: cluster.getCenter() })
           })
 
@@ -190,7 +190,7 @@ const KakaoMap = ({
         console.log("마커 클릭됨:", position) // 디버깅용 로그 추가
 
         const locationInfo = {
-          id: position.id,
+          id: position.id ,
           name: position.name,
           address: position.address || position.roadAddress,
           category: position.category,
@@ -237,7 +237,7 @@ const KakaoMap = ({
     if (!map || !selectedPlace) {
       return
     }
-    const { lat, lng, name } = selectedPlace
+    const { lat, lng} = selectedPlace
 
     const position = new window.kakao.maps.LatLng(lat, lng)
 

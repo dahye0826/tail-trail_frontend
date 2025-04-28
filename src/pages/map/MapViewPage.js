@@ -3,7 +3,7 @@
 // MapViewPage.js - PlaceListPage 방식으로 지역/카테고리 옵션 설정 (도로명 주소에서 시(city)만 추출)
 
 import axios from "axios"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import "bootstrap-icons/font/bootstrap-icons.css"
 import "bootstrap/dist/css/bootstrap.min.css"
@@ -13,6 +13,61 @@ import Footer from "../../components/Footer"
 import KakaoMap from "../../components/KakaoMap"
 
 const API_BASE_URL = "http://localhost:9000/api"
+
+// 커스텀 드롭다운 컴포넌트
+function CustomDropdown({ options, value, onChange, placeholder }) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [selectedValue, setSelectedValue] = useState(value || "")
+  const dropdownRef = useRef(null)
+
+  useEffect(() => {
+    setSelectedValue(value)
+  }, [value])
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
+
+  const handleSelect = (option) => {
+    setSelectedValue(option)
+    onChange(option)
+    setIsOpen(false)
+  }
+
+  const displayValue = selectedValue || placeholder
+
+  return (
+    <div className="custom-dropdown" ref={dropdownRef}>
+      <div className={`dropdown-header ${isOpen ? "active" : ""}`} onClick={() => setIsOpen(!isOpen)}>
+        <span>{displayValue}</span>
+        <i className={`bi bi-chevron-down dropdown-icon ${isOpen ? "open" : ""}`}></i>
+      </div>
+      <div className={`dropdown-menu ${isOpen ? "open" : ""}`}>
+        <div className={`dropdown-item ${selectedValue === "" ? "selected" : ""}`} onClick={() => handleSelect("")}>
+          {placeholder}
+        </div>
+        {options.map((option, index) => (
+          <div
+            key={index}
+            className={`dropdown-item ${selectedValue === option ? "selected" : ""}`}
+            onClick={() => handleSelect(option)}
+          >
+            {option}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 function MapViewPage() {
   const [places, setPlaces] = useState([])
@@ -148,31 +203,19 @@ function MapViewPage() {
                     </button>
                   </div>
 
-                  <select
-                    className="sidebar-filter-select"
+                  <CustomDropdown
+                    options={cities}
                     value={regionFilter}
-                    onChange={(e) => setRegionFilter(e.target.value)}
-                  >
-                    <option value="">지역 선택</option>
-                    {cities.map((city, index) => (
-                      <option key={index} value={city}>
-                        {city}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setRegionFilter}
+                    placeholder="지역 선택"
+                  />
 
-                  <select
-                    className="sidebar-filter-select"
+                  <CustomDropdown
+                    options={categories}
                     value={categoryFilter}
-                    onChange={(e) => setCategoryFilter(e.target.value)}
-                  >
-                    <option value="">카테고리 선택</option>
-                    {categories.map((category, index) => (
-                      <option key={index} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setCategoryFilter}
+                    placeholder="카테고리 선택"
+                  />
 
                   <button className="sidebar-reset-btn" onClick={handleResetFilters}>
                     필터 초기화
@@ -195,7 +238,7 @@ function MapViewPage() {
                       <p className="text-muted">검색 결과가 없습니다.</p>
                     </div>
                   ) : (
-                    <div className="places-list-items">
+                    <div className="places-list-items-scrollable">
                       {filteredPlaces.map((place) => (
                         <div
                           key={place.id}

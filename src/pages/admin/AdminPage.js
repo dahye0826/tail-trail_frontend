@@ -13,23 +13,6 @@ function AdminPage() {
 
   const isAdmin = true 
 
-  if (!isAdmin) {
-    return (
-      <>
-        <Navbar isLoggedIn={true} />
-        <div className="container mt-5 text-center">
-          <div className="alert alert-danger">
-            <h3>접근 권한이 없습니다</h3>
-            <p>관리자만 접근할 수 있는 페이지입니다.</p>
-            <Link to="/" className="btn btn-primary mt-3">
-              홈으로 돌아가기
-            </Link>
-          </div>
-        </div>
-        <Footer />
-      </>
-    )
-  }
 
   const handleMenuClick = (tab) => {
     setActiveTab(tab)
@@ -140,7 +123,6 @@ function AdminUsers() {
     <div className="admin-section">
       <div className="admin-section-header">
         <h2>사용자 관리</h2>
-        <p>사용자 계정을 관리할 수 있습니다.</p>
       </div>
       <div className="admin-section-body">
         <div className="admin-placeholder">

@@ -269,7 +269,7 @@ useEffect(() => {
 
                     {/* 검색 결과 리스트 */}
                     {searchResults.length > 0 && (
-                      <div className="search-results-container mb-3">
+                      <div className="search-results-containerpost mb-3">
                         <div className="search-results-header">
                           <small className="text-muted">검색 결과 ({searchResults.length})</small>
                         </div>
