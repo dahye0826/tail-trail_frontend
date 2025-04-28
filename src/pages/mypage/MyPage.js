@@ -131,6 +131,19 @@ const MyPage = () => {
     fetchUserData();
   }, [navigate]);
 
+  const handleDeleteAccount = async () => {
+    if (!window.confirm("정말로 회원탈퇴 하시겠습니까?")) return;
+    const userId = localStorage.getItem("userId");
+    try {
+      await userAPI.deleteUser(userId);
+      alert("회원탈퇴가 완료되었습니다.");
+      localStorage.clear();
+      navigate("/");
+    } catch (error) {
+      alert("회원탈퇴에 실패했습니다.");
+    }
+  };
+
   // JSX는 변경 없이 동일하게 유지
   return (
     <>
@@ -286,6 +299,8 @@ const MyPage = () => {
                         여행지 둘러보기
                       </Link>
                     </div>
+
+                    <button className="btn btn-danger" onClick={handleDeleteAccount}>회원탈퇴</button>
                   </>
                 )}
               </div>
