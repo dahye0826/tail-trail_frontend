@@ -246,7 +246,7 @@ function ReportManagement() {
         <div className="content-details">
           <div className="content-meta">
             <span className="content-author">{contentData.author}</span>
-            <span className="content-date">{formatDate(contentData.createdAt)}</span>
+            <span className="content-date">작성일:{formatDate(contentData.createdAt)}</span>
             <span className="content-date">방문일:{formatDate(contentData.visitDate)}</span>
             <div className="content-rating">
               {[...Array(5)].map((_, i) => (
