@@ -61,6 +61,7 @@ function ReportManagement() {
             author: response.data.userName,
             createdAt: response.data.createdAt,
           })
+
           break
 
         case "VISITEDPLACE":
