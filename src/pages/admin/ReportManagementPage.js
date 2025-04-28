@@ -78,9 +78,27 @@ function ReportManagement() {
         default:
           setContentData({ note: "지원되지 않는 콘텐츠 유형입니다." })
       }
-    } catch (err) {
-      console.error("콘텐츠 상세 정보 로딩 오류:", err)
-      setContentData({ error: "콘텐츠를 불러오는데 실패했습니다." })
+    }catch (err) {
+      console.error("콘텐츠 상세 정보 로딩 오류:", err);
+    
+      if (report.targetType === "COMMENT") {
+        // 댓글이 없으면 별도 메시지 표시
+        setContentData({ 
+          error: "이미 삭제된 댓글입니다."
+        });
+      } else if (report.targetType === "POST") {
+        setContentData({ 
+          error: "이미 삭제된 게시글입니다."
+        });
+      } else if (report.targetType === "VISITEDPLACE") {
+        setContentData({ 
+          error: "이미 삭제된 방문 기록입니다."
+        });
+      } else {
+        setContentData({ 
+          error: "콘텐츠를 불러오는데 실패했습니다."
+        });
+      }
     } finally {
       setContentLoading(false)
     }
