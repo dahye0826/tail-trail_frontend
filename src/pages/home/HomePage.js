@@ -72,23 +72,25 @@ const HomePage = () => {
   }, [])
 
   // 2. 최근 리뷰 데이터 가져오기 useEffect 추가 - fetchPlaces 함수 다음에 추가
-  // useEffect(() => {
-  //   const fetchReviews = async () => {
-  //     try {
-  //       setReviewsLoading(true)
-  //       const response = await axios.get("http://localhost:9000/api/visited-place/reviews")
-  //       console.log("최근 리뷰 데이터:", response.data)
-  //       setReviews(response.data)
-  //       setReviewsLoading(false)
-  //     } catch (error) {
-  //       console.error("최근 리뷰 로딩 오류:", error)
-  //       setReviewsLoading(false)
-  //       setReviews([])
-  //     }
-  //   }
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        setReviewsLoading(true)
+        const response = await axios.get("http://localhost:9000/api/visited-place/recent-reviews", {
+          params: { size: 4 },
+        })
+        console.log("최근 리뷰 데이터:", response.data)
+        setReviews(response.data)
+        setReviewsLoading(false)
+      } catch (error) {
+        console.error("최근 리뷰 로딩 오류:", error)
+        setReviewsLoading(false)
+        setReviews([])
+      }
+    }
 
-  //   fetchReviews()
-  // }, [])
+    fetchReviews()
+  }, [])
 
   return (
     <>
@@ -251,8 +253,8 @@ const HomePage = () => {
           </Container>
         </div>
 
-        {/* 최근 리뷰 섹션 - 카드 형식으로 변경 */}
-        {/* <div className="review-section py-4" style={{ backgroundColor: "white" }}>
+        {/* 최근 리뷰 섹션 - 카드 형식으로 변경  */}
+        <div className="review-section py-4" style={{ backgroundColor: "white" }}>
           <Container>
             <div className="text-center mb-4 d-flex justify-content-between align-items-center">
               <div>
@@ -274,23 +276,9 @@ const HomePage = () => {
               <Row className="review-cards">
                 {reviews.length > 0 ? (
                   reviews.map((review) => (
-                    <Col md={6} lg={4} className="mb-4" key={placeId}>
-                      <Link to={`/places/place/${placeId}`} className="text-decoration-none">
+                    <Col md={6} lg={3} className="mb-4" key={review.visitId}>
+                      <Link to={`/places/place/${review.placeId}`} className="text-decoration-none">
                         <div className="review-card">
-                          {review.imageUrl && (
-                            <div className="review-card-image">
-                              <img
-                                src={review.imageUrl || "/placeholder.svg"}
-                                alt={review.placeName}
-                                className="img-fluid"
-                              />
-                            </div>
-                          )}
-                          {!review.imageUrl && (
-                            <div className="review-card-image placeholder-image">
-                              <i className="bi bi-image"></i>
-                            </div>
-                          )}
                           <div className="card-body">
                             <div className="mb-2 rating">
                               {[...Array(Math.floor(review.rating || 0))].map((_, i) => (
@@ -303,7 +291,7 @@ const HomePage = () => {
                             </div>
                             <h5 className="review-title">{review.placeName}</h5>
                             <p className="review-location mb-2">{review.roadAddress}</p>
-                            <p className="review-text">"{review.content}"</p>
+                            <p className="review-text">{review.note}</p>
                             <div className="card-meta">
                               <span className="author">
                                 <div className="mini-avatar">{review.userName?.charAt(0) || "?"}</div>
@@ -324,7 +312,7 @@ const HomePage = () => {
               </Row>
             )}
           </Container>
-        </div> */}
+        </div>
       </div>
 
       <Footer />
