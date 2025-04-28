@@ -31,11 +31,12 @@
   position: relative;
   display: inline-block;
   padding-bottom: 0;
+  font-size: 1.5rem;
 }
 
 /* 언더바 제거 */
 .place-header h2:after {
-  content: none; /* 언더바 제거 */
+  content: none; 
 }
 
 /* 부제목도 심플하게 */
