@@ -26,7 +26,6 @@ function Navbar() {
       // 관리자 상태 확인
       const userRole = localStorage.getItem("userRole")
       console.log("현재 사용자 역할:", userRole) // 디버깅용 로그
-      setIsAdmin(userRole === "admin")
     } else {
       setIsAdmin(false)
     }
