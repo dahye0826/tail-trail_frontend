@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback, useMemo } from "react"
+import { useState, useEffect, useCallback, useMemo, useRef } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import "bootstrap-icons/font/bootstrap-icons.css"
 import "bootstrap/dist/css/bootstrap.min.css"
@@ -12,7 +12,6 @@ import { favoriteAPI } from "../../services/api"
 
 const API_BASE_URL = "http://localhost:9000/api"
 const ML_SERVER_URL = "http://localhost:9001"
-
 
 function PlaceListPage() {
   // State management
@@ -493,6 +492,56 @@ function PlaceListPage() {
     )
   }
 
+  const CustomDropdown = ({ options, value, onChange, placeholder }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef(null);
+
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+          setIsOpen(false);
+        }
+      };
+
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }, []);
+
+    const handleSelect = (option) => {
+      onChange(option);
+      setIsOpen(false);
+    };
+
+    const selectedLabel = value ? options.find(opt => opt.value === value)?.label : placeholder;
+
+    return (
+      <div className="custom-dropdown" ref={dropdownRef}>
+        <div 
+          className={`dropdown-header ${isOpen ? 'active' : ''}`}
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <span>{selectedLabel}</span>
+          <i className={`bi bi-chevron-down dropdown-icon ${isOpen ? 'open' : ''}`}></i>
+        </div>
+        {isOpen && (
+          <div className="dropdown-menu open">
+            {options.map((option) => (
+              <div
+                key={option.value}
+                className={`dropdown-item ${value === option.value ? 'selected' : ''}`}
+                onClick={() => handleSelect(option.value)}
+              >
+                {option.label}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // Render main component
   return (
     <>
@@ -558,78 +607,62 @@ function PlaceListPage() {
             <div className="filter-container p-3 mb-4 rounded shadow-sm">
               <div className="row g-3">
                 <div className="col-md-3">
-                  <select
-                    className="form-select"
+                  <CustomDropdown
+                    options={[
+                      { value: "", label: "지역 선택" },
+                      ...cities.map(city => ({ value: city, label: city }))
+                    ]}
                     value={regionFilter}
-                    onChange={(e) => {
-                      setRegionFilter(e.target.value)
-                      setCurrentPage(1)
+                    onChange={(value) => {
+                      setRegionFilter(value);
+                      setCurrentPage(1);
                     }}
-                    aria-label="지역 선택"
-                  >
-                    <option value="">지역 선택</option>
-                    {cities.map((city, index) => (
-                      <option key={index} value={city}>
-                        {city}
-                      </option>
-                    ))}
-                  </select>
+                    placeholder="지역 선택"
+                  />
                 </div>
                 <div className="col-md-2">
-                  <select
-                    className="form-select"
+                  <CustomDropdown
+                    options={[
+                      { value: "", label: "카테고리 선택" },
+                      ...Object.keys(categoryMapping).map(category => ({ value: category, label: category }))
+                    ]}
                     value={categoryFilter}
-                    onChange={(e) => {
-                      setCategoryFilter(e.target.value)
-                      setCurrentPage(1)
+                    onChange={(value) => {
+                      setCategoryFilter(value);
+                      setCurrentPage(1);
                     }}
-                    aria-label="카테고리 선택"
-                  >
-                    <option value="">카테고리 선택</option>
-                    {Object.keys(categoryMapping).map((category, index) => (
-                      <option key={index} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
+                    placeholder="카테고리 선택"
+                  />
                 </div>
                 {categoryFilter === "숙박업소" && (
                   <div className="col-md-2">
-                    <select
-                      className="form-select"
+                    <CustomDropdown
+                      options={[
+                        { value: "", label: "세부 카테고리" },
+                        ...subCategories.map(subCat => ({ value: subCat, label: subCat }))
+                      ]}
                       value={subCategoryFilter}
-                      onChange={(e) => {
-                        setSubCategoryFilter(e.target.value)
-                        setCurrentPage(1)
+                      onChange={(value) => {
+                        setSubCategoryFilter(value);
+                        setCurrentPage(1);
                       }}
-                      aria-label="세부 카테고리 선택"
-                    >
-                      <option value="">세부 카테고리</option>
-                      {subCategories.map((subCat, index) => (
-                        <option key={index} value={subCat}>
-                          {subCat}
-                        </option>
-                      ))}
-                    </select>
+                      placeholder="세부 카테고리"
+                    />
                   </div>
                 )}
                 <div className="col-md-2">
-                  <select
-                    className="form-select"
+                  <CustomDropdown
+                    options={[
+                      { value: "", label: "반려견 크기" },
+                      ...petSizes.map(size => ({ value: size.value, label: size.label }))
+                    ]}
                     value={petSizeFilter}
-                    onChange={(e) => {
-                      setPetSizeFilter(e.target.value)
-                      setCurrentPage(1)
+                    onChange={(value) => {
+                      setPetSizeFilter(value);
+                      setCurrentPage(1);
                     }}
-                    aria-label="반려견 크기 선택"
-                  >
-                    <option value="">반려견 크기</option>
-                    {petSizes.map((size, index) => (
-                      <option key={index} value={size.value}>
-                        {size.label}
-                      </option>
-                    ))}
-                  </select>
+                    placeholder="반려견 크기"
+                  />
                 </div>
                 <div className={categoryFilter === "숙박업소" ? "col-md-3" : "col-md-5"}>
                   <div className="input-group">
