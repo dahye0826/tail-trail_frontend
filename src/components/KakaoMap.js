@@ -1,8 +1,9 @@
 "use client"
 import { useEffect, useRef, useState } from "react"
 import "./KakaoMap.css"
+import axios from "axios"
 
-function KakaoMap ({
+function KakaoMap({
   initialLocation,
   markerPositions = [],
   height = "400px",
@@ -25,6 +26,38 @@ function KakaoMap ({
   const [selectedLocation, setSelectedLocation] = useState(null)
   const clustererRef = useRef(null)
   const markersRef = useRef([])
+  const [averageRatings, setAverageRatings] = useState({})
+
+  // 별점 렌더링 함수 추가
+  function renderStarRating(rating) {
+    if (!rating)
+      return (
+        <span>
+          <i className="bi bi-star"></i>
+          <i className="bi bi-star"></i>
+          <i className="bi bi-star"></i>
+          <i className="bi bi-star"></i>
+          <i className="bi bi-star"></i> (0)
+        </span>
+      )
+
+    const fullStars = Math.floor(rating)
+    const hasHalfStar = rating - fullStars >= 0.5
+    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0)
+
+    return (
+      <span className="star-rating">
+        {[...Array(fullStars)].map((_, i) => (
+          <i key={`full-${i}`} className="bi bi-star-fill text-warning"></i>
+        ))}
+        {hasHalfStar && <i className="bi bi-star-half text-warning"></i>}
+        {[...Array(emptyStars)].map((_, i) => (
+          <i key={`empty-${i}`} className="bi bi-star text-warning"></i>
+        ))}
+        <span className="ms-1">({rating.toFixed(1)})</span>
+      </span>
+    )
+  }
 
   useEffect(() => {
     const script = document.createElement("script")
@@ -190,7 +223,7 @@ function KakaoMap ({
         console.log("마커 클릭됨:", position) // 디버깅용 로그 추가
 
         const locationInfo = {
-          id: position.id ,
+          id: position.id,
           name: position.name,
           address: position.address || position.roadAddress,
           category: position.category,
@@ -237,7 +270,7 @@ function KakaoMap ({
     if (!map || !selectedPlace) {
       return
     }
-    const { lat, lng} = selectedPlace
+    const { lat, lng } = selectedPlace
 
     const position = new window.kakao.maps.LatLng(lat, lng)
 
@@ -256,6 +289,15 @@ function KakaoMap ({
     map.setCenter(position)
     setSelectedMarker({ marker })
   }, [selectedPlace, map])
+
+  useEffect(() => {
+    const fetchAverageRatings = async () => {
+      const response = await axios.get("http://localhost:9000/api/visited-place/average-ratings")
+      setAverageRatings(response.data)
+    }
+
+    fetchAverageRatings()
+  }, [])
 
   const searchPlaces = (keyword) => {
     if (!keyword.trim()) return
@@ -358,6 +400,11 @@ function KakaoMap ({
             <i className="bi bi-geo-alt-fill place-info-icon" />
             {(selectedPlace || selectedLocation).name}
           </div>
+          {(selectedPlace || selectedLocation) && (
+            <div className="place-info-rating">
+              {renderStarRating(averageRatings[selectedPlace?.id || selectedLocation?.id] || 0)}
+            </div>
+          )}
           <div className="place-info-address">
             <i className="bi bi-geo-alt me-1 place-info-icon" />
             {(selectedPlace || selectedLocation).address}

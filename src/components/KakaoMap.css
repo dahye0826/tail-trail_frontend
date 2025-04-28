@@ -116,7 +116,7 @@
   width: 300px;
   background: #fff;
   border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 20px 18px 18px 18px;
   z-index: 20;
   display: flex;
@@ -179,6 +179,22 @@
 }
 .place-info-btn:hover {
   background: #38b8ab;
+}
+
+/* 별점 스타일 추가 */
+.star-rating {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  margin: 2px 0;
+}
+
+.star-rating i {
+  margin-right: 1px;
+}
+
+.place-info-rating {
+  margin-bottom: 5px;
 }
 
 /* 클러스터 스타일 */
