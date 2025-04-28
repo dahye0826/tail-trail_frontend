@@ -69,6 +69,38 @@ function CustomDropdown({ options, value, onChange, placeholder }) {
   )
 }
 
+// 별점 렌더링 함수 추가
+function renderStarRating(rating) {
+  if (!rating)
+    return (
+      <span className="star-rating">
+        <i className="bi bi-star text-warning"></i>
+        <i className="bi bi-star text-warning"></i>
+        <i className="bi bi-star text-warning"></i>
+        <i className="bi bi-star text-warning"></i>
+        <i className="bi bi-star text-warning"></i>
+        <span className="ms-1">(0)</span>
+      </span>
+    )
+
+  const fullStars = Math.floor(rating)
+  const hasHalfStar = rating - fullStars >= 0.5
+  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0)
+
+  return (
+    <span className="star-rating">
+      {[...Array(fullStars)].map((_, i) => (
+        <i key={`full-${i}`} className="bi bi-star-fill text-warning"></i>
+      ))}
+      {hasHalfStar && <i className="bi bi-star-half text-warning"></i>}
+      {[...Array(emptyStars)].map((_, i) => (
+        <i key={`empty-${i}`} className="bi bi-star text-warning"></i>
+      ))}
+      <span className="ms-1">({rating.toFixed(1)})</span>
+    </span>
+  )
+}
+
 function MapViewPage() {
   const [places, setPlaces] = useState([])
   const [loading, setLoading] = useState(true)
@@ -83,7 +115,7 @@ function MapViewPage() {
 
   const [cities, setCities] = useState([])
   const [categories, setCategories] = useState([])
-
+  const [averageRatings, setAverageRatings] = useState({})
   // 화면 크기 변경 감지
   useEffect(() => {
     const handleResize = () => {
@@ -135,6 +167,15 @@ function MapViewPage() {
       }
     }
     fetchPlaces()
+  }, [])
+
+  useEffect(() => {
+    const fetchAverageRatings = async () => {
+      const response = await axios.get(`${API_BASE_URL}/visited-place/average-ratings`)
+      setAverageRatings(response.data)
+    }
+
+    fetchAverageRatings()
   }, [])
 
   const filteredPlaces = places.filter((place) => {
@@ -239,20 +280,27 @@ function MapViewPage() {
                     </div>
                   ) : (
                     <div className="places-list-items-scrollable">
-                      {filteredPlaces.map((place) => (
-                        <div
-                          key={place.id}
-                          className={`place-list-item ${selectedPlace?.id === place.id ? "active" : ""}`}
-                          onClick={() => handlePlaceSelect(place)}
-                        >
-                          <div className="place-name">{place.name || "이름 없음"}</div>
-                          <div className="place-address">
-                            <i className="bi bi-geo-alt me-1"></i>
-                            {place.address || "주소 없음"}
+                      {filteredPlaces.map((place) => {
+                        const placeRating = averageRatings[place.id] || 0.0 // ⭐ 여기에 별점 연결
+
+                        return (
+                          <div
+                            key={place.id}
+                            className={`place-list-item ${selectedPlace?.id === place.id ? "active" : ""}`}
+                            onClick={() => handlePlaceSelect(place)}
+                          >
+                            <div className="place-name">{place.name || "이름 없음"}</div>
+
+                            <div className="place-info-rating">{renderStarRating(placeRating)}</div>
+
+                            <div className="place-address">
+                              <i className="bi bi-geo-alt me-1"></i>
+                              {place.address || "주소 없음"}
+                            </div>
+                            <span className="place-category">{place.category}</span>
                           </div>
-                          <span className="place-category">{place.category}</span>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   )}
                 </div>
@@ -279,6 +327,7 @@ function MapViewPage() {
                       name: place.name,
                       address: place.address,
                       category: place.category,
+                      rating: averageRatings[place.id] || 0.0,
                     }))}
                     selectedPlace={selectedPlace}
                     height="calc(100vh - 150px)"
@@ -286,6 +335,7 @@ function MapViewPage() {
                     defaultLevel={selectedPlace ? 3 : 7}
                     showInfoCard={true}
                     onLocationSelect={handlePlaceSelect}
+                    review={selectedPlace?.review}
                   />
                 )}
               </div>
