@@ -180,7 +180,7 @@ const VisitedPlacesPage = () => {
       <div className="mypage-background">
         <div className="container py-5">
           <div className="row">
-            <div className="col-lg-3 col-md-4 mb-4">
+            <div className="col-auto mb-4">
               <div className="sidebar-container">
                 <div className="sidebar-header">
                   <h5 className="sidebar-title">마이페이지</h5>
@@ -214,137 +214,135 @@ const VisitedPlacesPage = () => {
                 </ul>
               </div>
             </div>
-            <div className="col-lg-9 col-md-8">
+            <div className="col">
               <div className="mypage-content-container">
                 <div className="mb-4">
                   <h2 className="mypage-title">방문이력관광지</h2>
                   <p className="mypage-subtitle">내가 방문한 반려동물 동반 관광지를 확인하세요.</p>
                 </div>
 
-            
-            {error && ( // 오류가 있으면
-              <div className="alert alert-danger" role="alert">
-                {error} {/* 오류 메시지 표시 */}
-              </div>
-            )}
+                {error && ( // 오류가 있으면
+                  <div className="alert alert-danger" role="alert">
+                    {error} {/* 오류 메시지 표시 */}
+                  </div>
+                )}
 
-            {loading ? ( // 로딩 중이면
-              <div className="text-center py-5">
-                <div className="spinner-border text-primary" role="status">
-                  <span className="visually-hidden">로딩 중...</span> {/* 로딩 스피너 */}
-                </div>
-              </div>
-            ) : visitedPlaces.length === 0 ? ( // 방문 장소가 없으면
-              <div className="text-center py-5">
-                <i className="bi bi-star display-1 text-muted"></i> {/* 별 아이콘 */}
-                <p className="mt-3">방문한 관광지가 없습니다.</p> {/* 안내 메시지 */}
-                <Link to="/places" className="btn btn-primary mt-2">
-                  장소 둘러보기 {/* 장소 둘러보기 버튼 */}
-                </Link>
-              </div>
-            ) : ( // 방문 장소가 있으면
-              <div className="visited-places-list">
-                {visitedPlaces.map((visit, idx) => {
-                  console.log("방문 데이터:", visit);  // 전체 방문 데이터 로깅
-                  console.log("created_at 값:", visit.created_at);  // created_at 값 확인
-                  const placeId = visit.placeId || visit.place_id || (visit.place && visit.place.placeId);
-                  return (
-                    <div key={visit.visitId || visit.visit_id || idx} className="card mb-3">
-                      <div className="card-body">
-                        <div className="place-info">
-                          {visit.place && visit.place.city && (
-                            <div className="mb-2" key={`region-${visit.place.city}-${visit.visitId || visit.visit_id || idx}`}>
-                              {renderRegionBadge(visit.place.city)}
+                {loading ? ( // 로딩 중이면
+                  <div className="text-center py-5">
+                    <div className="spinner-border text-primary" role="status">
+                      <span className="visually-hidden">로딩 중...</span> {/* 로딩 스피너 */}
+                    </div>
+                  </div>
+                ) : visitedPlaces.length === 0 ? ( // 방문 장소가 없으면
+                  <div className="text-center py-5">
+                    <i className="bi bi-star display-1 text-muted"></i> {/* 별 아이콘 */}
+                    <p className="mt-3">방문한 관광지가 없습니다.</p> {/* 안내 메시지 */}
+                    <Link to="/places" className="btn btn-primary mt-2">
+                      장소 둘러보기 {/* 장소 둘러보기 버튼 */}
+                    </Link>
+                  </div>
+                ) : ( // 방문 장소가 있으면
+                  <div className="visited-places-list">
+                    {visitedPlaces.map((visit, idx) => {
+                      console.log("방문 데이터:", visit);  // 전체 방문 데이터 로깅
+                      console.log("created_at 값:", visit.created_at);  // created_at 값 확인
+                      const placeId = visit.placeId || visit.place_id || (visit.place && visit.place.placeId);
+                      return (
+                        <div key={visit.visitId || visit.visit_id || idx} className="card mb-3">
+                          <div className="card-body">
+                            <div className="place-info">
+                              {visit.place && visit.place.city && (
+                                <div className="mb-2" key={`region-${visit.place.city}-${visit.visitId || visit.visit_id || idx}`}>
+                                  {renderRegionBadge(visit.place.city)}
+                                </div>
+                              )}
+                              <div className="d-flex justify-content-between align-items-start mb-2">
+                                <h5 className="place-name mb-0">
+                                  {getPlaceName(visit)}
+                                </h5>
+                                <div className="rating-container">
+                                  {renderStars(visit.rating)}
+                                </div>
+                              </div>
+                              {visit.place && (
+                                <p className="place-address mb-2">
+                                  <i className="bi bi-geo-alt me-2"></i>
+                                  {visit.place.fullAddress || `${visit.place.city || ''} ${visit.place.district || ''}`}
+                                </p>
+                              )}
+                              {visit.note && (
+                                <div className="visit-note mb-3">
+                                  {visit.note}
+                                </div>
+                              )}
+                              <div className="d-flex justify-content-between align-items-center">
+                                <div className="visit-date text-muted">
+                                  <i className="bi bi-calendar3 me-2"></i>
+                                  방문일: {visit.visitDate}
+                                </div>
+                                {placeId && (
+                                  <Link
+                                    to={`/places/place/${placeId}#review`}
+                                    className="view-btn"
+                                  >
+                                    보기
+                                  </Link>
+                                )}
+                              </div>
                             </div>
-                          )}
-                          <div className="d-flex justify-content-between align-items-start mb-2">
-                            <h5 className="place-name mb-0">
-                              {getPlaceName(visit)}
-                            </h5>
-                            <div className="rating-container">
-                              {renderStars(visit.rating)}
-                            </div>
-                          </div>
-                          {visit.place && (
-                            <p className="place-address mb-2">
-                              <i className="bi bi-geo-alt me-2"></i>
-                              {visit.place.fullAddress || `${visit.place.city || ''} ${visit.place.district || ''}`}
-                            </p>
-                          )}
-                          {visit.note && (
-                            <div className="visit-note mb-3">
-                              {visit.note}
-                            </div>
-                          )}
-                          <div className="d-flex justify-content-between align-items-center">
-                            <div className="visit-date text-muted">
-                              <i className="bi bi-calendar3 me-2"></i>
-                              방문일: {visit.visitDate}
-                            </div>
-                            {placeId && (
-                              <Link
-                                to={`/places/place/${placeId}#review`}
-                                className="view-btn"
-                              >
-                                보기
-                              </Link>
-                            )}
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+                      );
+                    })}
 
-            {/* 페이지네이션 */}
-            {totalPages > 1 && ( // 페이지가 여러 개면
-              <nav className="mt-4" aria-label="방문 이력 페이지네이션">
-                <ul className="pagination justify-content-center"> {/* 중앙 정렬된 페이지네이션 */}
-                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}> {/* 현재 첫 페이지면 비활성화 */}
-                    <button
-                      className="page-link"
-                      onClick={() => setCurrentPage(currentPage - 1)} // 이전 페이지로 이동
-                      disabled={currentPage === 1} // 첫 페이지면 비활성화
-                    >
-                      이전 {/* 이전 버튼 */}
-                    </button>
-                  </li>
-                  {Array.from({ length: totalPages }).map((_, index) => { // 페이지 번호 반복
-                    const pageNumber = index + 1;
-                    return (
-                      <li
-                        key={`page-${pageNumber}`}
-                        className={`page-item ${currentPage === pageNumber ? 'active' : ''}`} // 현재 페이지면 활성화
-                      >
-                        <button
-                          className="page-link"
-                          onClick={() => setCurrentPage(pageNumber)} // 해당 페이지로 이동
-                        >
-                          {pageNumber} {/* 페이지 번호 */}
-                        </button>
-                      </li>
-                    );
-                  })}
-                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}> {/* 현재 마지막 페이지면 비활성화 */}
-                    <button
-                      className="page-link"
-                      onClick={() => setCurrentPage(currentPage + 1)} // 다음 페이지로 이동
-                      disabled={currentPage === totalPages} // 마지막 페이지면 비활성화
-                    >
-                      다음 {/* 다음 버튼 */}
-                    </button>
-                  </li>
-                </ul>
-              </nav>
-            )}
-              </div> {/* 현수정 */}
+                    {/* 페이지네이션 */}
+                    {totalPages > 1 && ( // 페이지가 여러 개면
+                      <nav className="mt-4" aria-label="방문 이력 페이지네이션">
+                        <ul className="pagination justify-content-center"> {/* 중앙 정렬된 페이지네이션 */}
+                          <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}> {/* 현재 첫 페이지면 비활성화 */}
+                            <button
+                              className="page-link"
+                              onClick={() => setCurrentPage(currentPage - 1)} // 이전 페이지로 이동
+                              disabled={currentPage === 1} // 첫 페이지면 비활성화
+                            >
+                              이전 {/* 이전 버튼 */}
+                            </button>
+                          </li>
+                          {Array.from({ length: totalPages }).map((_, index) => { // 페이지 번호 반복
+                            const pageNumber = index + 1;
+                            return (
+                              <li
+                                key={`page-${pageNumber}`}
+                                className={`page-item ${currentPage === pageNumber ? 'active' : ''}`} // 현재 페이지면 활성화
+                              >
+                                <button
+                                  className="page-link"
+                                  onClick={() => setCurrentPage(pageNumber)} // 해당 페이지로 이동
+                                >
+                                  {pageNumber} {/* 페이지 번호 */}
+                                </button>
+                              </li>
+                            );
+                          })}
+                          <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}> {/* 현재 마지막 페이지면 비활성화 */}
+                            <button
+                              className="page-link"
+                              onClick={() => setCurrentPage(currentPage + 1)} // 다음 페이지로 이동
+                              disabled={currentPage === totalPages} // 마지막 페이지면 비활성화
+                            >
+                              다음 {/* 다음 버튼 */}
+                            </button>
+                          </li>
+                        </ul>
+                      </nav>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </div>
-      
 
       {/* 지도 모달 */}
       {showMap && selectedPlace && ( // 지도가 보이고 선택된 장소가 있으면
