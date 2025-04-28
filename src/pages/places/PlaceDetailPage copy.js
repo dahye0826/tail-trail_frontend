@@ -33,7 +33,6 @@ function PlaceDetailPage() {
   const reviewRef = useRef(null)
   const location = useLocation()
   const [averageRating, setAverageRating] = useState(0);
-  const [reviewList, setReviewList] = useState([]);
 
   // Format incoming place data
   const formatPlaceData = useCallback((placeData) => {
@@ -76,14 +75,6 @@ function PlaceDetailPage() {
       lastUpdated: placeData.lastUpdated || null,
     }
   }, [])
-
-const userId = localStorage.getItem("userId")
-  // 트래킹 로직 (추천 알고리즘 구현)
-  usePlaceViewTracker({
-    
-    placeId: Number(id),
-    userId: Number(userId)
-  })
 
   // 방문 이력 로드
   const loadVisitHistory = useCallback(async () => {
@@ -186,7 +177,6 @@ const userId = localStorage.getItem("userId")
     try {
       await axios.delete(`${API_BASE_URL}/visited-place/${visitHistory.visitId}`)
       setVisitHistory(null)
-      setReviewList(prev => prev.filter(review => review.visitId !== visitHistory.visitId))
       alert("방문 후기가 삭제되었습니다.")
     } catch (error) {
       console.error("리뷰 삭제 오류:", error)
@@ -555,41 +545,6 @@ const userId = localStorage.getItem("userId")
     </div>
   );
 
-  useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const response = await axios.get(`${API_BASE_URL}/visited-place/reviews`, {
-          params: { placeId: id }
-        });
-        setReviewList(response.data);
-      } catch (error) {
-        console.error("리뷰 리스트 불러오기 오류:", error);
-      }
-    };
-    fetchReviews();
-  }, [id]);
-
-  const renderReviewList = () => (
-    <div>
-      {reviewList.length === 0 ? (
-        <p style={{ fontSize: "1.2rem" }}>아직 등록된 방문후기가 없습니다.</p>
-      ) : (
-        reviewList.map((review, idx) => (
-          <div key={idx} className="review-item">
-            <div className="review-header">
-              <span className="review-author">{review.userName || "익명"}</span>
-              <span className="review-rating">| 평점: {review.rating}</span>
-              <span className="review-dates">
-                방문일: {review.visitDate} | 작성일: {review.createdAt}
-              </span>
-            </div>
-            <div className="review-content">{review.note}</div>
-          </div>
-        ))
-      )}
-    </div>
-  );
-
   if (loading) {
     return (
       <>
@@ -703,7 +658,6 @@ const userId = localStorage.getItem("userId")
               {/* 방문 후기 섹션 */}
               <div className="review-section mt-4" ref={reviewRef}>
                 <h3 className="section-title mb-3">방문 후기</h3>
-                {renderReviewList()}
                 {renderReviewSection()}
               </div>
 

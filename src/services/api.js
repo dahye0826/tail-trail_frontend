@@ -154,6 +154,74 @@ export const userAPI = {
     }
   },
   
+  updateProfile: (userId, userData) => api.put(`/users/${userId}`, userData),
+  deleteUser: (userId) => api.delete(`/users/${userId}`),
+  
+  getUserStats: async (userId) => {
+    try {
+      // 1. 게시글 수 조회
+      const postsRes = await api.get(`/users/${userId}/posts?page=1&size=1`);
+      
+      // 2. 방문 이력 수 조회 - 백엔드 엔드포인트와 일치시킴
+      const visitedRes = await api.get(`/visited-place/mypage`, {
+        params: { userId, page: 1, size: 1 }
+      });
+      
+      // 3. 즐겨찾기 수 조회
+      const favoritesRes = await api.get(`/favorites`, {
+        params: { userId, page: 1, size: 1 }
+      });
+      
+      // 응답 구조 확인 및 로깅
+      console.log("Posts response:", postsRes.data);
+      console.log("Visited response:", visitedRes.data);
+      console.log("Favorites response:", favoritesRes.data);
+      
+      // 방문 이력 데이터 추출 - 다양한 응답 구조 지원
+      let visitedCount = 0;
+      
+      if (visitedRes.data) {
+        if (visitedRes.data.totalItems !== undefined) {
+          visitedCount = visitedRes.data.totalItems;
+        } else if (visitedRes.data.totalElements !== undefined) {
+          visitedCount = visitedRes.data.totalElements;
+        } else if (Array.isArray(visitedRes.data)) {
+          visitedCount = visitedRes.data.length;
+        } else if (visitedRes.data.data && visitedRes.data.data.totalItems !== undefined) {
+          visitedCount = visitedRes.data.data.totalItems;
+        } else if (visitedRes.data.visitedPlaces && Array.isArray(visitedRes.data.visitedPlaces)) {
+          visitedCount = visitedRes.data.visitedPlaces.length;
+        }
+      }
+      
+      // 포스트 및 즐겨찾기 데이터 추출
+      let postCount = postsRes.data?.totalItems || 0;
+      let favoriteCount = favoritesRes.data?.totalItems || 0;
+      
+      // 최종 결과 반환
+      const result = {
+        data: {
+          postCount,
+          visitedCount,
+          favoriteCount
+        }
+      };
+      
+      console.log("최종 통계 결과:", result);
+      return result;
+    } catch (error) {
+      console.error("통계 가져오기 오류:", error);
+      // 오류 발생시 기본값 제공
+      return {
+        data: {
+          postCount: 0,
+          visitedCount: 0,
+          favoriteCount: 0
+        }
+      };
+    }
+  },
+  
   updateProfile: (userId, userData) => api.put(`/users/${userId}`, userData)
 };
 

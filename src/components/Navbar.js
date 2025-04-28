@@ -19,15 +19,21 @@ function Navbar() {
 
   // 로그인 상태 확인 함수
   const checkLoginStatus = () => {
-    const loginStatus = localStorage.getItem("isLoggedIn") === "true"
-    setIsLoggedIn(loginStatus)
-
+    const loginStatus = localStorage.getItem("isLoggedIn") === "true";
+    setIsLoggedIn(loginStatus);
+  
     if (loginStatus) {
       // 관리자 상태 확인
-      const userRole = localStorage.getItem("userRole")
-      console.log("현재 사용자 역할:", userRole) // 디버깅용 로그
+      const userRole = localStorage.getItem("userRole");
+      console.log("현재 사용자 역할:", userRole); // 디버깅용 로그
+  
+      if (userRole === "admin") {
+        setIsAdmin(true);    // 관리자면 true
+      } else {
+        setIsAdmin(false);   // 일반 사용자면 false
+      }
     } else {
-      setIsAdmin(false)
+      setIsAdmin(false);     // 로그인 안 했으면 false
     }
   }
 
@@ -63,12 +69,11 @@ function Navbar() {
       <div className="container">
         <Link className="navbar-brand" to="/">
           <img
-            src={process.env.PUBLIC_URL + "/images/logo.png" || "/placeholder.svg"}
+            src={process.env.PUBLIC_URL + "/images/weblogo2.png" || "/placeholder.svg"}
             alt="이음길"
             className="navbar-logo me-2"
-            style={{ height: "40px", width: "auto", display: "inline-block" }}
+            style={{ height: "79px", width: "auto", display: "inline-block" }}
           />
-          이음길
         </Link>
 
         {/* 중앙 네비게이션 메뉴 */}
