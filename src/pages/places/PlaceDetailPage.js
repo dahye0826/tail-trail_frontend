@@ -97,6 +97,13 @@ function PlaceDetailPage() {
     }
   }, [id])
 
+
+  // 트래킹 로직 (추천 알고리즘 구현)
+  usePlaceViewTracker({
+    placeId: Number(id),
+    userId: user?.id,
+  })
+
   // 방문 후기 제출
   const handleReviewSubmit = async (e) => {
     e.preventDefault()
