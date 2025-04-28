@@ -76,6 +76,14 @@ function PlaceDetailPage() {
     }
   }, [])
 
+const userId = localStorage.getItem("userId")
+  // 트래킹 로직 (추천 알고리즘 구현)
+  usePlaceViewTracker({
+    
+    placeId: Number(id),
+    userId: Number(userId)
+  })
+
   // 방문 이력 로드
   const loadVisitHistory = useCallback(async () => {
     try {
