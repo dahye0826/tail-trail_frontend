@@ -19,6 +19,7 @@ import MapViewPage from "./pages/map/MapViewPage"
 import FavoritesPage from "./pages/mypage/FavoritesPage"
 import VisitedPlacesPage from "./pages/mypage/VisitedPlacesPage"
 import AdminPage from "./pages/admin/AdminPage";
+import { Link } from "react-router-dom"
 
 function AppRouter() {
   return (

@@ -13,6 +13,17 @@ import axios from "axios"
 
 const API_BASE_URL = "http://localhost:9000/api" // API 서버 주소
 
+// place 정보를 가져오는 함수 추가
+const fetchPlaceInfo = async (placeId) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/places/${placeId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching place info for ID ${placeId}:`, error);
+    return null;
+  }
+};
+
 // 방문 이력 관광지 페이지 컴포넌트 정의
 const VisitedPlacesPage = () => {
   const navigate = useNavigate() // 페이지 이동을 위한 함수
@@ -50,44 +61,40 @@ const VisitedPlacesPage = () => {
 
       // 서버에 방문 이력 데이터 요청
       const response = await axios.get(`${API_BASE_URL}/visited-place/mypage`, {
-        params: { // 요청 파라미터
-          userId: Number(userId), // 사용자 ID
-          page: currentPage - 1, // 페이지 번호 (서버는 0부터 시작)
-          size: pageSize // 페이지 크기
+        params: {
+          userId: Number(userId),
+          page: currentPage - 1,
+          size: pageSize
         }
       })
 
-      console.log("API 응답:", response.data) // 응답 데이터 콘솔에 출력
+      console.log("API 전체 응답:", response.data)
+      console.log("첫 번째 방문 데이터:", response.data.content[0])
+      console.log("첫 번째 방문의 place 정보:", response.data.content[0].place)
+      console.log("place_name 확인:", response.data.content[0].place?.place_name)
 
-      if (response.data && response.data.content) { // 응답 데이터가 있으면
+      if (response.data && response.data.content) {
+        // 모든 place 정보를 한번에 가져오기
+        const placePromises = response.data.content.map(visit => fetchPlaceInfo(visit.placeId));
+        const places = await Promise.all(placePromises);
+        
         // 응답 데이터를 적절한 형태로 변환
-        const updatedContent = response.data.content.map(visit => {
-          // visit 객체의 기본 구조 설정
-          const visitData = {
-            visitId: visit.visit_id, // 방문 ID
-            userId: visit.user_id, // 사용자 ID
-            placeId: visit.place_id, // 장소 ID
-            visitDate: visit.visit_date, // 방문 날짜
-            rating: visit.rating, // 평점
-            note: visit.note, // 메모
-            createdAt: visit.created_at, // 생성 시간
-            place: visit.place // 장소 정보
-          }
-
-          // placeId가 1650인 경우 특별 처리 (WOOF라는 특별한 장소)
-          if (visitData.placeId === 1650) {
-            return {
-              ...visitData, // 기존 데이터 유지
-              place: { // place 객체 업데이트
-                ...visitData.place, // 기존 place 데이터 유지
-                placeId: 1650, // 장소 ID
-                placeName: 'WOOF' // 장소 이름 강제 설정
-              }
-            }
-          }
-
-          return visitData // 일반 장소는 그대로 반환
-        })
+        const updatedContent = response.data.content.map((visit, index) => {
+          console.log("각 방문 데이터 처리:", visit);
+          const placeInfo = places[index];
+          console.log("place 정보:", placeInfo);
+          
+          // 원본 데이터의 visitDate를 유지
+          return {
+            visitId: visit.visitId,
+            userId: visit.userId,
+            placeId: visit.placeId,
+            visitDate: visit.visitDate,  // 원본 visitDate 유지
+            rating: visit.rating,
+            note: visit.note,
+            place: placeInfo || {}
+          };
+        });
         
         // 상태 업데이트
         setVisitedPlaces(updatedContent) // 방문 장소 목록 설정
@@ -158,12 +165,12 @@ const VisitedPlacesPage = () => {
     setSelectedPlace(null) // 선택된 장소 초기화
   }
 
-  // 장소 이름 표시 함수 (WOOF 특별 케이스 처리)
+  // 장소 이름 표시 함수 수정
   const getPlaceName = useCallback((visit) => {
-    if (visit.placeId === 1650) { // placeId가 1650이면
-      return 'WOOF' // WOOF 이름 반환
+    if (visit.placeId === 1650) {
+      return 'WOOF'
     }
-    return visit.place?.placeName || '장소 정보 없음' // 일반 장소는 placeName 반환 (없으면 '장소 정보 없음')
+    return visit.place?.placeName || '장소 정보 없음'
   }, [])
 
   // 컴포넌트 렌더링
@@ -237,60 +244,57 @@ const VisitedPlacesPage = () => {
               </div>
             ) : ( // 방문 장소가 있으면
               <div className="visited-places-list">
-                {visitedPlaces.map((visit) => ( // 방문 장소 목록 반복
-                  <div key={visit.visitId} className="card mb-3"> {/* 각 방문 장소 카드 */}
-                    <div className="card-body">
-                      <div className="place-info">
-                        {visit.place && visit.place.city && ( // 도시 정보가 있으면
-                          <div className="mb-2" key={`region-${visit.visitId}-${visit.place.city}`}>
-                            {renderRegionBadge(visit.place.city)} {/* 지역 뱃지 표시 */}
+                {visitedPlaces.map((visit, idx) => {
+                  console.log("방문 데이터:", visit);  // 전체 방문 데이터 로깅
+                  console.log("created_at 값:", visit.created_at);  // created_at 값 확인
+                  const placeId = visit.placeId || visit.place_id || (visit.place && visit.place.placeId);
+                  return (
+                    <div key={visit.visitId || visit.visit_id || idx} className="card mb-3">
+                      <div className="card-body">
+                        <div className="place-info">
+                          {visit.place && visit.place.city && (
+                            <div className="mb-2" key={`region-${visit.place.city}-${visit.visitId || visit.visit_id || idx}`}>
+                              {renderRegionBadge(visit.place.city)}
+                            </div>
+                          )}
+                          <div className="d-flex justify-content-between align-items-start mb-2">
+                            <h5 className="place-name mb-0">
+                              {getPlaceName(visit)}
+                            </h5>
+                            <div className="rating-container">
+                              {renderStars(visit.rating)}
+                            </div>
                           </div>
-                        )}
-                        <div className="d-flex justify-content-between align-items-start mb-2">
-                          <h5 className="place-name mb-0">
-                            {getPlaceName(visit)} {/* 장소 이름 표시 */}
-                          </h5>
-                          <div className="rating-container">
-                            {renderStars(visit.rating)} {/* 별점 표시 */}
-                          </div>
-                        </div>
-                        {visit.place && ( // 장소 정보가 있으면
-                          <p className="place-address mb-2">
-                            <i className="bi bi-geo-alt me-2"></i> {/* 위치 아이콘 */}
-                            {visit.place.fullAddress || `${visit.place.city || ''} ${visit.place.district || ''}`} {/* 주소 표시 */}
-                          </p>
-                        )}
-                        {visit.note && ( // 메모가 있으면
-                          <div className="visit-note mb-3">
-                            {visit.note} {/* 방문 노트 표시 */}
-                          </div>
-                        )}
-                        <div className="d-flex justify-content-between align-items-center">
-                          <div className="visit-date text-muted">
-                            <i className="bi bi-calendar3 me-2"></i> {/* 달력 아이콘 */}
-                            방문일: {new Date(visit.visitDate).toLocaleDateString()} {/* 방문 날짜 표시 */}
-                          </div>
-                          <div className="btn-group">
-                            {visit.place && (visit.place.latitude || visit.place.longitude) && ( // 위치 정보가 있으면
-                              <button
-                                className="btn btn-outline-secondary btn-sm me-2"
-                                onClick={() => handleMapView(visit.place)} // 지도 보기 처리
+                          {visit.place && (
+                            <p className="place-address mb-2">
+                              <i className="bi bi-geo-alt me-2"></i>
+                              {visit.place.fullAddress || `${visit.place.city || ''} ${visit.place.district || ''}`}
+                            </p>
+                          )}
+                          {visit.note && (
+                            <div className="visit-note mb-3">
+                              {visit.note}
+                            </div>
+                          )}
+                          <div className="d-flex justify-content-between align-items-center">
+                            <div className="visit-date text-muted">
+                              <i className="bi bi-calendar3 me-2"></i>
+                              방문일: {visit.visitDate}
+                            </div>
+                            {placeId && (
+                              <Link
+                                to={`/places/place/${placeId}#review`}
+                                className="view-btn"
                               >
-                                <i className="bi bi-map me-1"></i>위치보기 {/* 위치보기 버튼 */}
-                              </button>
+                                보기
+                              </Link>
                             )}
-                            <Link
-                              to={`/places/place/${Number(visit.placeId)}`}
-                              className="btn btn-outline-primary btn-sm"
-                            >
-                              <i className="bi bi-eye me-1"></i>상세보기 {/* 상세보기 버튼 */}
-                            </Link>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
 
