@@ -123,9 +123,9 @@ function ReportManagement() {
     // 확인 대화상자 표시
     let confirmMessage = ""
     if (action === "approve") {
-      confirmMessage = "정말로 이 게시물을 삭제하겠습니까?"
+      confirmMessage = ` 이 ${targetType}을 삭제하겠습니까?`
     } else {
-      confirmMessage = "정말로 이 게시물을 남기겠습니까?"
+      confirmMessage = ` 이 ${targetType}을 남기겠습니까?`
     }
 
     if (!window.confirm(confirmMessage)) {

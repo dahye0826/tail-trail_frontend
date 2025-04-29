@@ -116,7 +116,14 @@ const HomePage = () => {
                   }}
                 >
                   <div className="banner-overlay"></div>
+                  {/* 데스크톱용 배너 콘텐츠 */}
                   <div className="banner-content">
+                    <h1 className="fw-bold">이음길</h1>
+                    <p className="lead">꼬리를 따라 이어지는 여행길</p>
+                  </div>
+
+                  {/* 모바일용 배너 콘텐츠 */}
+                  <div className="banner-content-mobile">
                     <h1 className="fw-bold">이음길</h1>
                     <p className="lead">꼬리를 따라 이어지는 여행길</p>
                   </div>
@@ -158,7 +165,14 @@ const HomePage = () => {
                   }}
                 >
                   <div className="banner-overlay"></div>
+                  {/* 데스크톱용 배너 콘텐츠 */}
                   <div className="banner-content">
+                    <h1 className="fw-bold">이음길</h1>
+                    <p className="lead">꼬리를 따라 이어지는 여행길</p>
+                  </div>
+
+                  {/* 모바일용 배너 콘텐츠 */}
+                  <div className="banner-content-mobile">
                     <h1 className="fw-bold">이음길</h1>
                     <p className="lead">꼬리를 따라 이어지는 여행길</p>
                   </div>
@@ -200,7 +214,14 @@ const HomePage = () => {
                   }}
                 >
                   <div className="banner-overlay"></div>
+                  {/* 데스크톱용 배너 콘텐츠 */}
                   <div className="banner-content">
+                    <h1 className="fw-bold">이음길</h1>
+                    <p className="lead">꼬리를 따라 이어지는 여행길</p>
+                  </div>
+
+                  {/* 모바일용 배너 콘텐츠 */}
+                  <div className="banner-content-mobile">
                     <h1 className="fw-bold">이음길</h1>
                     <p className="lead">꼬리를 따라 이어지는 여행길</p>
                   </div>
@@ -358,7 +379,7 @@ const HomePage = () => {
               </div>
             ) : (
               <Row className="review-cards">
-                {reviews.length > 0 ? (
+                {reviews.length > 0 &&
                   reviews.map((review) => (
                     <Col md={6} lg={3} className="mb-4" key={review.visitId}>
                       <Link to={`/places/place/${review.placeId}`} className="text-decoration-none">
@@ -387,12 +408,7 @@ const HomePage = () => {
                         </div>
                       </Link>
                     </Col>
-                  ))
-                ) : (
-                  <Col className="text-center py-4">
-                    <p>아직 등록된 리뷰가 없습니다.</p>
-                  </Col>
-                )}
+                  ))}
               </Row>
             )}
           </Container>

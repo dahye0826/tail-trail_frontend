@@ -15,7 +15,7 @@ function Footer() {
                 style={{
                   height: "180px",
                   width: "auto",
-                  marginLeft: "20px",
+                  marginLeft: "100px",
                   marginTop: "15px",
                 }}
               />
