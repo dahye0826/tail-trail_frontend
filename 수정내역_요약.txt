@@ -1,0 +1,23 @@
+[라우팅 수정 내역]
+
+1. AppRouter.js 수정
+- /mypage/rated 라우트 제거
+- RatedPlacesPage import 문 제거
+
+2. ProfileEditPage.js 수정
+- 사이드바 메뉴에서 "/mypage/rated" 링크를 "/mypage/visited"로 변경
+- 메뉴 텍스트를 "별점 등록한 곳"에서 "방문이력관광지"로 변경
+
+[수정 이유]
+- /mypage/rated 경로가 더 이상 사용되지 않음
+- 방문 이력 관광지 페이지로 통합하여 사용자 경험 개선
+- 라우팅 에러 해결
+
+[영향 받는 파일]
+1. team-midtermproject/frontend/src/AppRouter.js
+2. team-midtermproject/src/pages/mypage/ProfileEditPage.js
+
+[테스트 필요 사항]
+1. /mypage/visited 페이지 정상 작동 확인
+2. 사이드바 메뉴에서 방문이력관광지 링크 정상 작동 확인
+3. 기존 /mypage/rated 경로 접근 시 리다이렉션 확인 
