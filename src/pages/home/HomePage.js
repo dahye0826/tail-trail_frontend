@@ -65,11 +65,19 @@ const HomePage = () => {
     const fetchPlaces = async () => {
       try {
         const response = await axios.get("http://localhost:9000/api/places/all")
-        console.log("홈페이지 장소 데이터:", response.data)
-        setPlaces(response.data)
+        const rawPlaces = response.data || []
+
+        // 이미지 경로 추가해서 가공
+        const formattedPlaces = rawPlaces.map((place) => ({
+          ...place,
+          imageUrl: place.placeImage
+            ? `http://localhost:9000${place.placeImage.startsWith("/") ? place.placeImage : "/" + place.placeImage}`
+            : "/placeholder.svg", // 기본 이미지 대체
+        }))
+
+        setPlaces(formattedPlaces)
       } catch (error) {
         console.error("장소 데이터 로딩 오류:", error)
-        // 오류 발생 시 빈 배열 설정
         setPlaces([])
       }
     }
@@ -77,7 +85,8 @@ const HomePage = () => {
     fetchPlaces()
   }, [])
 
-  // 2. 최근 리뷰 데이터 가져오기 useEffect 추가 - fetchPlaces 함수 다음에 추가
+
+  // (1) 최근 리뷰 데이터 가져오기
   useEffect(() => {
     const fetchReviews = async () => {
       try {
@@ -97,6 +106,64 @@ const HomePage = () => {
 
     fetchReviews()
   }, [])
+
+  // (2) 리뷰에 placeImage 추가 보완 (== 여기에 붙이세요)
+  useEffect(() => {
+    const fetchReviewImages = async () => {
+      if (reviews.length > 0) {
+        try {
+          const updatedReviews = await Promise.all(
+            reviews.map(async (review) => {
+              try {
+                const response = await axios.get(`http://localhost:9000/api/places/${review.placeId}`)
+                const placeData = response.data
+                return {
+                  ...review,
+                  placeImage: placeData.placeImage
+                    ? (placeData.placeImage.startsWith("/") ? `http://localhost:9000${placeData.placeImage}` : `http://localhost:9000/${placeData.placeImage}`)
+                    : "/placeholder.svg",
+                }
+              } catch (error) {
+                console.error(`장소 ${review.placeId} 이미지 로딩 오류:`, error)
+                return {
+                  ...review,
+                  placeImage: "/placeholder.svg",
+                }
+              }
+            })
+          )
+
+          setReviews(updatedReviews)
+        } catch (error) {
+          console.error("리뷰 이미지 보완 오류:", error)
+        }
+      }
+    }
+
+    fetchReviewImages()
+  }, [reviews.length])
+
+  // 별점에 따른 클래스 이름 반환 함수
+  const getRatingClass = (rating) => {
+    if (!rating) return "rating-3"
+    const roundedRating = Math.round(rating)
+    return `rating-${roundedRating}`
+  }
+
+  // 장소 카테고리에 따른 썸네일 이미지 URL 반환 함수
+  const getCategoryThumbnail = (category) => {
+    const categoryMap = {
+      카페: "/images/cafe-thumb.jpg",
+      식당: "/images/restaurant-thumb.jpg",
+      펜션: "/images/pension-thumb.jpg",
+      호텔: "/images/hotel-thumb.jpg",
+      모텔: "/images/motel-thumb.jpg",
+      공원: "/images/park-thumb.jpg",
+      해변: "/images/beach-thumb.jpg",
+    }
+
+    return categoryMap[category] || "/images/default-thumb.jpg"
+  }
 
   return (
     <>
@@ -314,7 +381,7 @@ const HomePage = () => {
           <Container>
             <div className="text-center mb-4 d-flex justify-content-between align-items-center">
               <div>
-                <h2 className="fw-bold section-title">커뮤니티</h2>
+                <h2 className="fw-bold section-title">반려동물과의 여행 이야기</h2>
                 <p className="lead text-muted mb-0">우리의 반려 이야기, 함께 나눠요.</p>
               </div>
               <Link to="/community" className="plus-btn">
@@ -332,7 +399,7 @@ const HomePage = () => {
             ) : (
               <Row className="community-cards mb-4">
                 {communityPosts.map((post) => (
-                  <Col md={6} lg={3} className="mb-4" key={post.id}>
+                  <Col md={6} lg={3} className="mb-5" key={post.id}>
                     <Link to={`/community/post/${post.id}`} className="text-decoration-none">
                       <div className="community-card">
                         <div className="card-body">
@@ -363,7 +430,7 @@ const HomePage = () => {
           <Container>
             <div className="text-center mb-4 d-flex justify-content-between align-items-center">
               <div>
-                <h2 className="fw-bold section-title">최근 리뷰</h2>
+                <h2 className="fw-bold section-title">반려인들의 최신 리뷰 모음</h2>
                 <p className="lead text-muted mb-0">반려인들이 남긴 생생한 장소 리뷰를 확인해보세요</p>
               </div>
               <Link to="/places" className="plus-btn">
@@ -383,25 +450,48 @@ const HomePage = () => {
                   reviews.map((review) => (
                     <Col md={6} lg={3} className="mb-4" key={review.visitId}>
                       <Link to={`/places/place/${review.placeId}`} className="text-decoration-none">
-                        <div className="review-card">
-                          <div className="card-body">
-                            <div className="mb-2 rating">
-                              {[...Array(Math.floor(review.rating || 0))].map((_, i) => (
-                                <i key={i} className="bi bi-star-fill text-warning"></i>
-                              ))}
-                              {review.rating % 1 >= 0.5 && <i className="bi bi-star-half text-warning"></i>}
-                              {[...Array(5 - Math.ceil(review.rating || 0))].map((_, i) => (
-                                <i key={i} className="bi bi-star text-warning"></i>
-                              ))}
+                        <div className={`review-card rating-${Math.round(review.rating || 3)}`}>
+                          {/* 장소 이미지 */}
+                          <div className="review-image-container">
+                            <img
+                              src={review.placeImage || "/placeholder.svg"}
+                              alt={review.placeName || "장소 이미지"}
+                              className="review-image"
+                              onError={(e) => {
+                                e.target.src = "/placeholder.svg"
+                              }}
+                            />
+
+                            {/* 별점 뱃지 */}
+                            <div className="rating-badge">
+                              <i className="bi bi-star-fill"></i>
+                              <span>{review.rating?.toFixed(1) || "0.0"}</span>
                             </div>
-                            <h5 className="review-title">{review.placeName}</h5>
-                            <p className="review-location mb-2">{review.roadAddress}</p>
-                            <p className="review-text">{review.note}</p>
-                            <div className="card-meta">
-                              <span className="author">
-                                <div className="mini-avatar">{review.userName?.charAt(0) || "?"}</div>
-                                <span className="user-name">{review.userName}</span>
-                              </span>
+                            {/* 카테고리 뱃지 */}
+                            {review.industrySub && <div className="category-badge">{review.industrySub}</div>}
+                          </div>
+
+                          {/* 리뷰 내용 */}
+                          <div className="review-content">
+                            {/* 장소 이름 */}
+                            <h5 className="place-name">
+                              <i className="bi bi-geo-alt-fill"></i>
+                              {review.placeName}
+                            </h5>
+
+                            {/* 리뷰 텍스트 말풍선 */}
+                            <div className="review-bubble">
+                              {review.note || "이 장소는 반려동물과 함께하기 정말 좋았어요!"}
+                            </div>
+
+                            {/* 리뷰 메타 정보 */}
+                            <div className="review-meta">
+                              <div className="user-profile">
+                                <div className="user-avatar">{review.userName?.charAt(0) || "?"}</div>
+                                <div className="user-info">
+                                  <span className="user-name">{review.userName}</span>
+                                </div>
+                              </div>
                               <span className="review-date">{review.visitDate?.split("T")[0] || "날짜 없음"}</span>
                             </div>
                           </div>
