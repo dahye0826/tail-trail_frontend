@@ -1012,3 +1012,151 @@ body {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   z-index: 10;
 }
+
+/* Add these styles to your PlaceDetailPage.css file */
+
+/* Notification toast styling */
+.place-notification {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  z-index: 1050;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  animation: fadeInOut 3s forwards;
+  max-width: 90%;
+  text-align: center;
+}
+
+.place-notification-error {
+  background-color: rgba(220, 53, 69, 0.9);
+}
+
+.place-notification-content {
+  display: inline-block;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translate(-50%, -20px); }
+  10% { opacity: 1; transform: translate(-50%, 0); }
+  90% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -20px); }
+}
+
+/* Add these styles to PlaceDetailPage.css */
+
+/* Review action buttons styling to match CommentItem */
+.place-detail-review-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 5px;
+}
+
+.place-detail-review-actions .btn-link {
+  text-decoration: none !important;
+  padding: 0;
+  font-size: 0.9rem;
+  background: none;
+  border: none;
+  transition: color 0.2s;
+}
+
+/* Blue color for edit (수정) button */
+.place-detail-review-actions .btn-link:not(.text-danger) {
+  color: #0d6efd;
+}
+
+.place-detail-review-actions .btn-link:not(.text-danger):hover {
+  color: #0a58ca;
+}
+
+.place-detail-review-actions .btn-link:hover {
+  text-decoration: none !important;
+  background-color: transparent;
+}
+
+.place-detail-review-actions .btn-link.text-danger {
+  color: #dc3545;
+}
+
+.place-detail-review-actions .btn-link.text-danger:hover {
+  color: #bd2130;
+}
+
+.place-detail-review-actions .btn-link.text-danger:hover {
+  color: #bd2130;
+}
+
+/* Adjust review header layout */
+.place-detail-review-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.place-detail-review-author {
+  font-weight: 600;
+  margin-right: 10px;
+}
+
+.place-detail-review-rating-stars {
+  margin-right: 10px;
+}
+
+.place-detail-review-dates {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+/* Making review entry similar to CommentItem */
+.place-detail-review-item {
+  border-bottom: 1px solid #eee;
+  padding: 15px 0;
+  position: relative;
+}
+
+.place-detail-review-item:last-child {
+  border-bottom: none;
+}
+
+/* Report dropdown styles similar to CommentItem */
+.place-detail-report-dropdown-container {
+  position: relative;
+  margin-left: auto;
+}
+
+.place-detail-report-btn {
+  padding: 0;
+  color: #6c757d;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* Media query for mobile responsiveness */
+@media (max-width: 768px) {
+  .place-detail-review-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .place-detail-review-author,
+  .place-detail-review-rating-stars,
+  .place-detail-review-dates {
+    margin-bottom: 5px;
+  }
+  
+  .place-detail-review-actions,
+  .place-detail-report-dropdown-container {
+    margin-left: 0;
+    margin-top: 10px;
+    align-self: flex-end;
+  }
+}
