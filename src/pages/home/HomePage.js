@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Container, Row, Col, Carousel } from "react-bootstrap"
+import { Container, Row, Col, Carousel, Button } from "react-bootstrap"
 import { Link } from "react-router-dom"
 import axios from "axios"
 import "bootstrap-icons/font/bootstrap-icons.css"
@@ -20,6 +20,12 @@ const HomePage = () => {
   // 1. 리뷰 데이터를 위한 state와 loading state 추가
   const [reviews, setReviews] = useState([])
   const [reviewsLoading, setReviewsLoading] = useState(true)
+
+  // 로그인 상태 확인
+  useEffect(() => {
+    const token = localStorage.getItem("token")
+    setIsLoggedIn(!!token)
+  }, [])
 
   // 커뮤니티 게시글 가져오기
   useEffect(() => {
@@ -114,6 +120,32 @@ const HomePage = () => {
                     <h1 className="fw-bold">이음길</h1>
                     <p className="lead">꼬리를 따라 이어지는 여행길</p>
                   </div>
+
+                  {/* 모바일 뷰에서 표시될 로그인/회원가입 버튼 */}
+                  <div className="mobile-auth-buttons">
+                    {isLoggedIn ? (
+                      <Button
+                        variant="outline-light"
+                        className="mobile-auth-btn"
+                        onClick={() => {
+                          localStorage.removeItem("token")
+                          setIsLoggedIn(false)
+                          window.location.href = "/"
+                        }}
+                      >
+                        로그아웃
+                      </Button>
+                    ) : (
+                      <>
+                        <Link to="/login" className="btn btn-light mobile-auth-btn">
+                          로그인
+                        </Link>
+                        <Link to="/signup" className="btn btn-outline-light mobile-auth-btn">
+                          회원가입
+                        </Link>
+                      </>
+                    )}
+                  </div>
                 </div>
               </Carousel.Item>
 
@@ -130,6 +162,32 @@ const HomePage = () => {
                     <h1 className="fw-bold">이음길</h1>
                     <p className="lead">꼬리를 따라 이어지는 여행길</p>
                   </div>
+
+                  {/* 모바일 뷰에서 표시될 로그인/회원가입 버튼 */}
+                  <div className="mobile-auth-buttons">
+                    {isLoggedIn ? (
+                      <Button
+                        variant="outline-light"
+                        className="mobile-auth-btn"
+                        onClick={() => {
+                          localStorage.removeItem("token")
+                          setIsLoggedIn(false)
+                          window.location.href = "/"
+                        }}
+                      >
+                        로그아웃
+                      </Button>
+                    ) : (
+                      <>
+                        <Link to="/login" className="btn btn-light mobile-auth-btn">
+                          로그인
+                        </Link>
+                        <Link to="/signup" className="btn btn-outline-light mobile-auth-btn">
+                          회원가입
+                        </Link>
+                      </>
+                    )}
+                  </div>
                 </div>
               </Carousel.Item>
 
@@ -145,6 +203,32 @@ const HomePage = () => {
                   <div className="banner-content">
                     <h1 className="fw-bold">이음길</h1>
                     <p className="lead">꼬리를 따라 이어지는 여행길</p>
+                  </div>
+
+                  {/* 모바일 뷰에서 표시될 로그인/회원가입 버튼 */}
+                  <div className="mobile-auth-buttons">
+                    {isLoggedIn ? (
+                      <Button
+                        variant="outline-light"
+                        className="mobile-auth-btn"
+                        onClick={() => {
+                          localStorage.removeItem("token")
+                          setIsLoggedIn(false)
+                          window.location.href = "/"
+                        }}
+                      >
+                        로그아웃
+                      </Button>
+                    ) : (
+                      <>
+                        <Link to="/login" className="btn btn-light mobile-auth-btn">
+                          로그인
+                        </Link>
+                        <Link to="/signup" className="btn btn-outline-light mobile-auth-btn">
+                          회원가입
+                        </Link>
+                      </>
+                    )}
                   </div>
                 </div>
               </Carousel.Item>
@@ -297,7 +381,7 @@ const HomePage = () => {
                                 <div className="mini-avatar">{review.userName?.charAt(0) || "?"}</div>
                                 <span className="user-name">{review.userName}</span>
                               </span>
-                              <span className="date">{review.visitDate?.split("T")[0] || "날짜 없음"}</span>
+                              <span className="review-date">{review.visitDate?.split("T")[0] || "날짜 없음"}</span>
                             </div>
                           </div>
                         </div>

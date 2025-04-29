@@ -1,0 +1,109 @@
+/* 테이블 스크롤 컨테이너 - 가로 스크롤로 변경 */
+.user-table-container {
+    overflow-x: auto;
+    border-radius: 0.25rem;
+  }
+  
+  /* 테이블 헤더 스타일 */
+  .user-table-container thead th {
+    background-color: #f8f9fa;
+    padding: 12px 8px;
+  }
+  
+  /* 테이블 행 간격 늘리기 */
+  .user-table-container tbody td {
+    padding: 12px 8px;
+    vertical-align: middle;
+  }
+  
+  /* 테이블 행 호버 효과 */
+  .user-table-container tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+  }
+  
+  /* 일반회원 뱃지 - 민트색 */
+  .badge-member {
+    background-color: #66c2a4;
+    color: white;
+    font-weight: 500;
+    padding: 5px 8px;
+    border-radius: 4px;
+  }
+  
+  /* 탈퇴 버튼 - 빨간색 */
+  .btn-withdraw {
+    background-color: white;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-withdraw:hover {
+    background-color: #dc3545;
+    color: white;
+    transform: translateY(-2px);
+  }
+  
+  .btn-withdraw:disabled {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    border-color: #6c757d;
+    cursor: not-allowed;
+  }
+  
+  /* 모달 내 탈퇴 버튼 */
+  .btn-withdraw-modal {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-withdraw-modal:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+  }
+  
+  /* 연락처 우측 정렬 */
+  .col-phone {
+    text-align: right;
+  }
+  
+  /* 프로필 이미지 스타일링 */
+  .profile-img {
+    object-fit: cover;
+    border: 2px solid #f0f0f0;
+  }
+  
+  /* 반려동물 정보 - 줄바꿈 적용 */
+  .pet-info {
+    word-wrap: break-word;
+    word-break: break-word;
+    max-width: 150px;
+  }
+  
+  /* 검색 폼 레이아웃 */
+  .search-form {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .search-form .flex-grow-1 {
+    flex-grow: 1;
+  }
+  
+  .profile-avatar {
+    width: 40px;     /* 가로 크기 */
+    height: 40px;    /* 세로 크기 */
+    font-size: 20px; /* 글자 크기 */
+    border-radius: 50%; /* 동그랗게 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ddd; /* 배경색 (원하는 대로) */
+    color: #333; /* 글자색 */
+  }

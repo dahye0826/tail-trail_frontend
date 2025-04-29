@@ -78,26 +78,26 @@ function ReportManagement() {
         default:
           setContentData({ note: "지원되지 않는 콘텐츠 유형입니다." })
       }
-    }catch (err) {
-      console.error("콘텐츠 상세 정보 로딩 오류:", err);
-    
+    } catch (err) {
+      console.error("콘텐츠 상세 정보 로딩 오류:", err)
+
       if (report.targetType === "COMMENT") {
         // 댓글이 없으면 별도 메시지 표시
-        setContentData({ 
-          error: "이미 삭제된 댓글입니다."
-        });
+        setContentData({
+          error: "이미 삭제된 댓글입니다.",
+        })
       } else if (report.targetType === "POST") {
-        setContentData({ 
-          error: "이미 삭제된 게시글입니다."
-        });
+        setContentData({
+          error: "이미 삭제된 게시글입니다.",
+        })
       } else if (report.targetType === "VISITEDPLACE") {
-        setContentData({ 
-          error: "이미 삭제된 방문 기록입니다."
-        });
+        setContentData({
+          error: "이미 삭제된 방문 기록입니다.",
+        })
       } else {
-        setContentData({ 
-          error: "콘텐츠를 불러오는데 실패했습니다."
-        });
+        setContentData({
+          error: "콘텐츠를 불러오는데 실패했습니다.",
+        })
       }
     } finally {
       setContentLoading(false)
@@ -118,7 +118,6 @@ function ReportManagement() {
     setContentData(null)
   }
 
-  // 신고 처리 (승인/거부)
   // 신고 처리 (승인/거부)
   const handleProcessReport = async (reportId, action, targetType, targetId) => {
     // 확인 대화상자 표시
@@ -227,8 +226,8 @@ function ReportManagement() {
         <div className="content-details">
           <h4 className="content-title">{contentData.title}</h4>
           <div className="content-meta">
-            <span className="content-author">{contentData.author}</span>
-            <span className="content-date">{formatDate(contentData.createdAt)}</span>
+            <span className="content-author">작성자: {contentData.author}</span>
+            <span className="content-date">작성일: {formatDate(contentData.createdAt)}</span>
           </div>
           <div className="content-body mt-3">
             <p>{contentData.content}</p>
@@ -251,8 +250,8 @@ function ReportManagement() {
       return (
         <div className="content-details">
           <div className="content-meta">
-            <span className="content-author">{contentData.author}</span>
-            <span className="content-date">{formatDate(contentData.createdAt)}</span>
+            <span className="content-author">작성자: {contentData.author}</span>
+            <span className="content-date">작성일: {formatDate(contentData.createdAt)}</span>
           </div>
           <div className="content-body mt-3">
             <p>{contentData.content}</p>
@@ -263,10 +262,11 @@ function ReportManagement() {
       return (
         <div className="content-details">
           <div className="content-meta">
-            <span className="content-author">{contentData.author}</span>
-            <span className="content-date">작성일:{formatDate(contentData.createdAt)}</span>
-            <span className="content-date">방문일:{formatDate(contentData.visitDate)}</span>
+            <span className="content-author">작성자: {contentData.author}</span>
+            <span className="content-date">작성일: {formatDate(contentData.createdAt)}</span>
+            <span className="content-date">방문일: {formatDate(contentData.visitDate)}</span>
             <div className="content-rating">
+              평점:{" "}
               {[...Array(5)].map((_, i) => (
                 <i key={i} className={`bi ${i < contentData.rating ? "bi-star-fill" : "bi-star"} text-warning`}></i>
               ))}
@@ -285,7 +285,8 @@ function ReportManagement() {
   return (
     <div className="admin-section">
       <div className="admin-section-header">
-        <h2>신고 내역 관리</h2>
+        <h4>신고 내역 관리</h4>
+        <p>사용자가 신고한 콘텐츠를 검토하고 처리하세요</p>
       </div>
 
       <div className="admin-section-body">
@@ -321,21 +322,23 @@ function ReportManagement() {
                   {reports.map((report) => (
                     <tr key={report.reportId}>
                       <td>
-                        {getTargetTypeText(report.targetType)} #{report.targetId}
+                        <span className="badge bg-info">
+                          {getTargetTypeText(report.targetType)} #{report.targetId}
+                        </span>
                       </td>
                       <td>
                         <span className="report-reason">{report.reason}</span>
                       </td>
                       <td>{formatDate(report.createdAt)}</td>
                       <td>
-                        <button className="btn-view" onClick={() => handleViewDetails(report)} title="상세보기">
+                        <button className="report-btn-view" onClick={() => handleViewDetails(report)}>
                           <i className="bi bi-eye"></i>상세보기
                         </button>
                       </td>
                       <td>
                         <div className="action-buttons">
                           <button
-                            className="btn-approve"
+                            className="report-btn-approve"
                             onClick={() =>
                               handleProcessReport(report.reportId, "approve", report.targetType, report.targetId)
                             }
@@ -343,7 +346,7 @@ function ReportManagement() {
                             승인
                           </button>
                           <button
-                            className="btn-reject"
+                            className="report-btn-reject"
                             onClick={() =>
                               handleProcessReport(report.reportId, "reject", report.targetType, report.targetId)
                             }
@@ -366,7 +369,10 @@ function ReportManagement() {
         <div className="report-modal-backdrop">
           <div className="report-content-modal">
             <div className="report-modal-header">
-              <h5 className="report-modal-title">{getTargetTypeText(selectedReport.targetType)} 상세 내용</h5>
+              <h5 className="report-modal-title">
+                <i className="bi bi-exclamation-triangle-fill me-2 text-warning"></i>
+                {getTargetTypeText(selectedReport.targetType)} 상세 내용
+              </h5>
               <button type="button" className="report-btn-close" onClick={handleCloseModal}>
                 ×
               </button>
@@ -375,7 +381,7 @@ function ReportManagement() {
             <div className="report-modal-footer">
               <div className="report-action-buttons">
                 <button
-                  className="report-btn-approve"
+                  className="report-modal-btn-approve"
                   onClick={() =>
                     handleProcessReport(
                       selectedReport.reportId,
@@ -385,10 +391,11 @@ function ReportManagement() {
                     )
                   }
                 >
+                  <i className="bi bi-check-circle-fill"></i>
                   승인 (콘텐츠 삭제)
                 </button>
                 <button
-                  className="report-btn-reject"
+                  className="report-modal-btn-reject"
                   onClick={() =>
                     handleProcessReport(
                       selectedReport.reportId,
@@ -398,6 +405,7 @@ function ReportManagement() {
                     )
                   }
                 >
+                  <i className="bi bi-x-circle-fill"></i>
                   거부 (콘텐츠 유지)
                 </button>
               </div>

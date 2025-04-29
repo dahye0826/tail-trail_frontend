@@ -84,6 +84,37 @@ body {
   font-family: "TmoneyRoundWindExtraBold", sans-serif; /* 폰트 추가 */
 }
 
+/* 모바일 로그인/회원가입 버튼 스타일 - 중앙 배치로 수정 */
+.mobile-auth-buttons {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  display: none; /* 기본적으로 숨김 */
+  flex-direction: column; /* 세로로 배치 */
+  align-items: center;
+  gap: 10px; /* 버튼 사이 간격 */
+  width: 80%; /* 너비 제한 */
+  max-width: 300px; /* 최대 너비 */
+}
+
+.mobile-auth-btn {
+  font-weight: 600;
+  border-radius: 30px;
+  padding: 12px 24px; /* 패딩 증가 */
+  font-size: 1.1rem; /* 글씨 크기 증가 */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  width: 100%; /* 버튼 너비 100% */
+  text-align: center;
+}
+
+.mobile-auth-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
 /* 서비스 소개 섹션 */
 .section-title {
   color: var(--accent-color);
@@ -532,6 +563,11 @@ body {
   .card-text {
     font-size: 0.8rem;
   }
+
+  /* 모바일에서 로그인/회원가입 버튼 표시 */
+  .mobile-auth-buttons {
+    display: flex;
+  }
 }
 
 /* 커뮤니티 카드 스타일 */
@@ -813,4 +849,10 @@ body {
   .community-card-image-container {
     height: 150px;
   }
+}
+
+.review-date {
+  color: #6c757d; /* 부드러운 회색 */
+  font-size: 0.9rem;
+  font-weight: 500;
 }

@@ -12,7 +12,7 @@ function AdminPage() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("dashboard")
 
-  const isAdmin = true 
+  const isAdmin = true
 
   const handleMenuClick = (tab) => {
     setActiveTab(tab)
@@ -21,39 +21,45 @@ function AdminPage() {
   return (
     <>
       <Navbar isLoggedIn={true} />
-      <div className="container mt-4 mb-5">
-        <div className="row">
-          <div className="col-md-3">
-            <div className="list-group mb-4">
-              <div className="list-group-item active">관리자 메뉴</div>
-              <Link 
-                to="#" 
-                className={`list-group-item list-group-item-action d-flex align-items-center ${activeTab === "dashboard" ? "active" : ""}`} 
-                onClick={() => handleMenuClick("dashboard")}
-              >
-                <i className="bi bi-speedometer2 me-2"></i>대시보드
-              </Link>
-              <Link 
-                to="#" 
-                className={`list-group-item list-group-item-action d-flex align-items-center ${activeTab === "reports" ? "active" : ""}`} 
-                onClick={() => handleMenuClick("reports")}
-              >
-                <i className="bi bi-shield-exclamation me-2"></i>신고내역 관리
-              </Link>
-              <Link 
-                to="#" 
-                className={`list-group-item list-group-item-action d-flex align-items-center ${activeTab === "users" ? "active" : ""}`} 
-                onClick={() => handleMenuClick("users")}
-              >
-                <i className="bi bi-people me-2"></i>사용자 관리
-              </Link>
+      <div className="admin-container py-4">
+        <div className="container mt-4 mb-5">
+          <div className="row">
+            <div className="col-md-3">
+              <div className="admin-sidebar mb-4">
+                <div className="list-group-item">관리자 메뉴</div>
+                <Link
+                  to="#"
+                  className={`list-group-item list-group-item-action d-flex align-items-center ${activeTab === "dashboard" ? "active" : ""}`}
+                  onClick={() => handleMenuClick("dashboard")}
+                >
+                  <i className="bi bi-speedometer2"></i>대시보드
+                </Link>
+                <Link
+                  to="#"
+                  className={`list-group-item list-group-item-action d-flex align-items-center ${activeTab === "reports" ? "active" : ""}`}
+                  onClick={() => handleMenuClick("reports")}
+                >
+                  <i className="bi bi-shield-exclamation"></i>신고내역 관리
+                </Link>
+                <Link
+                  to="#"
+                  className={`list-group-item list-group-item-action d-flex align-items-center ${activeTab === "users" ? "active" : ""}`}
+                  onClick={() => handleMenuClick("users")}
+                >
+                  <i className="bi bi-people"></i>사용자 관리
+                </Link>
+              </div>
             </div>
-          </div>
-          
-          <div className="col-md-9">
-            {activeTab === "dashboard" && <AdminDashboard onNavigate={handleMenuClick} />}
-            {activeTab === "reports" && <ReportManagement />}
-            {activeTab === "users" && <UserManagementPage />}
+
+            <div className="col-md-9">
+              <div className="card">
+                <div className="card-body">
+                  {activeTab === "dashboard" && <AdminDashboard onNavigate={handleMenuClick} />}
+                  {activeTab === "reports" && <ReportManagement />}
+                  {activeTab === "users" && <UserManagementPage />}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -66,7 +72,7 @@ function AdminPage() {
 function AdminDashboard({ onNavigate }) {
   const [totalReports, setTotalReports] = useState(0)
   const [totalUsers, setTotalUsers] = useState(0)
- 
+
   useEffect(() => {
     const fetchTotalReports = async () => {
       try {
@@ -80,7 +86,7 @@ function AdminDashboard({ onNavigate }) {
     const fetchTotalUsers = async () => {
       try {
         const response = await axios.get("http://localhost:9000/api/users", {
-          params: { page: 1, size: 1 }
+          params: { page: 1, size: 1 },
         })
         setTotalUsers(response.data.totalItems)
       } catch (error) {
@@ -94,44 +100,43 @@ function AdminDashboard({ onNavigate }) {
 
   return (
     <div>
-      <h4 className="mb-4">관리자 대시보드</h4>
-      
+      <div className="admin-section-header">
+        <h4>관리자 대시보드</h4>
+        <p>시스템 현황 및 주요 지표를 확인하세요</p>
+      </div>
+
       <div className="row">
         <div className="col-md-6 mb-4">
-          <div className="card h-100">
+          <div className="dashboard-card">
             <div className="card-body">
               <h5 className="card-title">
-                <i className="bi bi-shield-exclamation text-warning me-2"></i>
+                <i className="bi bi-shield-exclamation text-warning"></i>
                 신고 관리
               </h5>
               <p className="card-text">
-                <span className="h3">{totalReports}</span>건의 신고
+                <span className="h3">{totalReports}</span>
+                <span>건의 신고가 접수되었습니다</span>
               </p>
-              <button 
-                className="btn btn-info btn-sm"
-                onClick={() => onNavigate("reports")}
-              >
-                바로가기
+              <button className="btn btn-info" onClick={() => onNavigate("reports")}>
+                <i className="bi bi-arrow-right me-1"></i> 바로가기
               </button>
             </div>
           </div>
         </div>
-        
+
         <div className="col-md-6 mb-4">
-          <div className="card h-100">
+          <div className="dashboard-card">
             <div className="card-body">
               <h5 className="card-title">
-                <i className="bi bi-people text-primary me-2"></i>
+                <i className="bi bi-people text-primary"></i>
                 사용자 관리
               </h5>
               <p className="card-text">
-                <span className="h3">{totalUsers}</span>명의 사용자
+                <span className="h3">{totalUsers}</span>
+                <span>명의 사용자가 등록되어 있습니다</span>
               </p>
-              <button 
-                className="btn btn-info btn-sm"
-                onClick={() => onNavigate("users")}
-              >
-                바로가기
+              <button className="btn btn-info" onClick={() => onNavigate("users")}>
+                <i className="bi bi-arrow-right me-1"></i> 바로가기
               </button>
             </div>
           </div>
