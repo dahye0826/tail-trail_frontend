@@ -746,7 +746,7 @@ function PlaceDetailPage() {
                           스팸
                         </div>
                         <div
-                          className="place-detail-report-dropdown-item"
+    className="place-detail-report-dropdown-item"
                           onClick={() => handleReport(review.visitId, "기타")}
                         >
                           기타
@@ -841,6 +841,15 @@ function PlaceDetailPage() {
                           >
                             <i className="bi bi-clipboard"></i>
                           </button>
+                          <a
+                            href={`https://map.kakao.com/link/to/${encodeURIComponent(place.name)},${place.lat},${place.lng}`}
+                            className="place-detail-btn-kakao-small ms-2"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="카카오맵으로 길찾기"
+                          >
+                            <i className="bi bi-geo-alt"></i> 길찾기
+                          </a>
                         </dd>
 
                         <dt className="place-detail-col-sm-4">운영시간</dt>
