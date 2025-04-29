@@ -35,6 +35,8 @@ function PlaceListPage() {
   const [error, setError] = useState(null)
   const [recommendedPlaces, setRecommendedPlaces] = useState([])
   const [loadingRecommendations, setLoadingRecommendations] = useState(false)
+  // Add notification state
+  const [notification, setNotification] = useState({ show: false, message: "", type: "success" })
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -289,6 +291,16 @@ function PlaceListPage() {
     }
   }, [isLoggedIn]);
 
+  // Function to show notification
+  const showNotification = (message, type = "success") => {
+    setNotification({ show: true, message, type });
+    
+    // Auto hide after 3 seconds
+    setTimeout(() => {
+      setNotification({ show: false, message: "", type: "success" });
+    }, 3000);
+  };
+
   // Event handlers
   const handleSearch = () => setCurrentPage(1)
 
@@ -321,18 +333,19 @@ function PlaceListPage() {
         if (response.data.success) {
           if (response.data.isAdded) {
             setFavorites([...favorites, placeId]);
+            showNotification("즐겨찾기에 추가되었습니다.");
           } else {
             setFavorites(favorites.filter((id) => id !== placeId));
+            showNotification("즐겨찾기가 해제되었습니다.");
           }
         }
       } catch (error) {
         console.error("즐겨찾기 처리 오류:", error);
-        alert("즐겨찾기 업데이트 중 오류가 발생했습니다.");
+        showNotification("즐겨찾기 업데이트 중 오류가 발생했습니다.", "error");
       }
     },
     [isLoggedIn, navigate, location, favorites]
   );
-  
 
   const handleResetFilters = () => {
     setRegionFilter("")
@@ -544,11 +557,26 @@ function PlaceListPage() {
     );
   };
 
+  // Render notification toast
+  const renderNotification = () => {
+    if (!notification.show) return null;
+    
+    return (
+      <div className={`place-notification ${notification.type === 'error' ? 'place-notification-error' : ''}`}>
+        <div className="place-notification-content">
+          {notification.message}
+        </div>
+      </div>
+    );
+  };
+
   // Render main component
   return (
     <>
       <Navbar isLoggedIn={isLoggedIn} />
-{/* /**zz */}
+      {/* Notification Toast */}
+      {renderNotification()}
+
       <div className="places-background">
         <div className="container mt-4 mb-5">
           <div className="places-content-wrapper">
