@@ -130,12 +130,8 @@ function PlaceListPage() {
 
       const response = await favoriteAPI.getFavorites(userId, 1, 1000)
       if (response && response.data) {
-        const favoritesData = response.data.favorites || response.data.content || response.data
-        const favoriteIds = Array.isArray(favoritesData) 
-          ? favoritesData.map(fav => fav.placeId || fav)
-          : []
-        console.log("Loaded favorites:", favoriteIds)
-        setFavorites(favoriteIds)
+        const favoritesData = response.data.content || response.data
+        setFavorites(favoritesData.map(fav => fav.placeId))
       }
     } catch (error) {
       console.error("즐겨찾기 로드 오류:", error)
@@ -316,35 +312,6 @@ function PlaceListPage() {
       }
   
       try {
-<<<<<<< HEAD
-        const userId = localStorage.getItem("userId")
-        if (!userId) {
-          alert("로그인이 필요한 서비스입니다.")
-          navigate("/login")
-          return
-        }
-
-        const isFavorited = favorites.includes(placeId)
-        
-        // Use the toggle endpoint directly, which works in PlaceDetailPage
-        const response = await axios.post(`${API_BASE_URL}/favorites/toggle`, null, {
-          params: {
-            userId: Number(userId),
-            placeId: Number(placeId)
-          }
-        })
-        
-        console.log("즐겨찾기 토글 응답:", response.data)
-        
-        if (response.data.success) {
-          // Update UI based on server response
-          if (response.data.isAdded) {
-            setFavorites(prev => [...prev, placeId])
-            alert("즐겨찾기에 추가되었습니다.")
-          } else {
-            setFavorites(prev => prev.filter(id => id !== placeId))
-            alert("즐겨찾기가 해제되었습니다.")
-=======
         const userId = localStorage.getItem("userId");
   
         const response = await axios.post(`${API_BASE_URL}/favorites/toggle`, null, {
@@ -356,7 +323,6 @@ function PlaceListPage() {
             setFavorites([...favorites, placeId]);
           } else {
             setFavorites(favorites.filter((id) => id !== placeId));
->>>>>>> e0ab5398ed1d6b82e6166a63747454127361ce7f
           }
         }
       } catch (error) {
