@@ -3,7 +3,7 @@
 import "./Navbar.css"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
-import { authAPI } from "../services/api"
+import { authAPI } from "./../services/api"
 
 function Navbar() {
   const location = useLocation()
@@ -62,7 +62,7 @@ function Navbar() {
   }
 
   // 디버깅용 로그
-  console.log("로그인 상태:", isLoggedIn, "관리자 상태:", isAdmin)
+  // console.log("로그인 상태:", isLoggedIn, "관리자 상태:", isAdmin)
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light mb-4">

@@ -10,7 +10,6 @@ import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 import KakaoMap from "../../components/KakaoMap"
 import { usePlaceViewTracker } from "../../api/PlaceViewTracker"
-import { useReview } from "../../hooks/useReview"
 
 const API_BASE_URL = "http://localhost:9000/api"
 
@@ -18,22 +17,27 @@ function PlaceDetailPage() {
   const [place, setPlace] = useState(null)
   const [loading, setLoading] = useState(true)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [visitHistory, setVisitHistory] = useState(null)
   const [showReviewForm, setShowReviewForm] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(false) // 수정 모드인지 새 리뷰 작성 모드인지 구분
+  const [currentEditReviewId, setCurrentEditReviewId] = useState(null) // 현재 수정 중인 리뷰 ID
   const [mapContainerReady, setMapContainerReady] = useState(false)
   const [isFavorite, setIsFavorite] = useState(false)
   const [newReview, setNewReview] = useState({
     rating: 5,
     note: "",
-    visitDate: new Date().toISOString().split('T')[0]
+    visitDate: new Date().toISOString().split("T")[0],
   })
+  const [userHasReview, setUserHasReview] = useState(false) // 사용자가 이미 리뷰를 작성했는지 여부
+  const [userReviewId, setUserReviewId] = useState(null) // 사용자가 작성한 리뷰 ID
   const mapContainerRef = useRef(null)
   const { id } = useParams()
   const navigate = useNavigate()
   const reviewRef = useRef(null)
   const location = useLocation()
-  const [averageRating, setAverageRating] = useState(0);
-  const [reviewList, setReviewList] = useState([]);
+  const [averageRating, setAverageRating] = useState(0)
+  const [reviewList, setReviewList] = useState([])
+  const [showReportDropdown, setShowReportDropdown] = useState({})
+  const [hoverRating, setHoverRating] = useState(0)
 
   // Format incoming place data
   const formatPlaceData = useCallback((placeData) => {
@@ -66,45 +70,44 @@ function PlaceDetailPage() {
           rating: review.rating,
           comment: review.reviewContent,
         })) || [],
-        images: [
-          placeData.placeImage
-            ? `http://localhost:9000${placeData.placeImage}`
-            : "/placeholder.svg?height=400&width=800"
-        ],
+      images: [
+        placeData.placeImage ? `http://localhost:9000${placeData.placeImage}` : "/placeholder.svg?height=400&width=800",
+      ],
       lat: placeData.latitude || 37.5665,
       lng: placeData.longitude || 126.978,
       lastUpdated: placeData.lastUpdated || null,
     }
   }, [])
 
-const userId = localStorage.getItem("userId")
+  const userId = localStorage.getItem("userId")
   // 트래킹 로직 (추천 알고리즘 구현)
   usePlaceViewTracker({
-    
     placeId: Number(id),
-    userId: Number(userId)
+    userId: Number(userId),
   })
 
-  // 방문 이력 로드
-  const loadVisitHistory = useCallback(async () => {
-    try {
-      const userId = localStorage.getItem("userId")
-      if (!userId) return
-
-      const response = await axios.get(`${API_BASE_URL}/visited-place/check`, {
-        params: {
-          userId: Number(userId),
-          placeId: Number(id)
-        }
-      })
-
-      if (response.data) {
-        setVisitHistory(response.data)
-      }
-    } catch (error) {
-      console.error("방문 이력 로드 오류:", error)
+  // 사용자가 이미 리뷰를 작성했는지 확인
+  const checkUserReview = useCallback(() => {
+    if (!isLoggedIn || !userId || reviewList.length === 0) {
+      setUserHasReview(false)
+      setUserReviewId(null)
+      return
     }
-  }, [id])
+
+    const userReview = reviewList.find((review) => review.userId === Number(userId))
+    if (userReview) {
+      setUserHasReview(true)
+      setUserReviewId(userReview.visitId)
+    } else {
+      setUserHasReview(false)
+      setUserReviewId(null)
+    }
+  }, [isLoggedIn, userId, reviewList])
+
+  // 리뷰 목록이 변경될 때마다 사용자 리뷰 확인
+  useEffect(() => {
+    checkUserReview()
+  }, [reviewList, checkUserReview])
 
   // 방문 후기 제출
   const handleReviewSubmit = async (e) => {
@@ -116,27 +119,44 @@ const userId = localStorage.getItem("userId")
       return
     }
 
+    // 이미 리뷰를 작성한 경우 중복 작성 방지
+    if (userHasReview) {
+      alert("이미 리뷰를 작성하셨습니다. 기존 리뷰를 수정해주세요.")
+      return
+    }
+
     try {
-      const today = new Date().toISOString().split('T')[0];
+      const today = new Date().toISOString().split("T")[0]
       const reviewData = {
         userId: Number(userId),
         placeId: Number(id),
         rating: Number(newReview.rating),
         note: newReview.note,
         visitDate: today,
-        createdAt: today
+        createdAt: today,
       }
 
-      console.log("전송할 리뷰 데이터:", reviewData); // 디버깅용 로그
+      console.log("전송할 리뷰 데이터:", reviewData) // 디버깅용 로그
 
       const response = await axios.post(`${API_BASE_URL}/visited-place`, reviewData)
-      
+
       if (response.data) {
-        console.log("서버 응답:", response.data); // 디버깅용 로그
-        setVisitHistory(response.data)
-        setShowReviewForm(false)
+        console.log("서버 응답:", response.data) // 디버깅용 로그
+
+        // 리뷰 목록에 새 리뷰 추가
+        setReviewList((prevReviews) => [...prevReviews, response.data])
+
+        // 사용자 리뷰 상태 업데이트
+        setUserHasReview(true)
+        setUserReviewId(response.data.visitId)
+
+        // 폼 상태 초기화
+        resetFormState()
+
         alert("방문 후기가 등록되었습니다.")
-        window.location.reload() // 페이지 새로고침
+
+        // 평균 별점 다시 가져오기
+        fetchAverageRating()
       }
     } catch (error) {
       console.error("리뷰 제출 오류:", error)
@@ -145,33 +165,40 @@ const userId = localStorage.getItem("userId")
   }
 
   // 방문 후기 수정
-  const handleReviewUpdate = async () => {
-    if (!visitHistory) return
+  const handleReviewUpdate = async (e) => {
+    e.preventDefault()
+    if (!currentEditReviewId) return
 
     try {
-      const today = new Date().toISOString().split('T')[0];
+      const today = new Date().toISOString().split("T")[0]
       const reviewData = {
         userId: Number(localStorage.getItem("userId")),
         placeId: Number(id),
         rating: Number(newReview.rating),
         note: newReview.note,
         visitDate: today,
-        createdAt: today
+        createdAt: today,
       }
 
-      console.log("수정할 리뷰 데이터:", reviewData); // 디버깅용 로그
+      console.log("수정할 리뷰 데이터:", reviewData) // 디버깅용 로그
 
-      const response = await axios.put(
-        `${API_BASE_URL}/visited-place/${visitHistory.visitId}`,
-        reviewData
-      )
+      const response = await axios.put(`${API_BASE_URL}/visited-place/${currentEditReviewId}`, reviewData)
 
       if (response.data) {
-        console.log("서버 응답:", response.data); // 디버깅용 로그
-        setVisitHistory(response.data)
-        setShowReviewForm(false)
+        console.log("서버 응답:", response.data) // 디버깅용 로그
+
+        // 리뷰 목록에서 수정된 리뷰 업데이트
+        setReviewList((prevReviews) =>
+          prevReviews.map((review) => (review.visitId === currentEditReviewId ? response.data : review)),
+        )
+
+        // 폼 상태 초기화
+        resetFormState()
+
         alert("방문 후기가 수정되었습니다.")
-        window.location.reload() // 페이지 새로고침
+
+        // 평균 별점 다시 가져오기
+        fetchAverageRating()
       }
     } catch (error) {
       console.error("리뷰 수정 오류:", error)
@@ -180,18 +207,45 @@ const userId = localStorage.getItem("userId")
   }
 
   // 방문 후기 삭제
-  const handleReviewDelete = async () => {
-    if (!visitHistory || !window.confirm("방문 후기를 삭제하시겠습니까?")) return
+  const handleReviewDelete = async (reviewId) => {
+    if (!reviewId || !window.confirm("방문 후기를 삭제하시겠습니까?")) return
 
     try {
-      await axios.delete(`${API_BASE_URL}/visited-place/${visitHistory.visitId}`)
-      setVisitHistory(null)
-      setReviewList(prev => prev.filter(review => review.visitId !== visitHistory.visitId))
+      await axios.delete(`${API_BASE_URL}/visited-place/${reviewId}`)
+
+      // 리뷰 목록에서 삭제된 리뷰 제거
+      setReviewList((prev) => prev.filter((review) => review.visitId !== reviewId))
+
+      // 사용자의 리뷰를 삭제한 경우 상태 업데이트
+      if (reviewId === userReviewId) {
+        setUserHasReview(false)
+        setUserReviewId(null)
+      }
+
+      // 폼 상태 초기화
+      resetFormState()
+
       alert("방문 후기가 삭제되었습니다.")
+
+      // 평균 별점 다시 가져오기
+      fetchAverageRating()
     } catch (error) {
       console.error("리뷰 삭제 오류:", error)
       alert("방문 후기 삭제에 실패했습니다.")
     }
+  }
+
+  // 폼 상태 초기화 함수
+  const resetFormState = () => {
+    setShowReviewForm(false)
+    setIsEditMode(false)
+    setCurrentEditReviewId(null)
+    setNewReview({
+      rating: 5,
+      note: "",
+      visitDate: new Date().toISOString().split("T")[0],
+    })
+    setHoverRating(0)
   }
 
   // 즐겨찾기 상태 체크 함수
@@ -201,24 +255,23 @@ const userId = localStorage.getItem("userId")
       setIsFavorite(false)
       return
     }
-    
+
     try {
       const response = await axios.get(`${API_BASE_URL}/favorites`, {
-        params: { 
+        params: {
           userId: Number(userId),
           placeId: Number(id),
           page: 1,
-          size: 1
-        }
+          size: 1,
+        },
       })
-      
+
       // 응답 데이터 구조 확인 후 로깅
       console.log("즐겨찾기 상태 응답:", response.data)
-      
+
       // favorites 배열이 있고 길이가 0보다 크면 즐겨찾기된 상태
       const isFavorited = response.data.favorites && response.data.favorites.length > 0
       setIsFavorite(isFavorited)
-      
     } catch (error) {
       console.error("즐겨찾기 상태 확인 실패:", error)
       setIsFavorite(false)
@@ -230,23 +283,24 @@ const userId = localStorage.getItem("userId")
     const checkLoginStatus = () => {
       const loginStatus = localStorage.getItem("isLoggedIn") === "true"
       setIsLoggedIn(loginStatus)
-      
+
       if (loginStatus) {
         checkFavoriteStatus()
-        loadVisitHistory()
       } else {
         setIsFavorite(false)
+        setUserHasReview(false)
+        setUserReviewId(null)
       }
     }
 
     checkLoginStatus()
     // 로그인 상태 변경 감지
-    window.addEventListener('storage', checkLoginStatus)
-    
+    window.addEventListener("storage", checkLoginStatus)
+
     return () => {
-      window.removeEventListener('storage', checkLoginStatus)
+      window.removeEventListener("storage", checkLoginStatus)
     }
-  }, [checkFavoriteStatus, loadVisitHistory])
+  }, [checkFavoriteStatus])
 
   // 즐겨찾기 토글 함수
   const toggleFavorite = async () => {
@@ -267,12 +321,12 @@ const userId = localStorage.getItem("userId")
       const response = await axios.post(`${API_BASE_URL}/favorites/toggle`, null, {
         params: {
           userId: Number(userId),
-          placeId: Number(id)
-        }
+          placeId: Number(id),
+        },
       })
-      
+
       console.log("즐겨찾기 토글 응답:", response.data)
-      
+
       if (response.data.success) {
         setIsFavorite(response.data.isAdded)
         const message = response.data.isAdded ? "즐겨찾기에 추가되었습니다." : "즐겨찾기가 해제되었습니다."
@@ -304,9 +358,9 @@ const userId = localStorage.getItem("userId")
 
   useEffect(() => {
     if (location.hash === "#review" && reviewRef.current) {
-      reviewRef.current.scrollIntoView({ behavior: "smooth" });
+      reviewRef.current.scrollIntoView({ behavior: "smooth" })
     }
-  }, [location]);
+  }, [location])
 
   // Render stars for ratings
   const renderStars = (rating) => (
@@ -321,49 +375,80 @@ const userId = localStorage.getItem("userId")
     </>
   )
 
-  // Render pet size icons - 아이콘 제거
+  // 별점 표시 함수 (숫자 포함)
+  const renderStarsWithNumber = (rating) => (
+    <div className="place-detail-stars-with-number">
+      {renderStars(rating)}
+      <span className="place-detail-rating-number">({rating})</span>
+    </div>
+  )
+
+
   const renderPetSizeIcons = (categories) => {
     if (!categories?.length) return null
 
     return (
-      <div className="pet-size-icons mb-2">
+      <div className="place-detail-pet-size-icons mb-2">
         {categories.includes("small") && (
-          <span className="badge bg-info me-1" title="소형견 출입 가능">
-            소형
+          <span className="place-detail-badge bg-info me-1" title="소형견 출입 가능">
+            소형견
           </span>
         )}
         {categories.includes("medium") && (
-          <span className="badge bg-success me-1" title="중형견 출입 가능">
-            중형
+          <span className="place-detail-badge bg-success me-1" title="중형견 출입 가능">
+            중형견
           </span>
         )}
         {categories.includes("large") && (
-          <span className="badge bg-warning me-1" title="대형견 출입 가능">
-            대형
+          <span className="place-detail-badge bg-warning me-1" title="대형견 출입 가능">
+            대형견
           </span>
         )}
       </div>
     )
   }
 
+  // 별점 선택 핸들러
+  const handleStarClick = (rating) => {
+    setNewReview((prev) => ({ ...prev, rating }))
+  }
+
+  // 별점 호버 핸들러
+  const handleStarHover = (rating) => {
+    setHoverRating(rating)
+  }
+
+  // 별점 호버 종료 핸들러
+  const handleStarLeave = () => {
+    setHoverRating(0)
+  }
+
+  // 별점 선택 UI 렌더링
+  const renderStarRating = () => {
+    return (
+      <div className="place-detail-star-rating-container mb-3">
+        <label className="form-label d-block">평점</label>
+        <div className="place-detail-star-rating" onMouseLeave={handleStarLeave}>
+          {[1, 2, 3, 4, 5].map((star) => (
+            <i
+              key={star}
+              className={`bi ${
+                star <= (hoverRating || newReview.rating) ? "bi-star-fill" : "bi-star"
+              } place-detail-star-icon text-warning`}
+              onClick={() => handleStarClick(star)}
+              onMouseEnter={() => handleStarHover(star)}
+            ></i>
+          ))}
+          <span className="place-detail-rating-text ms-2">({newReview.rating}점)</span>
+        </div>
+      </div>
+    )
+  }
+
   // 방문 후기 폼 렌더링
   const renderReviewForm = () => (
-    <form onSubmit={visitHistory ? handleReviewUpdate : handleReviewSubmit} className="review-form">
-      <div className="mb-3">
-        <label className="form-label">평점</label>
-        <select
-          className="form-control"
-          value={newReview.rating}
-          onChange={(e) => setNewReview({ ...newReview, rating: Number(e.target.value) })}
-          required
-        >
-          {[5, 4, 3, 2, 1].map((rating) => (
-            <option key={rating} value={rating}>
-              {rating}점
-            </option>
-          ))}
-        </select>
-      </div>
+    <form onSubmit={isEditMode ? handleReviewUpdate : handleReviewSubmit} className="place-detail-review-form">
+      {renderStarRating()}
       <div className="mb-3">
         <label className="form-label">후기 내용</label>
         <textarea
@@ -376,53 +461,14 @@ const userId = localStorage.getItem("userId")
         ></textarea>
       </div>
       <div className="d-flex justify-content-end gap-2">
-        <button type="button" className="btn btn-secondary" onClick={() => setShowReviewForm(false)}>
+        <button type="button" className="btn btn-secondary" onClick={resetFormState}>
           취소
         </button>
         <button type="submit" className="btn btn-primary">
-          {visitHistory ? "수정하기" : "등록하기"}
+          {isEditMode ? "수정하기" : "등록하기"}
         </button>
       </div>
     </form>
-  )
-
-  // 방문 후기 표시
-  const renderReviewContent = () => (
-    <div className="review-content">
-      <div className="d-flex align-items-center mb-3">
-        <div className="rating me-3">
-          {renderStars(visitHistory.rating)}
-          <span className="ms-2">{visitHistory.rating}점</span>
-        </div>
-        <small className="text-muted">
-          방문일: {new Date(visitHistory.visitDate).toLocaleDateString()}
-        </small>
-      </div>
-      <div className="review-text-container">
-        <p className="review-text mb-2">{visitHistory.note}</p>
-        <small className="text-muted">
-          작성일: {new Date(visitHistory.createdAt).toLocaleDateString()}
-        </small>
-      </div>
-      <div className="mt-3 d-flex justify-content-end gap-2">
-        <button
-          className="btn btn-outline-primary btn-sm"
-          onClick={() => {
-            setNewReview({
-              rating: visitHistory.rating,
-              note: visitHistory.note,
-              visitDate: visitHistory.visitDate
-            })
-            setShowReviewForm(true)
-          }}
-        >
-          수정
-        </button>
-        <button className="btn btn-outline-danger btn-sm" onClick={handleReviewDelete}>
-          삭제
-        </button>
-      </div>
-    </div>
   )
 
   // 방문 후기 섹션 렌더링
@@ -442,37 +488,51 @@ const userId = localStorage.getItem("userId")
       return renderReviewForm()
     }
 
-    if (visitHistory) {
-      return renderReviewContent()
-    }
-
     return (
       <div className="text-center py-4">
-        <button className="btn btn-primary" onClick={() => setShowReviewForm(true)}>
-          방문 후기 작성하기
-        </button>
+        {!userHasReview ? (
+          <button
+            className="btn btn-primary"
+            onClick={() => {
+              setNewReview({
+                rating: 5,
+                note: "",
+                visitDate: new Date().toISOString().split("T")[0],
+              })
+              setIsEditMode(false)
+              setCurrentEditReviewId(null)
+              setShowReviewForm(true)
+            }}
+          >
+            방문 후기 작성하기
+          </button>
+        ) : (
+          <div className="alert alert-info" role="alert">
+            이미 리뷰를 작성하셨습니다. 리뷰 목록에서 수정하거나 삭제할 수 있습니다.
+          </div>
+        )}
       </div>
     )
   }
 
   // 지도 컴포넌트 렌더링
   const renderMap = () => {
-    if (loading || !place) return null;
+    if (loading || !place) return null
 
     return (
-      <div className="row mt-4">
-        <div className="col">
+      <div className="place-detail-row mt-4">
+        <div className="place-detail-col">
           <div className="d-flex justify-content-between align-items-center mb-3">
-            <h3 className="mb-0 section-title">위치</h3>
+            <h3 className="place-detail-mb-0 place-detail-section-titlelocation">위치</h3>
           </div>
-          <div 
+          <div
             ref={mapContainerRef}
-            className="map-container" 
+            className="place-detail-map-container"
             style={{ minHeight: "700px", width: "100%" }}
           >
             {mapContainerRef.current && (
               <KakaoMap
-                key={`map-${place.id}-${mapContainerRef.current ? 'mounted' : 'loading'}`}
+                key={`map-${place.id}-${mapContainerRef.current ? "mounted" : "loading"}`}
                 readOnly={true}
                 initialLocation={{
                   id: place.id,
@@ -495,34 +555,36 @@ const userId = localStorage.getItem("userId")
           </div>
         </div>
       </div>
-    );
-  };
+    )
+  }
 
   // 지도 컨테이너 초기화 확인
   useEffect(() => {
     if (mapContainerRef.current && place) {
       // 지도 컨테이너가 준비되면 강제로 리렌더링
-      setMapContainerReady(true);
+      setMapContainerReady(true)
     }
-  }, [place, mapContainerRef.current]);
+  }, [place, mapContainerRef.current])
 
   // 이미지 섹션에 즐겨찾기 버튼 추가
   const renderImageSection = () => (
-    <div className="row mb-4">
-      <div className="col">
-        <div className="position-relative">
+    <div className="place-detail-row place-detail-mb-4">
+      <div className="place-detail-col">
+        <div className="place-detail-position-relative">
           <img
             src={place.images[0] || "/placeholder.svg"}
             alt={place.name}
-            className="img-fluid rounded shadow-sm"
-            onError={(e) => {e.target.src = "/placeholder.svg?height=400&width=800"}}
+            className="place-detail-image img-fluid rounded shadow-sm"
+            onError={(e) => {
+              e.target.src = "/placeholder.svg?height=400&width=800"
+            }}
           />
-          <button 
-            className={`btn-favorite ${isFavorite ? 'active' : ''}`}
+          <button
+            className={`place-detail-btn-favorite ${isFavorite ? "active" : ""}`}
             onClick={toggleFavorite}
             aria-label={isFavorite ? "즐겨찾기 해제" : "즐겨찾기 추가"}
           >
-            <i className={`bi ${isFavorite ? 'bi-heart-fill' : 'bi-heart'}`}></i>
+            <i className={`bi ${isFavorite ? "bi-heart-fill" : "bi-heart"}`}></i>
           </button>
         </div>
       </div>
@@ -532,69 +594,181 @@ const userId = localStorage.getItem("userId")
   // 평균 별점 조회
   const fetchAverageRating = useCallback(async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/visited-place/places/${id}/average-rating`);
-      setAverageRating(response.data);
+      const response = await axios.get(`${API_BASE_URL}/visited-place/places/${id}/average-rating`)
+      setAverageRating(response.data)
     } catch (error) {
-      console.error('평균 별점 조회 실패:', error);
+      console.error("평균 별점 조회 실패:", error)
     }
-  }, [id]);
+  }, [id])
 
   // 컴포넌트 마운트 시 평균 별점 조회
   useEffect(() => {
-    fetchAverageRating();
-  }, [fetchAverageRating]);
+    fetchAverageRating()
+  }, [fetchAverageRating])
 
   // 카테고리와 별점 표시 컴포넌트
   const renderCategoryAndRating = () => (
-    <div className="category-rating-container">
-      <span className="category-badge">{place.category}</span>
-      <div className="rating-display">
+    <div className="place-detail-category-rating-container">
+      <span className="place-detail-category-badge">{place.category}</span>
+      <div className="place-detail-rating-display">
         {renderStars(averageRating)}
-        <span className="rating-count">({averageRating ? averageRating.toFixed(1) : '0.0'})</span>
+        <span className="place-detail-rating-count">({averageRating ? averageRating.toFixed(1) : "0.0"})</span>
       </div>
     </div>
-  );
+  )
 
   useEffect(() => {
     const fetchReviews = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/visited-place/reviews`, {
-          params: { placeId: id }
-        });
-        setReviewList(response.data);
+          params: { placeId: id },
+        })
+        setReviewList(response.data)
       } catch (error) {
-        console.error("리뷰 리스트 불러오기 오류:", error);
+        console.error("리뷰 리스트 불러오기 오류:", error)
       }
-    };
-    fetchReviews();
-  }, [id]);
+    }
+    fetchReviews()
+  }, [id])
+
+  const handleReportToggle = (reviewId) => {
+    setShowReportDropdown((prev) => ({
+      ...prev,
+      [reviewId]: !prev[reviewId],
+    }))
+  }
+
+  const handleReport = async (reviewId, reason) => {
+    if (!isLoggedIn) {
+      alert("로그인이 필요한 서비스입니다.")
+      navigate("/login")
+      return
+    }
+
+    try {
+      const userId = localStorage.getItem("userId")
+      const reportData = {
+        userId: Number(userId),
+        targetId: reviewId,
+        targetType: "VISITEDPLACE",
+        reason: reason,
+      }
+
+      await axios.post(`${API_BASE_URL}/report`, reportData)
+      alert(`리뷰가 '${reason}' 사유로 신고되었습니다.`)
+      setShowReportDropdown((prev) => ({
+        ...prev,
+        [reviewId]: false,
+      }))
+    } catch (error) {
+      console.error("신고 처리 오류:", error)
+      alert("신고 처리 중 오류가 발생했습니다.")
+    }
+  }
+
+  // 리뷰 수정 시작
+  const handleEditReview = (review) => {
+    setNewReview({
+      rating: review.rating,
+      note: review.note,
+      visitDate: review.visitDate,
+    })
+    setIsEditMode(true)
+    setCurrentEditReviewId(review.visitId)
+    setShowReviewForm(true)
+
+    // 리뷰 폼으로 스크롤
+    if (reviewRef.current) {
+      reviewRef.current.scrollIntoView({ behavior: "smooth" })
+    }
+  }
 
   const renderReviewList = () => (
     <div>
       {reviewList.length === 0 ? (
         <p style={{ fontSize: "1.2rem" }}>아직 등록된 방문후기가 없습니다.</p>
       ) : (
-        reviewList.map((review, idx) => (
-          <div key={idx} className="review-item">
-            <div className="review-header">
-              <span className="review-author">{review.userName || "익명"}</span>
-              <span className="review-rating">| 평점: {review.rating}</span>
-              <span className="review-dates">
-                방문일: {review.visitDate} | 작성일: {review.createdAt}
-              </span>
+        reviewList.map((review, idx) => {
+          const isCurrentUserReview = isLoggedIn && Number(localStorage.getItem("userId")) === review.userId
+
+          return (
+            <div key={idx} className="place-detail-review-item">
+              <div className="place-detail-review-header">
+                <span className="place-detail-review-author">{review.userName || "익명"}</span>
+                <div className="place-detail-review-rating-stars">{renderStarsWithNumber(review.rating)}</div>
+                <span className="place-detail-review-dates">
+                  방문일: {review.visitDate} | 작성일: {review.createdAt}
+                </span>
+
+                {/* 작성자인 경우 수정/삭제 버튼 표시 */}
+                {isCurrentUserReview && (
+                  <div className="place-detail-review-actions">
+                    <button className="btn btn-sm btn-outline-primary me-2" onClick={() => handleEditReview(review)}>
+                      수정
+                    </button>
+                    <button
+                      className="btn btn-sm btn-outline-danger"
+                      onClick={() => handleReviewDelete(review.visitId)}
+                    >
+                      삭제
+                    </button>
+                  </div>
+                )}
+
+                {/* 작성자가 아닌 경우 신고 버튼 표시 */}
+                {isLoggedIn && !isCurrentUserReview && (
+                  <div className="place-detail-report-dropdown-container">
+                    <button
+                      className="btn btn-sm btn-link text-secondary place-detail-report-btn"
+                      onClick={() => handleReportToggle(review.visitId)}
+                    >
+                      <i className="bi bi-flag"></i> 
+                    </button>
+                    {showReportDropdown[review.visitId] && (
+                      <div className="place-detail-report-dropdown">
+                        <div className="place-detail-report-dropdown-header">신고 사유 선택</div>
+                        <div
+                          className="place-detail-report-dropdown-item"
+                          onClick={() => handleReport(review.visitId, "영리 목적/홍보성")}
+                        >
+                          영리 목적/홍보성
+                        </div>
+                        <div
+                          className="place-detail-report-dropdown-item"
+                          onClick={() => handleReport(review.visitId, "욕설/인신공격")}
+                        >
+                          욕설/인신공격
+                        </div>
+                        <div
+                          className="place-detail-report-dropdown-item"
+                          onClick={() => handleReport(review.visitId, "스팸")}
+                        >
+                          스팸
+                        </div>
+                        <div
+                          className="place-detail-report-dropdown-item"
+                          onClick={() => handleReport(review.visitId, "기타")}
+                        >
+                          기타
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+              <div className="place-detail-review-content">{review.note}</div>
             </div>
-            <div className="review-content">{review.note}</div>
-          </div>
-        ))
+          )
+        })
       )}
     </div>
-  );
+  )
 
   if (loading) {
     return (
       <>
         <Navbar isLoggedIn={isLoggedIn} />
-        <div className="places-background">
+        <div className="place-detail-background">
           <div className="container mt-5 text-center">
             <div className="spinner-border text-primary" role="status">
               <span className="visually-hidden">Loading...</span>
@@ -610,10 +784,10 @@ const userId = localStorage.getItem("userId")
     <>
       <Navbar isLoggedIn={isLoggedIn} />
 
-      <div className="places-background">
+      <div className="place-detail-background">
         <div className="container py-4 place-detail-container">
           {/* Back button */}
-          <button className="btn btn-outline-secondary mb-3" onClick={() => navigate("/places")}>
+          <button className="place-detail-btn-outline-secondary mb-3" onClick={() => navigate("/places")}>
             <i className="bi bi-arrow-left me-1"></i> 목록으로
           </button>
 
@@ -621,13 +795,12 @@ const userId = localStorage.getItem("userId")
           {!loading && place && (
             <>
               {renderImageSection()}
-              <div className="row mb-3">
-                <div className="col">
+              <div className="place-detail-row place-detail-mb-3">
+                <div className="place-detail-col">
                   <div className="d-flex justify-content-between align-items-start">
                     <div>
                       {renderCategoryAndRating()}
-                      <h3 className="mb-1">{place.name}</h3>
-                      <p className="text-muted mb-1">{place.address}</p>
+                      <h3 className="place-detail-mb-1">{place.name}</h3>
                     </div>
                   </div>
                   <p className="text-muted mb-3" style={{ fontSize: "15px" }}>
@@ -638,9 +811,9 @@ const userId = localStorage.getItem("userId")
                     {renderPetSizeIcons(place.petSizeCategories)}
 
                     {place.amenities?.length > 0 && (
-                      <div className="amenities mb-3">
+                      <div className="place-detail-amenities mb-3">
                         {place.amenities.map((amenity, index) => (
-                          <span key={index} className="badge amenity-badge">
+                          <span key={index} className="place-detail-badge place-detail-amenity-badge">
                             {amenity}
                           </span>
                         ))}
@@ -651,18 +824,18 @@ const userId = localStorage.getItem("userId")
               </div>
 
               {/* Place information */}
-              <div className="card mb-4 info-card">
+              <div className="card mb-4 place-detail-info-card">
                 <div className="card-body">
-                  <div className="row">
-                    <div className="col-md-6">
-                      <h4 className="section-title mb-3">장소 정보</h4>
-                      <dl className="row">
-                        <dt className="col-sm-4">주소</dt>
-                        <dd className="col-sm-8">
+                  <div className="place-detail-row">
+                    <div className="place-detail-col-md-6">
+                      <h4 className="place-detail-section-titleplaceinfo mb-3">장소 정보</h4>
+                      <dl className="place-detail-row">
+                        <dt className="place-detail-col-sm-4">주소</dt>
+                        <dd className="place-detail-col-sm-8">
                           {place.address}
                           <button
                             type="button"
-                            className="btn-icon-copy ms-2"
+                            className="place-detail-btn-icon-copy ms-2"
                             onClick={() => navigator.clipboard.writeText(place.address)}
                             title="주소 복사"
                           >
@@ -670,30 +843,30 @@ const userId = localStorage.getItem("userId")
                           </button>
                         </dd>
 
-                        <dt className="col-sm-4">운영시간</dt>
-                        <dd className="col-sm-8">{place.operatingHours}</dd>
+                        <dt className="place-detail-col-sm-4">운영시간</dt>
+                        <dd className="place-detail-col-sm-8">{place.operatingHours}</dd>
 
-                        <dt className="col-sm-4">휴무일</dt>
-                        <dd className="col-sm-8">{place.closedDay}</dd>
+                        <dt className="place-detail-col-sm-4">휴무일</dt>
+                        <dd className="place-detail-col-sm-8">{place.closedDay}</dd>
 
-                        <dt className="col-sm-4">입장료</dt>
-                        <dd className="col-sm-8">{place.entryFee}</dd>
+                        <dt className="place-detail-col-sm-4">입장료</dt>
+                        <dd className="place-detail-col-sm-8">{place.entryFee}</dd>
                       </dl>
                     </div>
-                    <div className="col-md-6">
-                      <h4 className="section-title mb-3">추가 정보</h4>
-                      <dl className="row">
-                        <dt className="col-sm-4">주차여부</dt>
-                        <dd className="col-sm-8">{place.parkingAvailable}</dd>
+                    <div className="place-detail-col-md-6">
+                      <h4 className="place-detail-section-titleadditionalinfo mb-3">추가 정보</h4>
+                      <dl className="place-detail-row">
+                        <dt className="place-detail-col-sm-4">주차여부</dt>
+                        <dd className="place-detail-col-sm-8">{place.parkingAvailable}</dd>
 
-                        <dt className="col-sm-4">실외여부</dt>
-                        <dd className="col-sm-8">{place.isOutdoor}</dd>
+                        <dt className="place-detail-col-sm-4">실외여부</dt>
+                        <dd className="place-detail-col-sm-8">{place.isOutdoor}</dd>
 
-                        <dt className="col-sm-4">문의 및 안내</dt>
-                        <dd className="col-sm-8">{place.phoneNumber}</dd>
+                        <dt className="place-detail-col-sm-4">문의 및 안내</dt>
+                        <dd className="place-detail-col-sm-8">{place.phoneNumber}</dd>
 
-                        <dt className="col-sm-4">반려견 추가 요금</dt>
-                        <dd className="col-sm-8">{place.petExtraCharge}</dd>
+                        <dt className="place-detail-col-sm-4">반려견 추가 요금</dt>
+                        <dd className="place-detail-col-sm-8">{place.petExtraCharge}</dd>
                       </dl>
                     </div>
                   </div>
@@ -701,8 +874,8 @@ const userId = localStorage.getItem("userId")
               </div>
 
               {/* 방문 후기 섹션 */}
-              <div className="review-section mt-4" ref={reviewRef}>
-                <h3 className="section-title mb-3">방문 후기</h3>
+              <div className="place-detail-review-section mt-4" ref={reviewRef}>
+                <h3 className="place-detail-section-titlereview mb-3">방문 후기</h3>
                 {renderReviewList()}
                 {renderReviewSection()}
               </div>
@@ -726,5 +899,4 @@ const userId = localStorage.getItem("userId")
     </>
   )
 }
-
 export default PlaceDetailPage

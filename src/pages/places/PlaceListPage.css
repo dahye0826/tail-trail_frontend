@@ -23,22 +23,30 @@
   border: 1px solid var(--border-color);
 }
 
-/* 장소 헤더 스타일 개선 - 언더바와 색상 제거하고 심플하게 수정 */
+/* 장소 헤더 스타일 개선 */
+.place-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
 .place-header h2 {
-  color: var(--accent-color); /* 원래 색상으로 복원 */
-  font-weight: 600; /* 약간 더 가벼운 폰트 무게 */
+  color: var(--accent-color);
+  font-weight: 600;
   margin-bottom: 1rem;
+text-align: center;
   position: relative;
   display: inline-block;
   padding-bottom: 0;
+  font-size: 1.5rem;
 }
 
 /* 언더바 제거 */
 .place-header h2:after {
-  content: none; /* 언더바 제거 */
+  content: none; 
 }
 
-/* 부제목도 심플하게 */
 .subtitle {
   color: #6c757d;
   font-size: 1rem;
@@ -60,18 +68,25 @@
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
-.form-select,
-.form-control {
+/* 셀렉트 박스 스타일 */
+.filter-container .form-select {
   border: 1px solid #dee2e6;
   border-radius: 4px;
   padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-color);
+  background-color: white;
   transition: all 0.2s ease;
 }
 
-.form-select:focus,
-.form-control:focus {
+.filter-container .form-select:focus {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 0.2rem rgba(78, 205, 196, 0.25);
+}
+
+.filter-container .form-select option {
+  font-size: 0.9rem;
+  padding: 0.5rem;
 }
 
 .btn-primary {
@@ -390,9 +405,6 @@
     margin-bottom: 15px;
   }
 
-  .place-header h2 {
-    font-size: 1.5rem;
-  }
 
   .subtitle {
     font-size: 1rem;
@@ -434,4 +446,137 @@
   background-color: white;
   border: none;
   margin: 2rem 0;
+}
+
+/* 추천 장소 카드 스타일 */
+.recommended-section .place-card {
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.recommended-section .card-img-top {
+  height: 150px;
+  object-fit: cover;
+}
+
+.recommended-section .card-body {
+  padding: 0.75rem;
+}
+
+.recommended-section .card-title {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.recommended-section .card-text {
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.recommended-section .badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* 추천 장소 섹션 스타일 */
+.recommended-section {
+  margin-bottom: 2rem;
+}
+
+.recommended-section h4 {
+  margin-bottom: 1.5rem;
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+.recommended-section .row {
+  justify-content: center;
+}
+
+.recommended-section .place-card {
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+/* 커스텀 드롭다운 스타일 */
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background-color: white;
+  border: 1.5px solid var(--secondary-color);
+  border-radius: 10px;
+  cursor: pointer;
+  height: var(--input-height);
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.dropdown-header:hover {
+  border-color: var(--primary-color);
+}
+
+.dropdown-header.active {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(78, 205, 196, 0.2);
+}
+
+.dropdown-icon {
+  color: var(--accent-color);
+  transition: transform 0.2s ease;
+}
+
+.dropdown-icon.open {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  display: none;
+}
+
+.dropdown-menu.open {
+  display: block;
+}
+
+.dropdown-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: var(--light-bg);
+}
+
+.dropdown-item.selected {
+  background-color: #d4f0e9;
+  color: #2a9d8f;
+  font-weight: 500;
+}
+
+.dropdown-item:first-child {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.dropdown-item:last-child {
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
 }

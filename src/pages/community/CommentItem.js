@@ -96,11 +96,25 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
   }
 
   // 신고 처리
-  const handleReport = (reason) => {
-    // 여기에 신고 API 호출 로직 추가
-    alert(`댓글이 '${reason}' 사유로 신고되었습니다.`)
-    setShowReportDropdown(false)
-  }
+  const handleReport = async (reason) => {
+    if (!window.confirm(`이 댓글을 '${reason}' 사유로 신고하시겠습니까?`)) return;
+  
+    try {
+      await axios.post("http://localhost:9000/api/report", {
+        targetId: comment.commentId,     // 신고할 댓글 ID
+        targetType: "COMMENT",            // 댓글이니까 COMMENT
+        reason: reason,                   // 선택한 신고 사유
+        reporterId: currentUser?.userId,  // 현재 로그인한 사용자 ID
+      });
+  
+      alert("신고가 접수되었습니다.");
+    } catch (error) {
+      console.error("댓글 신고 오류:", error);
+      alert("댓글 신고에 실패했습니다.");
+    } finally {
+      setShowReportDropdown(false);
+    }
+  };
 
   return (
     <div className="comment-item">

@@ -334,10 +334,12 @@ export const favoriteAPI = {
       return Promise.reject(new Error("사용자 ID를 찾을 수 없습니다"));
     }
     
-    // 직접 요청 수행 - 숫자형으로 변환
-    return api.post(`/favorites`, {
-      userId: Number(userId),
-      placeId: Number(placeId)
+    // 토글 엔드포인트 사용
+    return api.post(`/favorites/toggle`, null, {
+      params: {
+        userId: Number(userId),
+        placeId: Number(placeId)
+      }
     });
   },
 
@@ -352,8 +354,23 @@ export const favoriteAPI = {
       return Promise.reject(new Error("사용자 ID를 찾을 수 없습니다"));
     }
     
-    // 직접 요청 수행
-    return api.delete(`/favorites/${userId}/${placeId}`);
+    // 토글 엔드포인트 사용
+    return api.post(`/favorites/toggle`, null, {
+      params: {
+        userId: Number(userId),
+        placeId: Number(placeId)
+      }
+    });
+  },
+
+  // 토글 메서드 추가
+  toggleFavorite: (userId, placeId) => {
+    return api.post(`/favorites/toggle`, null, {
+      params: {
+        userId: Number(userId),
+        placeId: Number(placeId)
+      }
+    });
   },
 
   checkFavorite: (userId, placeId) => api.get(`/favorites/check`, {

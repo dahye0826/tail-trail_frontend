@@ -11,7 +11,7 @@ body {
   background-color: white;
 }
 
-.places-background {
+.place-detail-background {
   background-color: white;
   padding: 1rem 0 3rem;
   margin-bottom: -3rem;
@@ -26,8 +26,8 @@ body {
   border: 1px solid var(--border-color);
 }
 
-/* 모든 h3 태그에서 배경, 테두리, 패딩 제거하여 언더바 효과 없애기 */
-h3 {
+/* 기본 h3 스타일 수정 */
+.place-detail-container h3:not(.section-titleplacedetail):not(.section-titlelocation):not(.section-titlereview) {
   color: var(--text-color);
   font-weight: 600;
   background-color: transparent;
@@ -37,50 +37,50 @@ h3 {
   border: none;
 }
 
-.info-card,
-.review-card {
+.place-detail-info-card,
+.place-detail-review-card {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   background-color: white;
   border: 1px solid var(--border-color);
 }
 
-.review-card {
+.place-detail-review-card {
   border-left: 4px solid var(--primary-color);
   margin-bottom: 1rem;
 }
 
 /* 정보 카드 제목 스타일 */
-.info-card h4 {
+.place-detail-info-card h4 {
   color: var(--text-color);
 }
 
-.review-card .card-title {
+.place-detail-review-card .place-detail-card-title {
   color: var(--primary-color);
   font-size: 1.2rem;
   font-weight: 600;
 }
 
-.info-card dt {
+.place-detail-info-card dt {
   font-weight: 600;
   color: var(--text-color);
 }
 
-.info-card dd {
+.place-detail-info-card dd {
   margin-bottom: 0.5rem;
 }
 
-.rating-display {
+.place-detail-rating-display {
   font-size: 0.9rem;
   vertical-align: middle;
 }
 
-.rating-text {
+.place-detail-rating-text {
   margin-left: 0.5rem;
   color: #6c757d;
 }
 
-.map-placeholder {
+.place-detail-map-placeholder {
   position: relative;
   border-radius: 8px;
   overflow: hidden;
@@ -88,7 +88,7 @@ h3 {
   border: 1px solid var(--border-color);
 }
 
-.admin-controls-container {
+.place-detail-admin-controls-container {
   text-align: right;
   margin-top: 2rem;
   padding: 1rem;
@@ -97,7 +97,7 @@ h3 {
   border: 1px solid var(--border-color);
 }
 
-.badge {
+.place-detail-badge {
   font-size: 0.75rem;
   font-weight: 500;
   padding: 0.35rem 0.65rem;
@@ -106,19 +106,31 @@ h3 {
   border-radius: 20px;
 }
 
-.category-badge {
-  background-color: var(--secondary-color);
-  color: var(--text-color);
+/* 카테고리 배지 래퍼 추가 - 카테고리를 아래로 내리기 위한 스타일 */
+.place-detail-category-badge-wrapper {
+  margin-top: 8px;
+  margin-bottom: 4px;
 }
 
-.amenity-badge {
+/* 카테고리 배지 스타일 수정 */
+.place-detail-category-badge {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.place-detail-amenity-badge {
   background-color: var(--light-bg);
   color: var(--accent-color);
   border: 1px solid var(--border-color);
 }
 
 /* 목록으로 돌아가기 버튼 스타일 - 커뮤니티 스타일과 일치시킴 */
-.btn-outline-secondary {
+.place-detail-btn-outline-secondary {
   color: var(--primary-color);
   border-color: var(--primary-color);
   background-color: white;
@@ -128,59 +140,59 @@ h3 {
   transition: all 0.2s;
 }
 
-.btn-outline-secondary:hover {
+.place-detail-btn-outline-secondary:hover {
   background-color: var(--primary-color);
   color: white;
   border-color: var(--primary-color);
 }
 
 /* 네이버/카카오 지도 버튼 스타일 */
-.nav-card .btn-success {
+.place-detail-nav-card .btn-success {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
 }
 
-.nav-card .btn-success:hover {
+.place-detail-nav-card .btn-success:hover {
   background-color: var(--accent-color);
   border-color: var(--accent-color);
 }
 
-.nav-card .btn-warning {
+.place-detail-nav-card .btn-warning {
   background-color: var(--secondary-color);
   border-color: var(--secondary-color);
   color: var(--text-color);
 }
 
-.nav-card .btn-warning:hover {
+.place-detail-nav-card .btn-warning:hover {
   background-color: #8fd3e8;
   border-color: #8fd3e8;
 }
 
 /* 리뷰 작성 버튼 스타일 */
-.btn-primary {
+.place-detail-btn-primary {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
 }
 
-.btn-primary:hover {
+.place-detail-btn-primary:hover {
   background-color: var(--accent-color);
   border-color: var(--accent-color);
 }
 
 /* 반려견 크기 아이콘 스타일 */
-.pet-size-icons .badge {
+.place-detail-pet-size-icons .place-detail-badge {
   background-color: var(--secondary-color);
   color: var(--text-color);
   font-weight: 500;
   padding: 0.35rem 0.75rem;
 }
 
-.container {
+.place-detail-container {
   max-width: 1140px;
   margin: 0 auto;
 }
 
-.post-meta {
+.place-detail-post-meta {
   background-color: white;
   padding: 10px;
   border-radius: 8px;
@@ -189,7 +201,7 @@ h3 {
 }
 
 /* 장소 이름 스타일 수정 */
-.place-detail-container h3.mb-1 {
+.place-detail-container h3.place-detail-mb-1 {
   color: var(--text-color);
   font-weight: 700;
   background-color: transparent;
@@ -199,7 +211,7 @@ h3 {
 }
 
 /* 위치 섹션 제목 스타일 통일 */
-.row h3.mb-3 {
+.place-detail-row h3.place-detail-mb-3 {
   background-color: transparent;
   border: none;
   padding: 0;
@@ -207,7 +219,7 @@ h3 {
 }
 
 /* 리뷰 섹션 제목 스타일 통일 */
-.d-flex h3.mb-0 {
+.place-detail-d-flex h3.place-detail-mb-0 {
   background-color: transparent;
   border: none;
   padding: 0;
@@ -215,88 +227,122 @@ h3 {
 }
 
 /* 카카오맵 길찾기 버튼 스타일 개선 */
-.kakao-directions-top {
+.place-detail-kakao-directions-top {
   display: none;
 }
 
-.btn-kakao {
+.place-detail-btn-kakao {
   display: none;
 }
 
 /* 후기 없음 영역 디자인 수정 */
-.no-reviews-container {
-  background-color: white;
-  border-radius: 12px;
-  padding: 2.5rem 1.5rem;
+.place-detail-no-reviews-container {
+  padding: 1.5rem;
   text-align: center;
   border: 1px dashed var(--border-color);
-  margin-bottom: 2rem;
+  border-radius: 8px;
+  background-color: #f8f9fa;
 }
 
-.no-reviews-icon {
+.place-detail-no-reviews-icon {
   font-size: 3rem;
   color: var(--secondary-color);
   margin-bottom: 1rem;
 }
 
-.no-reviews-text {
+.place-detail-no-reviews-text {
   font-size: 1.2rem;
   color: var(--text-color);
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
 
-.no-reviews-subtext {
+.place-detail-no-reviews-subtext {
   color: #6c757d;
   font-size: 0.95rem;
 }
 
 /* 지도 컨테이너 높이 조정 */
-.map-container {
+.place-detail-map-container {
   border-radius: 12px !important;
-  overflow: hidden  !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08)  !important;
-  margin-bottom: 2rem  !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  margin-bottom: 2rem !important;
 }
 
 /* 리뷰 폼 카드 스타일 개선 */
-.review-form-card {
+.place-detail-review-form-card {
   border: 1px solid var(--border-color);
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.review-form-card .card-title {
+.place-detail-review-form-card .place-detail-card-title {
   color: var(--accent-color);
   font-weight: 600;
 }
 
-.rating-select {
+.place-detail-rating-select {
   cursor: pointer;
   font-size: 1.5rem;
 }
 
 /* 섹션 제목 스타일 통일 */
-.section-title {
+.place-detail-section-titleplacedetail,
+.place-detail-section-titleplacename,
+.place-detail-section-titleplaceinfo,
+.place-detail-section-titleadditionalinfo,
+.place-detail-section-titlelocation,
+.place-detail-section-titlereview {
   color: var(--text-color);
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin-bottom: 1.2rem;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+/* 방문 후기 제목 스타일 - 밑줄을 글자 길이에만 맞추기 */
+.place-detail-section-titlereview {
+  color: var(--text-color);
+  font-weight: 700;
   font-size: 1.5rem;
   margin-bottom: 1rem;
   position: relative;
 }
 
-.section-title::after {
+.place-detail-section-titlereview::after,
+.place-detail-section-titleplacedetail::after,
+.place-detail-section-titleplacename::after,
+.place-detail-section-titleplaceinfo::after,
+.place-detail-section-titleadditionalinfo::after,
+.place-detail-section-titlelocation::after,
+.place-detail-row .place-detail-section-title::after {
   content: "";
   position: absolute;
-  bottom: -8px;
+  bottom: 0;
   left: 0;
   width: 100%;
   height: 2px;
   background-color: var(--primary-color);
 }
 
+/* 장소 이름 스타일 추가 조정 */
+.place-detail-section-titleplacename {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+/* 장소 정보와 추가 정보 제목 크기 조정 */
+.place-detail-section-titleplaceinfo,
+.place-detail-section-titleadditionalinfo {
+  font-size: 1.3rem;
+  color: var(--text-color);
+}
+
 /* 주소 복사 아이콘 버튼 스타일 */
-.btn-icon-copy {
+.place-detail-btn-icon-copy {
   background: none;
   border: none;
   color: var(--primary-color);
@@ -307,13 +353,13 @@ h3 {
   transition: all 0.2s;
 }
 
-.btn-icon-copy:hover {
+.place-detail-btn-icon-copy:hover {
   color: var(--accent-color);
   transform: scale(1.1);
 }
 
 /* 카카오맵 작은 길찾기 버튼 스타일 */
-.btn-kakao-small {
+.place-detail-btn-kakao-small {
   background-color: #fee500;
   color: #000000;
   border: none;
@@ -328,138 +374,151 @@ h3 {
   transition: all 0.2s ease;
 }
 
-.btn-kakao-small:hover {
+.place-detail-btn-kakao-small:hover {
   background-color: #f6dc00;
   color: #000000;
   text-decoration: none;
 }
 
-.btn-kakao-small i {
+.place-detail-btn-kakao-small i {
   font-size: 0.8rem;
   margin-right: 0.2rem;
 }
 
 /* 방문 후기 제목 스타일 */
-.review-title {
+.place-detail-review-title {
   padding-bottom: 8px;
 }
 
 /* 위치 섹션 제목 스타일도 통일 */
-.row .section-title {
-  padding-bottom: 8px;
+.place-detail-row .place-detail-section-title {
+  padding-bottom: 10px;
+  margin-bottom: 1.2rem;
+  color: var(--text-color);
 }
 
 /* 모바일 대응 스타일 */
 @media (max-width: 768px) {
-  .map-container {
+  .place-detail-map-container {
     min-height: 300px !important;
     max-height: 400px !important;
     height: auto !important;
   }
 
-  h3 {
+  .place-detail-container h3 {
     font-size: 1.5rem;
   }
 
-  .info-card .row {
+  .place-detail-info-card .place-detail-row {
     flex-direction: column;
   }
 
-  .info-card .col-md-6:last-child h4 {
+  .place-detail-info-card .place-detail-col-md-6:last-child h4 {
     margin-top: 1.5rem;
   }
 
-  .kakao-directions-top {
+  .place-detail-kakao-directions-top {
     justify-content: center;
     margin-bottom: 1.5rem;
   }
 
-  .btn-kakao {
+  .place-detail-btn-kakao {
     width: 100%;
     justify-content: center;
   }
 
-  .btn-kakao-small {
+  .place-detail-btn-kakao-small {
     margin-top: 0.5rem;
     margin-left: 0 !important;
     display: inline-flex;
   }
 
-  .btn-icon-copy {
+  .place-detail-btn-icon-copy {
     margin-top: 0.5rem;
   }
 }
 
 /* 방문 후기 섹션 스타일 */
-.review-section {
-  background-color: #fff;
+.place-detail-review-section {
+  background-color: white;
   border-radius: 12px;
   padding: 2rem;
-
 }
 
-.review-content {
+/* 리뷰 컨텐츠 스타일 개선 - 다른 카드와 통일 */
+.place-detail-review-content {
   background-color: #f8f9fa;
   border-radius: 8px;
   padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1rem;
 }
 
-.review-text-container {
+.place-detail-review-text-container {
   background-color: white;
   border-radius: 8px;
   padding: 1.5rem;
   border: 1px solid #e9ecef;
+  margin-top: 0.5rem;
 }
 
-.review-text {
+.place-detail-review-form {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 0;
+  border: 1px solid #e9ecef;
+}
+
+.place-detail-review-text {
   font-size: 1rem;
   line-height: 1.6;
   color: #343a40;
   margin-bottom: 1rem;
 }
 
-.rating {
+.place-detail-rating {
   display: flex;
   align-items: center;
   font-size: 1.1rem;
 }
 
-.rating i {
+.place-detail-rating i {
   color: #ffc107;
   margin-right: 2px;
 }
 
-.rating span {
+.place-detail-rating span {
   color: #495057;
   font-weight: 500;
 }
 
-.no-review {
+.place-detail-no-review {
   background-color: #f8f9fa;
   border-radius: 8px;
   padding: 2rem;
   text-align: center;
 }
 
-.review-icon {
+.place-detail-review-icon {
   font-size: 2.5rem;
   color: #adb5bd;
   margin-bottom: 1rem;
 }
 
-.place-detail-header {
+.place-detail-place-detail-header {
   display: flex;
   align-items: center;
   gap: 1rem;
   margin-bottom: 1rem;
 }
 
-.place-detail-header h1 {
+.place-detail-place-detail-header h1 {
   margin: 0;
   font-size: 2rem;
 }
 
-.btn-favorite {
+.place-detail-btn-favorite {
   position: absolute;
   top: 1rem;
   right: 1rem;
@@ -477,36 +536,36 @@ h3 {
   z-index: 10;
 }
 
-.btn-favorite:hover {
+.place-detail-btn-favorite:hover {
   transform: scale(1.1);
   background-color: white;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
 }
 
-.btn-favorite i {
+.place-detail-btn-favorite i {
   font-size: 1.5rem;
   color: #ccc;
   transition: color 0.2s ease;
 }
 
-.btn-favorite:hover i {
+.place-detail-btn-favorite:hover i {
   color: #ff4b4b;
 }
 
-.btn-favorite.active i {
+.place-detail-btn-favorite.active i {
   color: #ff4b4b;
 }
 
-.position-relative {
+.place-detail-position-relative {
   position: relative;
 }
 
 /* 이미지 컨테이너에 relative 포지션 추가 */
-.row.mb-4 .col {
+.place-detail-row.place-detail-mb-4 .place-detail-col {
   position: relative;
 }
 
-.average-rating-container {
+.place-detail-average-rating-container {
   background-color: #f8f9fa;
   border-radius: 8px;
   padding: 1.5rem;
@@ -514,109 +573,442 @@ h3 {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.average-rating-container h3 {
+.place-detail-average-rating-container h3 {
   font-size: 1.25rem;
   color: #343a40;
   margin-bottom: 1rem;
 }
 
-.average-rating {
+.place-detail-average-rating {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.average-rating .rating-stars {
+.place-detail-average-rating .place-detail-rating-stars {
   font-size: 1.5rem;
 }
 
-.average-rating .rating-count {
+.place-detail-average-rating .place-detail-rating-count {
   font-size: 1.25rem;
   color: #495057;
   font-weight: 500;
 }
 
 /* 별점 애니메이션 효과 */
-.average-rating .star {
+.place-detail-average-rating .place-detail-star {
   transition: transform 0.2s ease;
 }
 
-.average-rating:hover .star {
+.place-detail-average-rating:hover .place-detail-star {
   transform: scale(1.1);
 }
 
-.category-rating-container {
+/* 카테고리 컨테이너 수정 */
+.place-detail-category-rating-container {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 8px;
   margin-bottom: 12px;
   background-color: #f8f9fa;
   padding: 8px 12px;
   border-radius: 8px;
-  display: inline-flex;
 }
 
-.category-rating-container .category-badge {
-  font-size: 0.9rem;
-  padding: 4px 8px;
-  background-color: var(--primary-color);
-  color: white;
-  border-radius: 4px;
-  margin: 0;
-}
-
-.category-rating-container .rating-display {
+/* 별점 표시 컨테이너 수정 */
+.place-detail-category-rating-container .place-detail-rating-display {
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
-.category-rating-container .rating-count {
+.place-detail-category-rating-container .place-detail-rating-count {
   font-size: 0.9rem;
   color: #666;
   margin-left: 4px;
 }
 
-.category-rating-container i {
+.place-detail-category-rating-container i {
   color: #ffd700;
   font-size: 0.9rem;
 }
 
 /* 현수정: 방문후기 카드 스타일 */
-.review-item {
-  background: #f8f9fa;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  padding: 1.5rem 1.2rem;
-  margin-bottom: 1.5rem;
-  font-size: 1.3rem; /* 글자 크기 1.3배 */
-  transition: box-shadow 0.2s;
+.place-detail-review-item {
+  border-bottom: 1px solid #eee;
+  padding: 15px 0;
+  position: relative;
 }
-.review-item:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+
+.place-detail-review-item:last-child {
+  border-bottom: none;
 }
-.review-item .review-header {
+
+.place-detail-review-header {
   display: flex;
   align-items: center;
-  gap: 1.2rem;
-  margin-bottom: 0.7rem;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  position: relative;
 }
-.review-item .review-author {
+
+.place-detail-review-author {
+  font-weight: 600;
+  margin-right: 10px;
+}
+
+.place-detail-review-rating {
+  margin-right: 10px;
+}
+
+.place-detail-review-dates {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.place-detail-review-content {
+  margin-bottom: 10px;
+  white-space: pre-line;
+}
+
+/* 리뷰 작성자 액션 버튼 스타일 */
+.place-detail-review-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 5px;
+}
+
+/* 신고 드롭다운 스타일 */
+.place-detail-report-dropdown-container {
+  margin-left: auto;
+  position: relative;
+}
+
+.place-detail-report-btn {
+  padding: 0;
+  font-size: 0.85rem;
+}
+
+.place-detail-report-dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 150px;
+}
+
+.place-detail-report-dropdown-header {
+  padding: 8px 12px;
+  font-weight: 600;
+  border-bottom: 1px solid #eee;
+}
+
+.place-detail-report-dropdown-item {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.place-detail-report-dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+/* 모바일 대응 */
+@media (max-width: 768px) {
+  .place-detail-review-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .place-detail-review-author,
+  .place-detail-review-rating {
+    margin-bottom: 5px;
+  }
+
+  .place-detail-review-actions,
+  .place-detail-report-dropdown-container {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+}
+
+.place-detail-user-initial-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.place-detail-review-author-info {
+  flex: 1;
+}
+
+.place-detail-review-author {
   font-weight: bold;
   color: #2d3a4b;
-}
-.review-item .review-rating {
-  color: #ffb400;
-  font-size: 1.1em;
-}
-.review-item .review-dates {
-  margin-left: auto;
-  font-size: 0.95em;
-  color: #888;
-}
-.review-item .review-content {
-  margin-top: 0.5rem;
   margin-bottom: 0.2rem;
-  line-height: 1.7;
-  color: #222;
+}
+
+.place-detail-review-dates {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.place-detail-review-rating {
+  font-size: 0.9rem;
+}
+
+.place-detail-review-content-text {
+  margin: 0.5rem 0 1rem;
+  line-height: 1.6;
+}
+
+/* 별점 선택 스타일 */
+.place-detail-star-rating {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.place-detail-star-icon {
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin-right: 0.25rem;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.place-detail-star-icon:hover {
+  transform: scale(1.2);
+}
+
+.place-detail-rating-text {
+  font-size: 1rem;
+  color: #6c757d;
+}
+
+/* 방문 후기 작성하기 버튼 스타일 */
+.place-detail-review-write-btn {
+  margin: 0 auto;
+  display: block;
+  min-width: 200px;
+}
+
+/* 방문 후기 카드 컨테이너 스타일 */
+.place-detail-review-card-container {
+  /* 기존 스타일 제거하고 info-card 스타일 상속 */
+}
+
+/* 후기 아이콘 스타일 */
+.place-detail-no-reviews-icon {
+  font-size: 4rem;
+  color: var(--secondary-color);
+  margin-bottom: 1.5rem;
+}
+
+.place-detail-no-reviews-icon i {
+  display: inline-block;
+  animation: place-detail-pulse 2s infinite;
+}
+
+@keyframes place-detail-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 장소 이름과 별점 나란히 배치 */
+.place-detail-place-name-rating {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.place-detail-place-rating {
+  display: flex;
+  align-items: center;
+}
+
+/* 카테고리 태그 스타일 - 선과 겹치지 않게 여백 추가 */
+.place-detail-place-category {
+  color: var(--text-color);
+  font-size: 0.95rem;
+  margin-top: 20px;
+  padding: 4px 10px;
+  background-color: var(--secondary-color);
+  border-radius: 4px;
+  display: inline-block;
+}
+
+/* 리뷰 신고 관련 스타일 추가 */
+.place-detail-review-rating-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.place-detail-report-icon-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.place-detail-report-icon {
+  color: #adb5bd;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.place-detail-report-icon:hover {
+  color: #dc3545;
+}
+
+.place-detail-reported-icon {
+  color: #dc3545;
+  font-size: 0.9rem;
+}
+
+.place-detail-report-dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  width: 200px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  overflow: hidden;
+  border: 1px solid #e9ecef;
+}
+
+.place-detail-report-dropdown-header {
+  padding: 10px 15px;
+  font-weight: 600;
+  border-bottom: 1px solid #e9ecef;
+  background-color: #f8f9fa;
+}
+
+.place-detail-report-dropdown-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.place-detail-report-dropdown-item:hover {
+  background-color: #f8f9fa;
+  color: #dc3545;
+}
+
+/* 신고 버튼 스타일 */
+.place-detail-report-button {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: #6c757d;
+  font-size: 0.85rem;
+  transition: color 0.2s;
+}
+
+.place-detail-report-button:hover {
+  color: #dc3545;
+}
+
+.place-detail-reported-icon {
+  display: flex;
+  align-items: center;
+  color: #dc3545;
+  font-size: 0.85rem;
+}
+
+.place-detail-report-icon {
+  margin-right: 4px;
+}
+
+.place-detail-report-text {
+  font-size: 0.85rem;
+  margin-left: 3px;
+}
+
+/* 신고 드롭다운 위치 조정 */
+.place-detail-report-dropdown {
+  right: 0;
+  top: 25px;
+}
+
+/* 리뷰 신고 버튼 스타일 추가 */
+.place-detail-report-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.place-detail-report-btn {
+  padding: 0;
+  color: #6c757d;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.place-detail-report-btn:hover {
+  color: #dc3545;
+}
+
+.place-detail-report-text {
+  font-size: 0.8rem;
+  vertical-align: middle;
+}
+
+/* 이미지 크기 및 비율 조정 */
+.place-detail-image {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* 이미지 컨테이너 스타일 */
+.place-detail-position-relative {
+  position: relative;
+  width: 100%;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 즐겨찾기 버튼 위치 조정 */
+.place-detail-btn-favorite {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 10;
 }

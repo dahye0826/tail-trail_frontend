@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback, useMemo } from "react"
+import { useState, useEffect, useCallback, useMemo, useRef } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import "bootstrap-icons/font/bootstrap-icons.css"
 import "bootstrap/dist/css/bootstrap.min.css"
@@ -11,6 +11,7 @@ import axios from "axios"
 import { favoriteAPI } from "../../services/api"
 
 const API_BASE_URL = "http://localhost:9000/api"
+const ML_SERVER_URL = "http://localhost:9001"
 
 function PlaceListPage() {
   // State management
@@ -32,6 +33,8 @@ function PlaceListPage() {
   const [totalPages, setTotalPages] = useState(5)
   const [totalResults, setTotalResults] = useState(0)
   const [error, setError] = useState(null)
+  const [recommendedPlaces, setRecommendedPlaces] = useState([])
+  const [loadingRecommendations, setLoadingRecommendations] = useState(false)
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -61,8 +64,23 @@ function PlaceListPage() {
 
   // Initialize data and check login status
   useEffect(() => {
+    const checkLoginStatus = () => {
+      const userId = localStorage.getItem("userId");
+      console.log("Checking login status - UserId:", userId);
+      
+      // userId가 존재하면 로그인 상태로 간주
+      const loggedIn = !!userId;
+      console.log("Setting isLoggedIn to:", loggedIn);
+      setIsLoggedIn(loggedIn);
+      
+      return loggedIn;
+    };
+
     const fetchInitialData = async () => {
       try {
+        // 먼저 로그인 상태 확인
+        const isUserLoggedIn = checkLoginStatus();
+        
         // Load cities and categories
         const [citiesResponse, categoriesResponse] = await Promise.all([
           axios.get(`${API_BASE_URL}/places/cities`),
@@ -72,10 +90,8 @@ function PlaceListPage() {
         if (citiesResponse.data) setCities(citiesResponse.data)
         if (categoriesResponse.data) setCategories(categoriesResponse.data)
 
-        // Check login status and load favorites if logged in
-        const token = localStorage.getItem("token")
-        if (token) {
-          setIsLoggedIn(true)
+        // 로그인된 경우에만 즐겨찾기 로드
+        if (isUserLoggedIn) {
           await fetchFavorites()
         }
       } catch (error) {
@@ -85,6 +101,26 @@ function PlaceListPage() {
 
     fetchInitialData()
   }, [])
+
+  // 로그인 상태 변경 감지
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const userId = localStorage.getItem("userId");
+      const newLoginStatus = !!userId;
+      console.log("Storage changed - New login status:", newLoginStatus);
+      setIsLoggedIn(newLoginStatus);
+    };
+
+    // storage 이벤트 리스너 추가
+    window.addEventListener('storage', handleStorageChange);
+    
+    // 초기 로그인 상태 확인
+    handleStorageChange();
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   // Fetch user favorites
   const fetchFavorites = async () => {
@@ -208,6 +244,51 @@ function PlaceListPage() {
     setPetSizeDisplay(sizeDisplayMap)
   }, [places, calculatePetSizeCategories])
 
+  // 추천 장소 로드
+  useEffect(() => {
+    console.log("Recommendation useEffect - isLoggedIn:", isLoggedIn);
+    const loadRecommendations = async () => {
+      const userId = localStorage.getItem("userId");
+      console.log("Current userId:", userId);
+      
+      if (!userId) {
+        console.log("No userId found, skipping recommendations");
+        return;
+      }
+
+      try {
+        console.log("Starting to load recommendations...");
+        setLoadingRecommendations(true);
+        
+        const response = await axios.post(`${ML_SERVER_URL}/recommend`, { userId });
+        console.log("Recommendation response:", response.data);
+
+        if (response.data && response.data.recommendedPlaceIds) {
+          const top3Ids = response.data.recommendedPlaceIds.slice(0, 3);
+          console.log("Top 3 recommended place IDs:", top3Ids);
+          
+          const placeDetailsPromises = top3Ids.map(placeId => 
+            axios.get(`${API_BASE_URL}/places/${placeId}`)
+          );
+          
+          const placeDetailsResponses = await Promise.all(placeDetailsPromises);
+          const placeDetails = placeDetailsResponses.map(response => response.data);
+          console.log("Place details:", placeDetails);
+          
+          setRecommendedPlaces(placeDetails);
+        }
+      } catch (error) {
+        console.error("추천 장소 로드 실패:", error);
+      } finally {
+        setLoadingRecommendations(false);
+      }
+    };
+
+    if (isLoggedIn) {
+      loadRecommendations();
+    }
+  }, [isLoggedIn]);
+
   // Event handlers
   const handleSearch = () => setCurrentPage(1)
 
@@ -224,32 +305,34 @@ function PlaceListPage() {
 
   const handleFavoriteToggle = useCallback(
     async (placeId, e) => {
-      e.stopPropagation()
+      e.stopPropagation();
       if (!isLoggedIn) {
-        navigate("/login", { state: { from: location } })
-        return
+        navigate("/login", { state: { from: location } });
+        return;
       }
-
+  
       try {
-        const userId = localStorage.getItem("userId")
-        const isFavorited = favorites.includes(placeId)
-
-        if (isFavorited) {
-          // 즐겨찾기 삭제
-          await favoriteAPI.removeFavorite(placeId, userId)
-          setFavorites(favorites.filter((id) => id !== placeId))
-        } else {
-          // 즐겨찾기 추가
-          await favoriteAPI.addFavorite(placeId, userId)
-          setFavorites([...favorites, placeId])
+        const userId = localStorage.getItem("userId");
+  
+        const response = await axios.post(`${API_BASE_URL}/favorites/toggle`, null, {
+          params: { userId: Number(userId), placeId: Number(placeId) },
+        });
+  
+        if (response.data.success) {
+          if (response.data.isAdded) {
+            setFavorites([...favorites, placeId]);
+          } else {
+            setFavorites(favorites.filter((id) => id !== placeId));
+          }
         }
       } catch (error) {
-        console.error("즐겨찾기 처리 오류:", error)
-        alert("즐겨찾기 업데이트 중 오류가 발생했습니다.")
+        console.error("즐겨찾기 처리 오류:", error);
+        alert("즐겨찾기 업데이트 중 오류가 발생했습니다.");
       }
     },
     [isLoggedIn, navigate, location, favorites]
-  )
+  );
+  
 
   const handleResetFilters = () => {
     setRegionFilter("")
@@ -374,13 +457,13 @@ function PlaceListPage() {
           aria-label={`${place.placeName} - ${place.city} ${place.district}`}
         >
           <div className="card-img-container">
-          <img
-            src={place.placeImage ? `http://localhost:9000${place.placeImage}` : "/assets/default-pet-place.jpg"}
-             className="card-img-top"
-            alt={place.placeName}
-            loading="lazy"
-            onError={(e) => {e.target.src = "/assets/default-pet-place.jpg"}}
-          />
+            <img
+              src={place.placeImage ? `http://localhost:9000${place.placeImage}` : "/assets/default-pet-place.jpg"}
+              className="card-img-top"
+              alt={place.placeName}
+              loading="lazy"
+              onError={(e) => { e.target.src = "/assets/default-pet-place.jpg" }}
+            />
             {isLoggedIn && (
               <button
                 className="btn-favorite"
@@ -411,96 +494,177 @@ function PlaceListPage() {
     )
   }
 
+  const CustomDropdown = ({ options, value, onChange, placeholder }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef(null);
+
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+          setIsOpen(false);
+        }
+      };
+
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }, []);
+
+    const handleSelect = (option) => {
+      onChange(option);
+      setIsOpen(false);
+    };
+
+    const selectedLabel = value ? options.find(opt => opt.value === value)?.label : placeholder;
+
+    return (
+      <div className="custom-dropdown" ref={dropdownRef}>
+        <div 
+          className={`dropdown-header ${isOpen ? 'active' : ''}`}
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <span>{selectedLabel}</span>
+          <i className={`bi bi-chevron-down dropdown-icon ${isOpen ? 'open' : ''}`}></i>
+        </div>
+        {isOpen && (
+          <div className="dropdown-menu open">
+            {options.map((option) => (
+              <div
+                key={option.value}
+                className={`dropdown-item ${value === option.value ? 'selected' : ''}`}
+                onClick={() => handleSelect(option.value)}
+              >
+                {option.label}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // Render main component
   return (
     <>
       <Navbar isLoggedIn={isLoggedIn} />
-
+{/* /**zz */}
       <div className="places-background">
         <div className="container mt-4 mb-5">
           <div className="places-content-wrapper">
             {/* Header */}
-            <div className="place-header text-center">
-              <h2 className="mb-4">반려동물과 함께하는 장소</h2>
-              <p className="subtitle mb-5">반려동물과 함께 방문할 수 있는 다양한 장소를 찾아보세요.</p>
+            <div className="place-header">
+              <h2>반려동물과 함께하는 장소</h2>
+              <p className="subtitle">반려동물과 함께 방문할 수 있는 다양한 장소를 찾아보세요.</p>
             </div>
+
+            {/* 추천 장소 섹션 - 필터 컨테이너 위로 이동 */}
+            {isLoggedIn && (
+              <div className="recommended-section mb-4">
+                <h4 className="mb-3">좋아할만한 장소</h4>
+                <div className="row row-cols-1 row-cols-md-3 g-4">
+                  {loadingRecommendations ? (
+                    <div className="col-12 text-center">
+                      <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
+                    </div>
+                  ) : recommendedPlaces.length > 0 ? (
+                    recommendedPlaces.map((place) => (
+                      <div key={place.placeId} className="col">
+                        <div
+                          className="card h-100 place-card"
+                          onClick={() => handlePlaceClick(place.placeId)}
+                          style={{ cursor: "pointer" }}
+                        >
+                          <img
+                            src={place.placeImage ? `http://localhost:9000${place.placeImage}` : "/assets/default-pet-place.jpg"}
+                            className="card-img-top"
+                            alt={place.placeName}
+                            loading="lazy"
+                            onError={(e) => { e.target.src = "/assets/default-pet-place.jpg" }}
+                          />
+                          <div className="card-body">
+                            <span className={`badge ${getCategoryBadgeClass(place.industryMain)}`}>
+                              {place.industryMain}
+                            </span>
+                            <h5 className="card-title mt-2">{place.placeName}</h5>
+                            <p className="card-text">
+                              <i className="bi bi-geo-alt me-1"></i> {place.city} {place.district}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="col-12">
+                      <p className="text-center">추천할 장소가 없습니다.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Filters and search */}
             <div className="filter-container p-3 mb-4 rounded shadow-sm">
               <div className="row g-3">
                 <div className="col-md-3">
-                  <select
-                    className="form-select"
+                  <CustomDropdown
+                    options={[
+                      { value: "", label: "지역 선택" },
+                      ...cities.map(city => ({ value: city, label: city }))
+                    ]}
                     value={regionFilter}
-                    onChange={(e) => {
-                      setRegionFilter(e.target.value)
-                      setCurrentPage(1)
+                    onChange={(value) => {
+                      setRegionFilter(value);
+                      setCurrentPage(1);
                     }}
-                    aria-label="지역 선택"
-                  >
-                    <option value="">지역 선택</option>
-                    {cities.map((city, index) => (
-                      <option key={index} value={city}>
-                        {city}
-                      </option>
-                    ))}
-                  </select>
+                    placeholder="지역 선택"
+                  />
                 </div>
                 <div className="col-md-2">
-                  <select
-                    className="form-select"
+                  <CustomDropdown
+                    options={[
+                      { value: "", label: "카테고리 선택" },
+                      ...Object.keys(categoryMapping).map(category => ({ value: category, label: category }))
+                    ]}
                     value={categoryFilter}
-                    onChange={(e) => {
-                      setCategoryFilter(e.target.value)
-                      setCurrentPage(1)
+                    onChange={(value) => {
+                      setCategoryFilter(value);
+                      setCurrentPage(1);
                     }}
-                    aria-label="카테고리 선택"
-                  >
-                    <option value="">카테고리 선택</option>
-                    {Object.keys(categoryMapping).map((category, index) => (
-                      <option key={index} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
+                    placeholder="카테고리 선택"
+                  />
                 </div>
                 {categoryFilter === "숙박업소" && (
                   <div className="col-md-2">
-                    <select
-                      className="form-select"
+                    <CustomDropdown
+                      options={[
+                        { value: "", label: "세부 카테고리" },
+                        ...subCategories.map(subCat => ({ value: subCat, label: subCat }))
+                      ]}
                       value={subCategoryFilter}
-                      onChange={(e) => {
-                        setSubCategoryFilter(e.target.value)
-                        setCurrentPage(1)
+                      onChange={(value) => {
+                        setSubCategoryFilter(value);
+                        setCurrentPage(1);
                       }}
-                      aria-label="세부 카테고리 선택"
-                    >
-                      <option value="">세부 카테고리</option>
-                      {subCategories.map((subCat, index) => (
-                        <option key={index} value={subCat}>
-                          {subCat}
-                        </option>
-                      ))}
-                    </select>
+                      placeholder="세부 카테고리"
+                    />
                   </div>
                 )}
                 <div className="col-md-2">
-                  <select
-                    className="form-select"
+                  <CustomDropdown
+                    options={[
+                      { value: "", label: "반려견 크기" },
+                      ...petSizes.map(size => ({ value: size.value, label: size.label }))
+                    ]}
                     value={petSizeFilter}
-                    onChange={(e) => {
-                      setPetSizeFilter(e.target.value)
-                      setCurrentPage(1)
+                    onChange={(value) => {
+                      setPetSizeFilter(value);
+                      setCurrentPage(1);
                     }}
-                    aria-label="반려견 크기 선택"
-                  >
-                    <option value="">반려견 크기</option>
-                    {petSizes.map((size, index) => (
-                      <option key={index} value={size.value}>
-                        {size.label}
-                      </option>
-                    ))}
-                  </select>
+                    placeholder="반려견 크기"
+                  />
                 </div>
                 <div className={categoryFilter === "숙박업소" ? "col-md-3" : "col-md-5"}>
                   <div className="input-group">

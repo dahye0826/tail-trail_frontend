@@ -320,6 +320,22 @@
   margin-top: 2px;
 }
 
+/* 별점 스타일 추가 */
+.star-rating {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  margin: 2px 0;
+}
+
+.star-rating i {
+  margin-right: 1px;
+}
+
+.place-info-rating {
+  margin-bottom: 5px;
+}
+
 /* 지도 컨테이너 스타일 */
 .map-container {
   position: relative;
