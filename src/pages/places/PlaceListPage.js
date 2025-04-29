@@ -309,13 +309,14 @@ function PlaceListPage() {
 
   const handleFavoriteToggle = useCallback(
     async (placeId, e) => {
-      e.stopPropagation()
+      e.stopPropagation();
       if (!isLoggedIn) {
-        navigate("/login", { state: { from: location } })
-        return
+        navigate("/login", { state: { from: location } });
+        return;
       }
-
+  
       try {
+<<<<<<< HEAD
         const userId = localStorage.getItem("userId")
         if (!userId) {
           alert("로그인이 필요한 서비스입니다.")
@@ -343,15 +344,29 @@ function PlaceListPage() {
           } else {
             setFavorites(prev => prev.filter(id => id !== placeId))
             alert("즐겨찾기가 해제되었습니다.")
+=======
+        const userId = localStorage.getItem("userId");
+  
+        const response = await axios.post(`${API_BASE_URL}/favorites/toggle`, null, {
+          params: { userId: Number(userId), placeId: Number(placeId) },
+        });
+  
+        if (response.data.success) {
+          if (response.data.isAdded) {
+            setFavorites([...favorites, placeId]);
+          } else {
+            setFavorites(favorites.filter((id) => id !== placeId));
+>>>>>>> e0ab5398ed1d6b82e6166a63747454127361ce7f
           }
         }
       } catch (error) {
-        console.error("즐겨찾기 처리 오류:", error)
-        alert("즐겨찾기 업데이트 중 오류가 발생했습니다.")
+        console.error("즐겨찾기 처리 오류:", error);
+        alert("즐겨찾기 업데이트 중 오류가 발생했습니다.");
       }
     },
     [isLoggedIn, navigate, location, favorites]
-  )
+  );
+  
 
   const handleResetFilters = () => {
     setRegionFilter("")

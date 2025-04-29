@@ -1,3 +1,5 @@
+"use client"
+
 import axios from "axios"
 import { useState, useEffect } from "react"
 import "./ReportManagementPage.css"
@@ -59,24 +61,44 @@ function ReportManagement() {
             author: response.data.userName,
             createdAt: response.data.createdAt,
           })
+
           break
 
         case "VISITEDPLACE":
           response = await axios.get(`http://localhost:9000/api/visited-place/${report.targetId}`)
           setContentData({
-            content: response.data.reviewContent,
+            note: response.data.note,
             rating: response.data.rating,
             author: response.data.userName,
             createdAt: response.data.createdAt,
+            visitDate: response.data.visitDate,
           })
           break
 
         default:
-          setContentData({ content: "지원되지 않는 콘텐츠 유형입니다." })
+          setContentData({ note: "지원되지 않는 콘텐츠 유형입니다." })
       }
-    } catch (err) {
-      console.error("콘텐츠 상세 정보 로딩 오류:", err)
-      setContentData({ error: "콘텐츠를 불러오는데 실패했습니다." })
+    }catch (err) {
+      console.error("콘텐츠 상세 정보 로딩 오류:", err);
+    
+      if (report.targetType === "COMMENT") {
+        // 댓글이 없으면 별도 메시지 표시
+        setContentData({ 
+          error: "이미 삭제된 댓글입니다."
+        });
+      } else if (report.targetType === "POST") {
+        setContentData({ 
+          error: "이미 삭제된 게시글입니다."
+        });
+      } else if (report.targetType === "VISITEDPLACE") {
+        setContentData({ 
+          error: "이미 삭제된 방문 기록입니다."
+        });
+      } else {
+        setContentData({ 
+          error: "콘텐츠를 불러오는데 실패했습니다."
+        });
+      }
     } finally {
       setContentLoading(false)
     }
@@ -97,6 +119,7 @@ function ReportManagement() {
   }
 
   // 신고 처리 (승인/거부)
+  // 신고 처리 (승인/거부)
   const handleProcessReport = async (reportId, action, targetType, targetId) => {
     // 확인 대화상자 표시
     let confirmMessage = ""
@@ -106,20 +129,14 @@ function ReportManagement() {
       confirmMessage = "정말로 이 게시물을 남기겠습니까?"
     }
 
-    // 사용자가 취소하면 함수 종료
     if (!window.confirm(confirmMessage)) {
       return
     }
 
     try {
-      await axios.put(`http://localhost:9000/api/report/${reportId}`, {
-        status: action === "approve" ? "APPROVED" : "REJECTED",
-      })
-
-      // 승인 시 해당 콘텐츠 삭제 API 호출
       if (action === "approve") {
+        // 승인일 때 → 원본 콘텐츠 삭제
         try {
-          // 콘텐츠 유형에 따라 다른 API 엔드포인트 호출
           switch (targetType) {
             case "POST":
               await axios.delete(`http://localhost:9000/api/community/${targetId}`)
@@ -127,7 +144,7 @@ function ReportManagement() {
             case "COMMENT":
               await axios.delete(`http://localhost:9000/api/comments/${targetId}`)
               break
-            case "VISTEDPLACE":
+            case "VISITEDPLACE":
               await axios.delete(`http://localhost:9000/api/visited-place/${targetId}`)
               break
             default:
@@ -136,14 +153,17 @@ function ReportManagement() {
         } catch (deleteErr) {
           console.error("콘텐츠 삭제 오류:", deleteErr)
           alert("콘텐츠 삭제 중 오류가 발생했습니다.")
-          return 
+          return
         }
       }
+
+      // 승인이든 거부든 신고 자체는 삭제
+      await axios.delete(`http://localhost:9000/api/report/${reportId}`)
 
       // 처리 후 목록에서 제거
       setReports((prevReports) => prevReports.filter((report) => report.reportId !== reportId))
 
-      // 모달이 열려있었다면 닫기
+      // 모달 닫기
       if (showModal && selectedReport && selectedReport.reportId === reportId) {
         handleCloseModal()
       }
@@ -239,12 +259,13 @@ function ReportManagement() {
           </div>
         </div>
       )
-    } else if (selectedReport.targetType === "VISTEDPLACE") {
+    } else if (selectedReport.targetType === "VISITEDPLACE") {
       return (
         <div className="content-details">
           <div className="content-meta">
             <span className="content-author">{contentData.author}</span>
-            <span className="content-date">{formatDate(contentData.createdAt)}</span>
+            <span className="content-date">작성일:{formatDate(contentData.createdAt)}</span>
+            <span className="content-date">방문일:{formatDate(contentData.visitDate)}</span>
             <div className="content-rating">
               {[...Array(5)].map((_, i) => (
                 <i key={i} className={`bi ${i < contentData.rating ? "bi-star-fill" : "bi-star"} text-warning`}></i>
@@ -252,7 +273,7 @@ function ReportManagement() {
             </div>
           </div>
           <div className="content-body mt-3">
-            <p>{contentData.content}</p>
+            <p>{contentData.note}</p>
           </div>
         </div>
       )
@@ -342,15 +363,45 @@ function ReportManagement() {
 
       {/* 콘텐츠 상세 모달 */}
       {showModal && selectedReport && (
-        <div className="modal-backdrop">
-          <div className="content-modal">
-            <div className="modal-header">
-              <h5 className="modal-title">{getTargetTypeText(selectedReport.targetType)} 상세 내용</h5>
-              <button type="button" className="btn-close" onClick={handleCloseModal}></button>
+        <div className="report-modal-backdrop">
+          <div className="report-content-modal">
+            <div className="report-modal-header">
+              <h5 className="report-modal-title">{getTargetTypeText(selectedReport.targetType)} 상세 내용</h5>
+              <button type="button" className="report-btn-close" onClick={handleCloseModal}>
+                ×
+              </button>
             </div>
-            <div className="modal-body">{renderContentDetails()}</div>
-            <div className="modal-footer">
-              <button className="btn-secondary" onClick={handleCloseModal}>
+            <div className="report-modal-body">{renderContentDetails()}</div>
+            <div className="report-modal-footer">
+              <div className="report-action-buttons">
+                <button
+                  className="report-btn-approve"
+                  onClick={() =>
+                    handleProcessReport(
+                      selectedReport.reportId,
+                      "approve",
+                      selectedReport.targetType,
+                      selectedReport.targetId,
+                    )
+                  }
+                >
+                  승인 (콘텐츠 삭제)
+                </button>
+                <button
+                  className="report-btn-reject"
+                  onClick={() =>
+                    handleProcessReport(
+                      selectedReport.reportId,
+                      "reject",
+                      selectedReport.targetType,
+                      selectedReport.targetId,
+                    )
+                  }
+                >
+                  거부 (콘텐츠 유지)
+                </button>
+              </div>
+              <button className="report-btn-secondary" onClick={handleCloseModal}>
                 닫기
               </button>
             </div>
