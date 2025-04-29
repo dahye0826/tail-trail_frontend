@@ -379,7 +379,7 @@ const HomePage = () => {
               </div>
             ) : (
               <Row className="review-cards">
-                {reviews.length > 0 ? (
+                {reviews.length > 0 &&
                   reviews.map((review) => (
                     <Col md={6} lg={3} className="mb-4" key={review.visitId}>
                       <Link to={`/places/place/${review.placeId}`} className="text-decoration-none">
@@ -408,12 +408,7 @@ const HomePage = () => {
                         </div>
                       </Link>
                     </Col>
-                  ))
-                ) : (
-                  <Col className="text-center py-4">
-                    <p>아직 등록된 리뷰가 없습니다.</p>
-                  </Col>
-                )}
+                  ))}
               </Row>
             )}
           </Container>
