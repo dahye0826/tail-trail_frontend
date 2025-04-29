@@ -60,13 +60,29 @@ body {
   background: linear-gradient(to right, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.1) 100%);
 }
 
+/* 기존 배너 콘텐츠 스타일 (데스크톱용) */
 .banner-content {
   position: absolute;
-  top: 50%;
-  transform: translateY(-160%);
+  top: 30%;
+  transform: translateY(-50%);
   left: 10%;
   z-index: 2;
   color: white;
+}
+
+/* 모바일용 배너 콘텐츠 스타일 추가 */
+.banner-content-mobile {
+  position: absolute;
+  top: 60%;
+  transform: translateY(-180%) !important;
+  left: 10%;
+  z-index: 2;
+  color: white;
+}
+
+/* 기본적으로 모바일 콘텐츠는 숨김 */
+.banner-content-mobile {
+  display: none;
 }
 
 /* 배너 콘텐츠 크기도 키우기 */
@@ -87,7 +103,7 @@ body {
 /* 모바일 로그인/회원가입 버튼 스타일 - 중앙 배치로 수정 */
 .mobile-auth-buttons {
   position: absolute;
-  top: 50%;
+  top: 70%; /* 50%에서 70%로 변경하여 하단으로 이동 */
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 10;
@@ -538,10 +554,29 @@ body {
   }
 }
 
-/* 반응형 스타일 */
+/* 반응형 스타일 - 모바일에서 배너 콘텐츠와 버튼 위치 추가 조정 */
 @media (max-width: 768px) {
+  /* 모바일 화면에서는 데스크톱 콘텐츠를 숨기고 모바일 콘텐츠를 표시 */
+  .banner-content {
+    display: none;
+  }
+
+  .banner-content-mobile {
+    display: block;
+  }
+
+  /* 모바일에서 배너 상단에 패딩 추가하여 네비바에 가려지지 않도록 함 */
+  .rounded-banner {
+    margin-top: 20px;
+  }
+
   .banner-image {
     height: 400px; /* 300px에서 400px로 증가 */
+  }
+
+  .banner-content-mobile {
+    top: 60%; /* 50%에서 60%로 변경하여 더 아래로 이동 */
+    transform: translateY(-50%);
   }
 
   .banner-content h1 {
@@ -567,6 +602,17 @@ body {
   /* 모바일에서 로그인/회원가입 버튼 표시 */
   .mobile-auth-buttons {
     display: flex;
+    top: 80%; /* 70%에서 80%로 변경하여 더 아래로 이동 */
+  }
+
+  /* 홈페이지 컨테이너에 상단 패딩 추가 */
+  .home-page {
+    padding-top: 20px;
+  }
+
+  /* 배너 컨테이너에 상단 패딩 추가 */
+  .py-4 {
+    padding-top: 2rem !important;
   }
 }
 

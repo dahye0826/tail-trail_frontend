@@ -212,7 +212,7 @@ const MyPage = () => {
                     <div className="profile-card mb-4">
                       <div className="row">
                         <div className="col-md-3 text-center mb-3 mb-md-0">
-                          <div className="profile-avatar">{userData.userName.charAt(0)}</div>
+                          <div className="profile-avatar-mypage">{userData.userName.charAt(0)}</div>
                         </div>
 
                         <div className="col-md-9">

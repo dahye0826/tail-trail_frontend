@@ -110,7 +110,7 @@ function PostDetailPage() {
       alert("이미 신고하셨습니다!")
       return // 여기서 바로 함수 종료
     }
-    const confirmReport = window.confirm(`정말로 "${reason}" 사유로 신고하시겠습니까?`)
+    const confirmReport = window.confirm(`이 게시물을 "${reason}" 사유로 신고하시겠습니까?`)
     if (!confirmReport) {
       return // 취소 누르면 신고 요청 안 보내고 끝냄
     }
