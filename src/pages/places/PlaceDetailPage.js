@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect, useCallback, useRef } from "react"
 import { useParams, useNavigate, Link, useLocation } from "react-router-dom"
 import axios from "axios"
@@ -38,6 +36,8 @@ function PlaceDetailPage() {
   const [reviewList, setReviewList] = useState([])
   const [showReportDropdown, setShowReportDropdown] = useState({})
   const [hoverRating, setHoverRating] = useState(0)
+  // Add notification state similar to PlaceListPage
+  const [notification, setNotification] = useState({ show: false, message: "", type: "success" })
 
   // Format incoming place data
   const formatPlaceData = useCallback((placeData) => {
@@ -109,6 +109,16 @@ function PlaceDetailPage() {
     checkUserReview()
   }, [reviewList, checkUserReview])
 
+  // Function to show notification similar to PlaceListPage
+  const showNotification = (message, type = "success") => {
+    setNotification({ show: true, message, type });
+    
+    // Auto hide after 3 seconds
+    setTimeout(() => {
+      setNotification({ show: false, message: "", type: "success" });
+    }, 3000);
+  };
+
   // 방문 후기 제출
   const handleReviewSubmit = async (e) => {
     e.preventDefault()
@@ -153,14 +163,14 @@ function PlaceDetailPage() {
         // 폼 상태 초기화
         resetFormState()
 
-        alert("방문 후기가 등록되었습니다.")
+        showNotification("방문 후기가 등록되었습니다.")
 
         // 평균 별점 다시 가져오기
         fetchAverageRating()
       }
     } catch (error) {
       console.error("리뷰 제출 오류:", error)
-      alert("방문 후기 등록에 실패했습니다. 오류: " + error.message)
+      showNotification("방문 후기 등록에 실패했습니다.", "error")
     }
   }
 
@@ -195,14 +205,14 @@ function PlaceDetailPage() {
         // 폼 상태 초기화
         resetFormState()
 
-        alert("방문 후기가 수정되었습니다.")
+        showNotification("방문 후기가 수정되었습니다.")
 
         // 평균 별점 다시 가져오기
         fetchAverageRating()
       }
     } catch (error) {
       console.error("리뷰 수정 오류:", error)
-      alert("방문 후기 수정에 실패했습니다. 오류: " + error.message)
+      showNotification("방문 후기 수정에 실패했습니다.", "error")
     }
   }
 
@@ -225,13 +235,13 @@ function PlaceDetailPage() {
       // 폼 상태 초기화
       resetFormState()
 
-      alert("방문 후기가 삭제되었습니다.")
+      showNotification("방문 후기가 삭제되었습니다.")
 
       // 평균 별점 다시 가져오기
       fetchAverageRating()
     } catch (error) {
       console.error("리뷰 삭제 오류:", error)
-      alert("방문 후기 삭제에 실패했습니다.")
+      showNotification("방문 후기 삭제에 실패했습니다.", "error")
     }
   }
 
@@ -330,11 +340,11 @@ function PlaceDetailPage() {
       if (response.data.success) {
         setIsFavorite(response.data.isAdded)
         const message = response.data.isAdded ? "즐겨찾기에 추가되었습니다." : "즐겨찾기가 해제되었습니다."
-        alert(message)
+        showNotification(message)
       }
     } catch (error) {
       console.error("즐겨찾기 처리 실패:", error)
-      alert("즐겨찾기 처리 중 오류가 발생했습니다.")
+      showNotification("즐겨찾기 처리 중 오류가 발생했습니다.", "error")
     }
   }
 
@@ -445,31 +455,41 @@ function PlaceDetailPage() {
     )
   }
 
-  // 방문 후기 폼 렌더링
-  const renderReviewForm = () => (
-    <form onSubmit={isEditMode ? handleReviewUpdate : handleReviewSubmit} className="place-detail-review-form">
-      {renderStarRating()}
-      <div className="mb-3">
-        <label className="form-label">후기 내용</label>
-        <textarea
-          className="form-control"
-          rows="4"
-          value={newReview.note}
-          onChange={(e) => setNewReview({ ...newReview, note: e.target.value })}
-          placeholder="방문 후기를 작성해주세요"
-          required
-        ></textarea>
-      </div>
-      <div className="d-flex justify-content-end gap-2">
-        <button type="button" className="btn btn-secondary" onClick={resetFormState}>
-          취소
-        </button>
-        <button type="submit" className="btn btn-primary">
-          {isEditMode ? "수정하기" : "등록하기"}
-        </button>
-      </div>
-    </form>
-  )
+  // 방문 후기 폼 렌더링 - 수정된 버튼 스타일 적용
+const renderReviewForm = () => (
+  <form onSubmit={isEditMode ? handleReviewUpdate : handleReviewSubmit} className="place-detail-review-form">
+    {renderStarRating()}
+    <div className="mb-3">
+      <label className="form-label">후기 내용</label>
+      <textarea
+        className="form-control"
+        rows="4"
+        value={newReview.note}
+        onChange={(e) => setNewReview({ ...newReview, note: e.target.value })}
+        placeholder="방문 후기를 작성해주세요"
+        required
+      ></textarea>
+    </div>
+    {/* 수정된 버튼 스타일: 취소 버튼과 등록하기 버튼을 동일한 크기로 설정 */}
+    <div className="d-flex justify-content-end">
+      <button 
+        type="button" 
+        className="btn btn-secondary me-2" 
+        onClick={resetFormState}
+        style={{ width: '100px' }}
+      >
+        취소
+      </button>
+      <button 
+        type="submit" 
+        className="btn btn-primary"
+        style={{ width: '100px' }}
+      >
+        {isEditMode ? "수정하기" : "등록하기"}
+      </button>
+    </div>
+  </form>
+)
 
   // 방문 후기 섹션 렌더링
   const renderReviewSection = () => {
@@ -655,14 +675,14 @@ function PlaceDetailPage() {
       }
 
       await axios.post(`${API_BASE_URL}/report`, reportData)
-      alert(`리뷰가 '${reason}' 사유로 신고되었습니다.`)
+      showNotification(`리뷰가 '${reason}' 사유로 신고되었습니다.`)
       setShowReportDropdown((prev) => ({
         ...prev,
         [reviewId]: false,
       }))
     } catch (error) {
       console.error("신고 처리 오류:", error)
-      alert("신고 처리 중 오류가 발생했습니다.")
+      showNotification("신고 처리 중 오류가 발생했습니다.", "error")
     }
   }
 
@@ -689,8 +709,8 @@ function PlaceDetailPage() {
         <p style={{ fontSize: "1.2rem" }}>아직 등록된 방문후기가 없습니다.</p>
       ) : (
         reviewList.map((review, idx) => {
-          const isCurrentUserReview = isLoggedIn && Number(localStorage.getItem("userId")) === review.userId
-
+          const isCurrentUserReview = isLoggedIn && Number(localStorage.getItem("userId")) === review.userId;
+  
           return (
             <div key={idx} className="place-detail-review-item">
               <div className="place-detail-review-header">
@@ -699,22 +719,27 @@ function PlaceDetailPage() {
                 <span className="place-detail-review-dates">
                   방문일: {review.visitDate} | 작성일: {review.createdAt}
                 </span>
-
-                {/* 작성자인 경우 수정/삭제 버튼 표시 */}
+  
+                {/* 작성자인 경우 수정/삭제 버튼 표시 - 스타일 업데이트 */}
                 {isCurrentUserReview && (
-                  <div className="place-detail-review-actions">
-                    <button className="btn btn-sm btn-outline-primary me-2" onClick={() => handleEditReview(review)}>
-                      수정
-                    </button>
-                    <button
-                      className="btn btn-sm btn-outline-danger"
-                      onClick={() => handleReviewDelete(review.visitId)}
-                    >
-                      삭제
-                    </button>
-                  </div>
-                )}
-
+  <div className="place-detail-review-actions">
+    <button 
+      className="btn btn-sm btn-link" 
+      onClick={() => handleEditReview(review)}
+      style={{ textDecoration: 'none', color: '#0d6efd' }}
+    >
+      수정
+    </button>
+    <button
+      className="btn btn-sm btn-link text-danger"
+      onClick={() => handleReviewDelete(review.visitId)}
+      style={{ textDecoration: 'none' }}
+    >
+      삭제
+    </button>
+  </div>
+)}
+  
                 {/* 작성자가 아닌 경우 신고 버튼 표시 */}
                 {isLoggedIn && !isCurrentUserReview && (
                   <div className="place-detail-report-dropdown-container">
@@ -746,7 +771,7 @@ function PlaceDetailPage() {
                           스팸
                         </div>
                         <div
-    className="place-detail-report-dropdown-item"
+                          className="place-detail-report-dropdown-item"
                           onClick={() => handleReport(review.visitId, "기타")}
                         >
                           기타
@@ -758,11 +783,24 @@ function PlaceDetailPage() {
               </div>
               <div className="place-detail-review-content">{review.note}</div>
             </div>
-          )
+          );
         })
       )}
     </div>
-  )
+  );
+  
+  // Render notification toast similar to PlaceListPage
+  const renderNotification = () => {
+    if (!notification.show) return null;
+    
+    return (
+      <div className={`place-notification ${notification.type === "error" ? "place-notification-error" : ""}`}>
+        <div className="place-notification-content">
+          {notification.message}
+        </div>
+      </div>
+    );
+  };
 
   if (loading) {
     return (
@@ -783,6 +821,9 @@ function PlaceDetailPage() {
   return (
     <>
       <Navbar isLoggedIn={isLoggedIn} />
+      
+      {/* Add notification toast */}
+      {renderNotification()}
 
       <div className="place-detail-background">
         <div className="container py-4 place-detail-container">
