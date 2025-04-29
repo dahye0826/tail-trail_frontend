@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect, useCallback, useMemo, useRef } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import "bootstrap-icons/font/bootstrap-icons.css"
@@ -68,13 +66,8 @@ function PlaceListPage() {
   useEffect(() => {
     const checkLoginStatus = () => {
       const userId = localStorage.getItem("userId");
-      console.log("Checking login status - UserId:", userId);
-      
-      // userId가 존재하면 로그인 상태로 간주
       const loggedIn = !!userId;
-      console.log("Setting isLoggedIn to:", loggedIn);
       setIsLoggedIn(loggedIn);
-      
       return loggedIn;
     };
 
@@ -104,6 +97,22 @@ function PlaceListPage() {
     fetchInitialData()
   }, [])
 
+  // Add event listener for page visibility to refresh favorites when returning to the page
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && isLoggedIn) {
+        fetchFavorites();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // Cleanup
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isLoggedIn]);
+
   // 로그인 상태 변경 감지
   useEffect(() => {
     const handleStorageChange = () => {
@@ -124,21 +133,79 @@ function PlaceListPage() {
     };
   }, []);
 
-  // Fetch user favorites
+  // Focus event to reload favorites when returning to this page
+  useEffect(() => {
+    const handleFocus = () => {
+      if (isLoggedIn) {
+        fetchFavorites();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [isLoggedIn]);
+
+  // location.pathname 변경 시 즐겨찾기 새로고침
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchFavorites();
+    }
+  }, [isLoggedIn, location.pathname]);
+  
+  // Improved fetch favorites function
   const fetchFavorites = async () => {
     try {
-      const userId = localStorage.getItem("userId")
-      if (!userId) return
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        console.log("사용자 ID가 없어 즐겨찾기를 가져올 수 없습니다.");
+        setFavorites([]);
+        return;
+      }
 
-      const response = await favoriteAPI.getFavorites(userId, 1, 1000)
-      if (response && response.data) {
-        const favoritesData = response.data.content || response.data
-        setFavorites(favoritesData.map(fav => fav.placeId))
+      // Direct API call instead of using favoriteAPI service which might have issues
+      const response = await axios.get(`${API_BASE_URL}/favorites`, {
+        params: {
+          userId: Number(userId),
+          page: 1,
+          size: 1000
+        }
+      });
+      
+      console.log("즐겨찾기 API 응답:", response.data);
+      
+      if (response.data) {
+        let favoritesList = [];
+        
+        // Handle different API response structures
+        if (Array.isArray(response.data)) {
+          favoritesList = response.data;
+        } else if (response.data.favorites && Array.isArray(response.data.favorites)) {
+          favoritesList = response.data.favorites;
+        } else if (response.data.content && Array.isArray(response.data.content)) {
+          favoritesList = response.data.content;
+        }
+        
+        // Extract placeId from favorite items and convert to numbers
+        const favoriteIds = favoritesList.map(item => {
+          if (typeof item === 'number') return item;
+          if (item.placeId !== undefined) return Number(item.placeId);
+          if (item.id !== undefined) return Number(item.id);
+          return null;
+        }).filter(id => id !== null);
+        
+        console.log("추출된 즐겨찾기 ID 목록:", favoriteIds);
+        setFavorites(favoriteIds);
+      } else {
+        setFavorites([]);
       }
     } catch (error) {
-      console.error("즐겨찾기 로드 오류:", error)
+      console.error("즐겨찾기 로드 오류:", error);
+      setFavorites([]);
     }
-  }
+  };
 
   // Update subcategories when category changes
   useEffect(() => {
@@ -248,26 +315,20 @@ function PlaceListPage() {
 
   // 추천 장소 로드
   useEffect(() => {
-    console.log("Recommendation useEffect - isLoggedIn:", isLoggedIn);
     const loadRecommendations = async () => {
       const userId = localStorage.getItem("userId");
-      console.log("Current userId:", userId);
       
       if (!userId) {
-        console.log("No userId found, skipping recommendations");
         return;
       }
 
       try {
-        console.log("Starting to load recommendations...");
         setLoadingRecommendations(true);
         
         const response = await axios.post(`${ML_SERVER_URL}/recommend`, { userId });
-        console.log("Recommendation response:", response.data);
 
         if (response.data && response.data.recommendedPlaceIds) {
           const top3Ids = response.data.recommendedPlaceIds.slice(0, 3);
-          console.log("Top 3 recommended place IDs:", top3Ids);
           
           const placeDetailsPromises = top3Ids.map(placeId => 
             axios.get(`${API_BASE_URL}/places/${placeId}`)
@@ -275,7 +336,6 @@ function PlaceListPage() {
           
           const placeDetailsResponses = await Promise.all(placeDetailsPromises);
           const placeDetails = placeDetailsResponses.map(response => response.data);
-          console.log("Place details:", placeDetails);
           
           setRecommendedPlaces(placeDetails);
         }
@@ -315,6 +375,7 @@ function PlaceListPage() {
 
   const handlePlaceClick = (placeId) => navigate(`/places/place/${placeId}`)
 
+  // Improved favorite toggle handler
   const handleFavoriteToggle = useCallback(
     async (placeId, e) => {
       e.stopPropagation();
@@ -325,17 +386,24 @@ function PlaceListPage() {
   
       try {
         const userId = localStorage.getItem("userId");
+        const numericPlaceId = Number(placeId);
   
         const response = await axios.post(`${API_BASE_URL}/favorites/toggle`, null, {
-          params: { userId: Number(userId), placeId: Number(placeId) },
+          params: { userId: Number(userId), placeId: numericPlaceId },
         });
   
+        console.log("즐겨찾기 토글 응답:", response.data);
+        
         if (response.data.success) {
           if (response.data.isAdded) {
-            setFavorites([...favorites, placeId]);
+            setFavorites(prevFavorites => {
+              return [...prevFavorites, numericPlaceId];
+            });
             showNotification("즐겨찾기에 추가되었습니다.");
           } else {
-            setFavorites(favorites.filter((id) => id !== placeId));
+            setFavorites(prevFavorites => {
+              return prevFavorites.filter(id => Number(id) !== numericPlaceId);
+            });
             showNotification("즐겨찾기가 해제되었습니다.");
           }
         }
@@ -344,7 +412,7 @@ function PlaceListPage() {
         showNotification("즐겨찾기 업데이트 중 오류가 발생했습니다.", "error");
       }
     },
-    [isLoggedIn, navigate, location, favorites]
+    [isLoggedIn, navigate, location]
   );
 
   const handleResetFilters = () => {
@@ -453,8 +521,15 @@ function PlaceListPage() {
     return items
   }, [currentPage, totalPages, handlePageChange])
 
-  const renderPlaceCard = (place) => {
-    const isFavorited = favorites.includes(place.placeId)
+  // Improved isFavorited function
+  const isFavorited = useCallback((placeId) => {
+    const numericPlaceId = Number(placeId);
+    return favorites.some(id => Number(id) === numericPlaceId);
+  }, [favorites]);
+
+  const renderPlaceCard = useCallback((place) => {
+    // Ensure placeId is a number for consistent comparison
+    const favorite = isFavorited(place.placeId);
 
     const handleCardClick = () => {
       handlePlaceClick(place.placeId)
@@ -481,9 +556,9 @@ function PlaceListPage() {
               <button
                 className="btn-favorite"
                 onClick={(e) => handleFavoriteToggle(place.placeId, e)}
-                aria-label={isFavorited ? "즐겨찾기 삭제" : "즐겨찾기 추가"}
+                aria-label={favorite ? "즐겨찾기 삭제" : "즐겨찾기 추가"}
               >
-                <i className={`bi ${isFavorited ? "bi-heart-fill" : "bi-heart"}`}></i>
+                <i className={`bi ${favorite ? "bi-heart-fill" : "bi-heart"}`}></i>
               </button>
             )}
           </div>
@@ -505,7 +580,7 @@ function PlaceListPage() {
         </div>
       </div>
     )
-  }
+  }, [isLoggedIn, isFavorited, handleFavoriteToggle, handlePlaceClick, getCategoryBadgeClass, renderPetSizeTags]);
 
   const CustomDropdown = ({ options, value, onChange, placeholder }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -570,6 +645,52 @@ function PlaceListPage() {
     );
   };
 
+  // Render recommended places with proper favorite state
+  const renderRecommendedPlace = (place) => {
+    const isFavorite = isFavorited(place.placeId);
+    
+    return (
+      <div key={place.placeId} className="col">
+        <div
+          className="card h-100 place-card"
+          onClick={() => handlePlaceClick(place.placeId)}
+          style={{ cursor: "pointer" }}
+        >
+          <div className="card-img-container">
+            <img
+              src={place.placeImage ? `http://localhost:9000${place.placeImage}` : "/assets/default-pet-place.jpg"}
+              className="card-img-top"
+              alt={place.placeName}
+              loading="lazy"
+              onError={(e) => { e.target.src = "/assets/default-pet-place.jpg" }}
+            />
+            {isLoggedIn && (
+              <button
+                className="btn-favorite"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleFavoriteToggle(place.placeId, e);
+                }}
+                aria-label={isFavorite ? "즐겨찾기 삭제" : "즐겨찾기 추가"}
+              >
+                <i className={`bi ${isFavorite ? "bi-heart-fill" : "bi-heart"}`}></i>
+              </button>
+            )}
+          </div>
+          <div className="card-body">
+            <span className={`badge ${getCategoryBadgeClass(place.industryMain)}`}>
+              {place.industryMain}
+            </span>
+            <h5 className="card-title mt-2">{place.placeName}</h5>
+            <p className="card-text">
+              <i className="bi bi-geo-alt me-1"></i> {place.city} {place.district}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // Render main component
   return (
     <>
@@ -598,32 +719,7 @@ function PlaceListPage() {
                       </div>
                     </div>
                   ) : recommendedPlaces.length > 0 ? (
-                    recommendedPlaces.map((place) => (
-                      <div key={place.placeId} className="col">
-                        <div
-                          className="card h-100 place-card"
-                          onClick={() => handlePlaceClick(place.placeId)}
-                          style={{ cursor: "pointer" }}
-                        >
-                          <img
-                            src={place.placeImage ? `http://localhost:9000${place.placeImage}` : "/assets/default-pet-place.jpg"}
-                            className="card-img-top"
-                            alt={place.placeName}
-                            loading="lazy"
-                            onError={(e) => { e.target.src = "/assets/default-pet-place.jpg" }}
-                          />
-                          <div className="card-body">
-                            <span className={`badge ${getCategoryBadgeClass(place.industryMain)}`}>
-                              {place.industryMain}
-                            </span>
-                            <h5 className="card-title mt-2">{place.placeName}</h5>
-                            <p className="card-text">
-                              <i className="bi bi-geo-alt me-1"></i> {place.city} {place.district}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))
+                    recommendedPlaces.map(renderRecommendedPlace)
                   ) : (
                     <div className="col-12">
                       <p className="text-center">추천할 장소가 없습니다.</p>
@@ -715,13 +811,14 @@ function PlaceListPage() {
               {/* Filter control buttons */}
               <div className="d-flex justify-content-between mt-3">
                 <div>
-                  <button
-                    className="btn btn-outline-secondary btn-sm me-2"
-                    onClick={handleResetFilters}
-                    aria-label="필터 초기화"
-                  >
-                    <i className="bi bi-x-circle me-1"></i> 필터 초기화
-                  </button>
+                <button
+                  className="reset-filter-btn"
+                  onClick={handleResetFilters}
+                  aria-label="필터 초기화"
+                  title="필터 초기화"
+                >
+                  <i className="bi bi-arrow-counterclockwise me-1"></i> 필터 초기화
+                </button>
                 </div>
               </div>
             </div>
