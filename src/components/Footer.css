@@ -8,7 +8,7 @@
 }
 
 .footer {
-  background-color: white;
+  background-color: #ffffff;
   border-top: 1px solid var(--border-color);
   color: var(--text-color);
   box-shadow: none;
@@ -131,4 +131,9 @@
     text-align: center !important;
     margin-top: 0.5rem;
   }
+}
+
+/* Ensure footer background is always white */
+footer.footer {
+  background-color: #ffffff !important;
 }

@@ -1,6 +1,5 @@
 /* 관리자 페이지 공통 스타일 */
 .admin-container {
-  background-color: #f8f9fa;
   min-height: calc(100vh - 60px);
 }
 
