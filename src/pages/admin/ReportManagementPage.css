@@ -285,11 +285,13 @@
 
 .content-meta {
   display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 15px;
-  color: #555555;
-  font-size: 0.9rem;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.content-meta-item {
+  display: flex;
+  align-items: center;
 }
 
 .content-author {

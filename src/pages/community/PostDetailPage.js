@@ -64,7 +64,26 @@ function PostDetailPage() {
         const response = await axios.get(`http://localhost:9000/api/community/${id}`)
         console.log("응답 데이터:", response.data)
 
-        setPost(response.data)
+        // 로그인한 사용자가 이 게시물을 신고했는지 확인
+        let isReported = false
+        const userId = localStorage.getItem("userId")
+
+        if (userId && isLoggedIn) {
+          try {
+            const reportCheck = await axios.get(`http://localhost:9000/api/report/check`, {
+              params: {
+                userId: Number(userId),
+                targetId: response.data.postId,
+                targetType: "POST",
+              },
+            })
+            isReported = reportCheck.data.isReported
+          } catch (error) {
+            console.error("신고 상태 확인 오류:", error)
+          }
+        }
+
+        setPost({ ...response.data, isReported })
         console.log("현재 목록 아이디:", id)
 
         setLoading(false)
@@ -74,7 +93,7 @@ function PostDetailPage() {
       }
     }
     fetchPostDetail()
-  }, [id])
+  }, [id, isLoggedIn])
 
   const handlePlaceClick = () => {
     if (post?.placeId) {
@@ -106,10 +125,11 @@ function PostDetailPage() {
   // 신고 처리
   const handleReport = async (reason) => {
     if (post.isReported) {
-      // 추가: 이미 신고된 경우
       alert("이미 신고하셨습니다!")
-      return // 여기서 바로 함수 종료
+      setShowReportDropdown(false)
+      return
     }
+
     const confirmReport = window.confirm(`이 게시물을 "${reason}" 사유로 신고하시겠습니까?`)
     if (!confirmReport) {
       return // 취소 누르면 신고 요청 안 보내고 끝냄
@@ -183,29 +203,37 @@ function PostDetailPage() {
                 {/* 작성자가 아니고 로그인한 경우에만 신고 버튼 표시 */}
                 {!isMyPost && isLoggedIn && (
                   <div className="report-dropdown-container" ref={reportDropdownRef}>
-                    <button
-                      className="btn btn-sm btn-link text-secondary report-btn"
-                      onClick={() => setShowReportDropdown(!showReportDropdown)}
-                      title="게시글 신고"
-                    >
-                      <i className="bi bi-flag"></i> 신고
-                    </button>
-                    {showReportDropdown && (
-                      <div className="report-dropdown">
-                        <div className="report-dropdown-header">신고 사유 선택</div>
-                        <div className="report-dropdown-item" onClick={() => handleReport("영리 목적/홍보성")}>
-                          영리 목적/홍보성
-                        </div>
-                        <div className="report-dropdown-item" onClick={() => handleReport("욕설/인신공격")}>
-                          욕설/인신공격
-                        </div>
-                        <div className="report-dropdown-item" onClick={() => handleReport("스팸")}>
-                          스팸
-                        </div>
-                        <div className="report-dropdown-item" onClick={() => handleReport("기타")}>
-                          기타
-                        </div>
-                      </div>
+                    {post.isReported ? (
+                      <span className="text-muted" style={{ fontSize: "0.85rem" }}>
+                        <i className="bi bi-flag-fill"></i> 신고됨
+                      </span>
+                    ) : (
+                      <>
+                        <button
+                          className="btn btn-sm btn-link text-secondary report-btn"
+                          onClick={() => setShowReportDropdown(!showReportDropdown)}
+                          title="게시글 신고"
+                        >
+                          <i className="bi bi-flag"></i>
+                        </button>
+                        {showReportDropdown && (
+                          <div className="report-dropdown">
+                            <div className="report-dropdown-header">신고 사유 선택</div>
+                            <div className="report-dropdown-item" onClick={() => handleReport("영리 목적/홍보성")}>
+                              영리 목적/홍보성
+                            </div>
+                            <div className="report-dropdown-item" onClick={() => handleReport("욕설/인신공격")}>
+                              욕설/인신공격
+                            </div>
+                            <div className="report-dropdown-item" onClick={() => handleReport("스팸")}>
+                              스팸
+                            </div>
+                            <div className="report-dropdown-item" onClick={() => handleReport("기타")}>
+                              기타
+                            </div>
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 )}
@@ -215,7 +243,7 @@ function PostDetailPage() {
 
           {/* 본문 내용 표시 - 처리 없이 그대로 표시 */}
           <div className="post-contentdetail">
-            <div  dangerouslySetInnerHTML={{ __html: post.content }}></div>
+            <div dangerouslySetInnerHTML={{ __html: post.content }}></div>
           </div>
 
           {/* 첨부 이미지 표시 */}

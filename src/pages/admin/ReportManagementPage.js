@@ -120,12 +120,19 @@ function ReportManagement() {
 
   // 신고 처리 (승인/거부)
   const handleProcessReport = async (reportId, action, targetType, targetId) => {
+
+    const typeText = getTargetTypeText(targetType)
     // 확인 대화상자 표시
     let confirmMessage = ""
     if (action === "approve") {
-      confirmMessage = ` 이 ${targetType}을 삭제하겠습니까?`
-    } else {
-      confirmMessage = ` 이 ${targetType}을 남기겠습니까?`
+      confirmMessage = ` 이 ${typeText}을 삭제하겠습니까?`
+    }  else {
+      // 삭제된 콘텐츠인 경우 메시지 다르게
+      if (contentData?.error) {
+        confirmMessage = `콘텐츠는 이미 삭제되었습니다. 신고만 목록에서 제거하시겠습니까?`
+      } else {
+        confirmMessage = `이 ${typeText}을 남기겠습니까?`
+      }
     }
 
     if (!window.confirm(confirmMessage)) {
@@ -151,7 +158,7 @@ function ReportManagement() {
           }
         } catch (deleteErr) {
           console.error("콘텐츠 삭제 오류:", deleteErr)
-          alert("콘텐츠 삭제 중 오류가 발생했습니다.")
+          alert("콘텐츠 삭제 중 오류가 발생했습니다. 이미 삭제된 콘텐츠일 수도 있습니다.")
           return
         }
       }
@@ -262,11 +269,17 @@ function ReportManagement() {
       return (
         <div className="content-details">
           <div className="content-meta">
-            <span className="content-author">작성자: {contentData.author}</span>
-            <span className="content-date">작성일: {formatDate(contentData.createdAt)}</span>
-            <span className="content-date">방문일: {formatDate(contentData.visitDate)}</span>
-            <div className="content-rating">
-              평점:{" "}
+            <div className="content-meta-item">
+              <span className="content-author">작성자: {contentData.author}</span>
+            </div>
+            <div className="content-meta-item">
+              <span className="content-date">작성일: {formatDate(contentData.createdAt)}</span>
+            </div>
+            <div className="content-meta-item">
+              <span className="content-date">방문일: {formatDate(contentData.visitDate)}</span>
+            </div>
+            <div className="content-meta-item content-rating">
+              <span>평점: </span>
               {[...Array(5)].map((_, i) => (
                 <i key={i} className={`bi ${i < contentData.rating ? "bi-star-fill" : "bi-star"} text-warning`}></i>
               ))}
@@ -387,13 +400,16 @@ function ReportManagement() {
                       selectedReport.reportId,
                       "approve",
                       selectedReport.targetType,
-                      selectedReport.targetId,
+                      selectedReport.targetId
                     )
                   }
+                  disabled={!!contentData?.error} // 에러가 있으면 비활성화
+                  style={contentData?.error ? { backgroundColor: "#ccc", borderColor: "#ccc", cursor: "not-allowed" } : {}}
                 >
                   <i className="bi bi-check-circle-fill"></i>
                   승인 (콘텐츠 삭제)
                 </button>
+
                 <button
                   className="report-modal-btn-reject"
                   onClick={() =>
@@ -401,14 +417,15 @@ function ReportManagement() {
                       selectedReport.reportId,
                       "reject",
                       selectedReport.targetType,
-                      selectedReport.targetId,
+                      selectedReport.targetId
                     )
                   }
                 >
                   <i className="bi bi-x-circle-fill"></i>
-                  거부 (콘텐츠 유지)
+                  {contentData?.error ? "목록에서 신고 제거" : "거부 (콘텐츠 유지)"}
                 </button>
               </div>
+
               <button className="report-btn-secondary" onClick={handleCloseModal}>
                 닫기
               </button>

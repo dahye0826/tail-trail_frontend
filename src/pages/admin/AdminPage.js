@@ -3,6 +3,7 @@ import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
+import { useAuth } from "../../contexts/AuthContext" 
 import ReportManagement from "./ReportManagementPage" // 신고내역관리 컴포넌트 import
 import UserManagementPage from "./UserManagementPage" // 사용자 관리 컴포넌트 import
 import "./AdminPage.css"
@@ -10,8 +11,15 @@ import "./AdminPage.css"
 function AdminPage() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("dashboard")
+  const { user, loading } = useAuth(); 
 
-  const isAdmin = true
+  useEffect(() => {
+    if (!loading && (!user || user.role !== "admin")) {
+      navigate("/") // 관리자가 아니면 홈으로
+    }
+  }, [user, loading, navigate])
+
+  if (loading) return <div>로딩 중...</div>
 
   const handleMenuClick = (tab) => {
     setActiveTab(tab)

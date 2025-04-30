@@ -443,9 +443,8 @@ function PlaceDetailPage() {
           {[1, 2, 3, 4, 5].map((star) => (
             <i
               key={star}
-              className={`bi ${
-                star <= (hoverRating || newReview.rating) ? "bi-star-fill" : "bi-star"
-              } place-detail-star-icon text-warning`}
+              className={`bi ${star <= (hoverRating || newReview.rating) ? "bi-star-fill" : "bi-star"
+                } place-detail-star-icon text-warning`}
               onClick={() => handleStarClick(star)}
               onMouseEnter={() => handleStarHover(star)}
             ></i>
@@ -629,20 +628,18 @@ function PlaceDetailPage() {
     </div>
   )
 
-  useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const response = await axios.get(`${API_BASE_URL}/visited-place/reviews`, {
-          params: { placeId: id },
-        })
-        setReviewList(response.data)
-      } catch (error) {
-        console.error("리뷰 리스트 불러오기 오류:", error)
-      }
-    }
-    fetchReviews()
-  }, [id])
+  const extractErrorMessage = (error, fallback = "오류가 발생했습니다.") => {
+    const data = error?.response?.data
 
+    if (!data) return fallback
+
+    if (typeof data === "string") return data // 이게 핵심!
+    if (typeof data === "object") {
+      return data.message || data.error || fallback
+    }
+
+    return fallback
+  }
   const handleReportToggle = (reviewId) => {
     setShowReportDropdown((prev) => ({
       ...prev,
@@ -650,12 +647,53 @@ function PlaceDetailPage() {
     }))
   }
 
+
+  // 로컬 스토리지에서 신고 여부를 확인하는 함수 추가
+  const isReported = (reviewId) => {
+    const key = `VISITEDPLACE_${reviewId}`
+    const reportedItems = JSON.parse(localStorage.getItem("reportedItems") || "{}")
+    console.log("⛳ reviewId:", reviewId, "stored:", reportedItems[key])
+    return reportedItems[key] === true
+  }
+
+  // useEffect에서 리뷰 목록을 가져오는 부분 수정
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/visited-place/reviews`, {
+          params: { placeId: id },
+        })
+
+        // 각 리뷰에 대해 로컬 스토리지에서 신고 여부 확인
+        const reviewsWithReportStatus = response.data.map((review) => ({
+          ...review,
+          isReported: isReported(review.visitId),
+        }))
+
+        setReviewList(reviewsWithReportStatus)
+      } catch (error) {
+        console.error("리뷰 리스트 불러오기 오류:", error)
+      }
+    }
+    fetchReviews()
+  }, [id])
+
   const handleReport = async (reviewId, reason) => {
     if (!isLoggedIn) {
       alert("로그인이 필요한 서비스입니다.")
       navigate("/login")
       return
     }
+
+    // 이미 신고한 경우 버튼 클릭 자체가 안 되게 만들었지만,
+    // 혹시라도 중복 요청이 발생했을 때 대비한 추가 방어 코드
+    const reportedItems = JSON.parse(localStorage.getItem("reportedItems") || "{}")
+    if (reportedItems[`VISITEDPLACE_${reviewId}`]) {
+      showNotification("이미 이 후기를 신고하셨습니다.", "error")
+      return
+    }
+
+    if (!window.confirm(`이 후기를 '${reason}' 사유로 신고하시겠습니까?`)) return
 
     try {
       const userId = localStorage.getItem("userId")
@@ -667,14 +705,40 @@ function PlaceDetailPage() {
       }
 
       await axios.post(`${API_BASE_URL}/report`, reportData)
-      showNotification(`리뷰가 '${reason}' 사유로 신고되었습니다.`)
+
+      // 로컬 스토리지에 신고 기록 저장
+      reportedItems[`VISITEDPLACE_${reviewId}`] = true
+      localStorage.setItem("reportedItems", JSON.stringify(reportedItems))
+
+      const key = `VISITEDPLACE_${reviewId}`
+    reportedItems[key] = true
+    localStorage.setItem("reportedItems", JSON.stringify(reportedItems))
+    console.log("✅ 저장 확인:", key, localStorage.getItem("reportedItems"))
+
+      // UI 업데이트
+      setReviewList((prevList) =>
+        prevList.map((r) =>
+          r.visitId === reviewId
+            ? { ...r, isReported: true }
+            : r
+        )
+      )
+
+      showNotification(`후기가 '${reason}' 사유로 신고되었습니다.`)
       setShowReportDropdown((prev) => ({
         ...prev,
         [reviewId]: false,
       }))
     } catch (error) {
-      console.error("신고 처리 오류:", error)
-      showNotification("신고 처리 중 오류가 발생했습니다.", "error")
+      const errorMessage = extractErrorMessage(error, "신고 처리 중 오류가 발생했습니다.")
+
+      if (errorMessage.includes("이미 신고하셨습니다")) {
+        showNotification("이미 이 후기를 신고하셨습니다.", "error")
+      } else {
+        showNotification(errorMessage, "error")
+      }
+
+      console.error("신고 처리 오류:", errorMessage)
     }
   }
 
@@ -702,7 +766,7 @@ function PlaceDetailPage() {
       ) : (
         reviewList.map((review, idx) => {
           const isCurrentUserReview = isLoggedIn && Number(localStorage.getItem("userId")) === review.userId
-
+          console.log("isReported:", review.visitId, review.isReported)
           return (
             <div key={idx} className="place-detail-review-item">
               <div className="place-detail-review-header">
@@ -732,43 +796,53 @@ function PlaceDetailPage() {
                   </div>
                 )}
 
-                {/* 작성자가 아닌 경우 신고 버튼 표시 */}
                 {isLoggedIn && !isCurrentUserReview && (
                   <div className="place-detail-report-dropdown-container">
-                    <button
-                      className="btn btn-sm btn-link text-secondary place-detail-report-btn"
-                      onClick={() => handleReportToggle(review.visitId)}
-                    >
-                      <i className="bi bi-flag"></i>
-                    </button>
-                    {showReportDropdown[review.visitId] && (
-                      <div className="place-detail-report-dropdown">
-                        <div className="place-detail-report-dropdown-header">신고 사유 선택</div>
-                        <div
-                          className="place-detail-report-dropdown-item"
-                          onClick={() => handleReport(review.visitId, "영리 목적/홍보성")}
+                    {isReported(review.visitId) ? (
+                      // 신고된 경우 - "신고됨"만 표시
+                      <span className="text-muted small" style={{ fontSize: "0.8rem" }}>
+                        <i className="bi bi-flag-fill"></i> 신고됨
+                      </span>
+                    ) : (
+                      // 신고 안 된 경우에만 버튼 렌더링
+                      <>
+                        <button
+                          className="btn btn-sm btn-link text-secondary place-detail-report-btn"
+                          onClick={() => handleReportToggle(review.visitId)}
+                          title="후기 신고하기"
                         >
-                          영리 목적/홍보성
-                        </div>
-                        <div
-                          className="place-detail-report-dropdown-item"
-                          onClick={() => handleReport(review.visitId, "욕설/인신공격")}
-                        >
-                          욕설/인신공격
-                        </div>
-                        <div
-                          className="place-detail-report-dropdown-item"
-                          onClick={() => handleReport(review.visitId, "스팸")}
-                        >
-                          스팸
-                        </div>
-                        <div
-                          className="place-detail-report-dropdown-item"
-                          onClick={() => handleReport(review.visitId, "기타")}
-                        >
-                          기타
-                        </div>
-                      </div>
+                          <i className="bi bi-flag"></i>
+                        </button>
+                        {showReportDropdown[review.visitId] && (
+                          <div className="place-detail-report-dropdown">
+                            <div className="place-detail-report-dropdown-header">신고 사유 선택</div>
+                            <div
+                              className="place-detail-report-dropdown-item"
+                              onClick={() => handleReport(review.visitId, "영리 목적/홍보성")}
+                            >
+                              영리 목적/홍보성
+                            </div>
+                            <div
+                              className="place-detail-report-dropdown-item"
+                              onClick={() => handleReport(review.visitId, "욕설/인신공격")}
+                            >
+                              욕설/인신공격
+                            </div>
+                            <div
+                              className="place-detail-report-dropdown-item"
+                              onClick={() => handleReport(review.visitId, "스팸")}
+                            >
+                              스팸
+                            </div>
+                            <div
+                              className="place-detail-report-dropdown-item"
+                              onClick={() => handleReport(review.visitId, "기타")}
+                            >
+                              기타
+                            </div>
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 )}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import axios from "axios"
 import "./CommentSection.css"
 
@@ -9,9 +9,33 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
   const [editedContent, setEditedContent] = useState(comment.content)
   const [isDeleting, setIsDeleting] = useState(false)
   const [showReportDropdown, setShowReportDropdown] = useState(false)
+  const [isReported, setIsReported] = useState(false)
 
   // 댓글 작성자인지 확인
   const isAuthor = currentUser?.userId === comment.userId
+
+  // 컴포넌트 마운트 시 신고 여부 확인
+  useEffect(() => {
+    const checkReportStatus = async () => {
+      if (!currentUser) return
+
+      try {
+        const response = await axios.get("http://localhost:9000/api/report/check", {
+          params: {
+            userId: currentUser.userId,
+            targetId: comment.commentId,
+            targetType: "COMMENT",
+          },
+        })
+
+        setIsReported(response.data.isReported)
+      } catch (error) {
+        console.error("신고 상태 확인 오류:", error)
+      }
+    }
+
+    checkReportStatus()
+  }, [comment.commentId, currentUser])
 
   // 댓글 수정 처리
   const handleUpdateComment = async () => {
@@ -97,24 +121,31 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
 
   // 신고 처리
   const handleReport = async (reason) => {
-    if (!window.confirm(`이 댓글을 '${reason}' 사유로 신고하시겠습니까?`)) return;
-  
+    if (isReported) {
+      alert("이미 신고하셨습니다.")
+      setShowReportDropdown(false)
+      return
+    }
+
+    if (!window.confirm(`이 댓글을 '${reason}' 사유로 신고하시겠습니까?`)) return
+
     try {
       await axios.post("http://localhost:9000/api/report", {
-        targetId: comment.commentId,     // 신고할 댓글 ID
-        targetType: "COMMENT",            // 댓글이니까 COMMENT
-        reason: reason,                   // 선택한 신고 사유
-        reporterId: currentUser?.userId,  // 현재 로그인한 사용자 ID
-      });
-  
-      alert("신고가 접수되었습니다.");
+        targetId: comment.commentId, // 신고할 댓글 ID
+        targetType: "COMMENT", // 댓글이니까 COMMENT
+        reason: reason, // 선택한 신고 사유
+        reporterId: currentUser?.userId, // 현재 로그인한 사용자 ID
+      })
+
+      alert(`댓글이 '${reason}' 사유로 신고되었습니다.`)
+      setIsReported(true)
     } catch (error) {
-      console.error("댓글 신고 오류:", error);
-      alert("댓글 신고에 실패했습니다.");
+      console.error("댓글 신고 오류:", error)
+      alert("댓글 신고에 실패했습니다.")
     } finally {
-      setShowReportDropdown(false);
+      setShowReportDropdown(false)
     }
-  };
+  }
 
   return (
     <div className="comment-item">
@@ -139,28 +170,37 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
           )}
           {!isAuthor && currentUser && (
             <div className="report-dropdown-container">
-              <button
-                className="btn btn-sm btn-link text-secondary report-btn"
-                onClick={() => setShowReportDropdown(!showReportDropdown)}
-              >
-                <i className="bi bi-flag"></i>
-              </button>
-              {showReportDropdown && (
-                <div className="report-dropdown">
-                  <div className="report-dropdown-header">신고 사유 선택</div>
-                  <div className="report-dropdown-item" onClick={() => handleReport("영리 목적/홍보성")}>
-                    영리 목적/홍보성
-                  </div>
-                  <div className="report-dropdown-item" onClick={() => handleReport("욕설/인신공격")}>
-                    욕설/인신공격
-                  </div>
-                  <div className="report-dropdown-item" onClick={() => handleReport("스팸")}>
-                    스팸
-                  </div>
-                  <div className="report-dropdown-item" onClick={() => handleReport("기타")}>
-                    기타
-                  </div>
-                </div>
+              {isReported ? (
+                <span className="text-muted small" style={{ fontSize: "0.8rem" }}>
+                  <i className="bi bi-flag-fill"></i> 신고됨
+                </span>
+              ) : (
+                <>
+                  <button
+                    className="btn btn-sm btn-link text-secondary report-btn"
+                    onClick={() => setShowReportDropdown(!showReportDropdown)}
+                    title="댓글 신고하기"
+                  >
+                    <i className="bi bi-flag"></i>
+                  </button>
+                  {showReportDropdown && (
+                    <div className="report-dropdown">
+                      <div className="report-dropdown-header">신고 사유 선택</div>
+                      <div className="report-dropdown-item" onClick={() => handleReport("영리 목적/홍보성")}>
+                        영리 목적/홍보성
+                      </div>
+                      <div className="report-dropdown-item" onClick={() => handleReport("욕설/인신공격")}>
+                        욕설/인신공격
+                      </div>
+                      <div className="report-dropdown-item" onClick={() => handleReport("스팸")}>
+                        스팸
+                      </div>
+                      <div className="report-dropdown-item" onClick={() => handleReport("기타")}>
+                        기타
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}
