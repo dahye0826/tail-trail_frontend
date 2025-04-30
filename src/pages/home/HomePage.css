@@ -77,10 +77,10 @@ body {
   color: white;
 }
 
-/* 모바일용 배너 콘텐츠 스타일 추가 */
+/* 모바일용 배너 콘텐츠 스타일 수정 - 위로 이동 */
 .banner-content-mobile {
   position: absolute;
-  top: 60%;
+  top: 30%; /* 60%에서 30%로 변경하여 상단으로 이동 */
   transform: translateY(-50%);
   left: 10%;
   z-index: 2;
@@ -107,10 +107,10 @@ body {
   font-family: "TmoneyRoundWindExtraBold", sans-serif; /* 폰트 추가 */
 }
 
-/* 모바일 로그인/회원가입 버튼 스타일 - 중앙 배치로 수정 */
+/* 모바일 로그인/회원가입 버튼 스타일 - 하단 배치로 수정 */
 .mobile-auth-buttons {
   position: absolute;
-  top: 70%; /* 50%에서 70%로 변경하여 하단으로 이동 */
+  top: 75%; /* 70%에서 75%로 변경하여 더 아래로 이동 */
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 10;
@@ -771,6 +771,7 @@ body {
 
   .banner-content-mobile {
     display: block;
+    top: 25%; /* 60%에서 25%로 변경 - 상단으로 더 이동 */
   }
 
   /* 모바일에서 배너 상단에 패딩 추가하여 네비바에 가려지지 않도록 함 */
@@ -782,17 +783,14 @@ body {
     height: 400px; /* 300px에서 400px로 증가 */
   }
 
-  .banner-content-mobile {
-    top: 60%; /* 50%에서 60%로 변경하여 더 아래로 이동 */
-    transform: translateY(-50%);
+  /* 모바일에서 배너 콘텐츠 텍스트 크기 조정 */
+  .banner-content-mobile h1 {
+    font-size: 2.8rem; /* 텍스트 크기 줄임 */
+    margin-bottom: 0.5rem; /* 마진 줄임 */
   }
 
-  .banner-content h1 {
-    font-size: 3.5rem; /* 2.5rem에서 3.5rem으로 증가 */
-  }
-
-  .banner-content p {
-    font-size: 1.8rem; /* 1.2rem에서 1.8rem으로 증가 */
+  .banner-content-mobile p {
+    font-size: 1.5rem; /* 텍스트 크기 줄임 */
   }
 
   .feature-item {
@@ -810,7 +808,7 @@ body {
   /* 모바일에서 로그인/회원가입 버튼 표시 */
   .mobile-auth-buttons {
     display: flex;
-    top: 80%; /* 70%에서 80%로 변경하여 더 아래로 이동 */
+    top: 80%; /* 버튼 위치를 하단으로 이동 */
   }
 
   /* 홈페이지 컨테이너에 상단 패딩 추가 */
@@ -988,9 +986,6 @@ body {
 .review-cards {
   margin-top: 1rem;
 }
-
-/* 리뷰 카드 이미지 관련 스타일 제거 */
-/* .review-card-image 관련 스타일 삭제 */
 
 .placeholder-image {
   display: flex;
