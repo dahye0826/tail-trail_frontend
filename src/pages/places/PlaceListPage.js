@@ -442,45 +442,52 @@ function PlaceListPage() {
 
   const handlePlaceClick = useCallback((placeId) => navigate(`/places/place/${placeId}`), [navigate])
 
-  // Improved favorite toggle handler
-  const handleFavoriteToggle = useCallback(
-    async (placeId, e) => {
-      e.stopPropagation()
-      if (!isLoggedIn) {
+// Improved favorite toggle handler
+const handleFavoriteToggle = useCallback(
+  async (placeId, e) => {
+    e.stopPropagation()
+    if (!isLoggedIn) {
+      // Show notification
+      setNotification({ show: true, message: "로그인이 필요한 서비스입니다.", type: "error" })
+      
+      // Wait a moment before redirecting (give time to see the notification)
+      setTimeout(() => {
         navigate("/login", { state: { from: location } })
-        return
-      }
+      }, 1500) // Wait 1.5 seconds before redirecting
+      
+      return
+    }
 
-      try {
-        const userId = localStorage.getItem("userId")
-        const numericPlaceId = Number(placeId)
+    try {
+      const userId = localStorage.getItem("userId")
+      const numericPlaceId = Number(placeId)
 
-        const response = await axios.post(`${API_BASE_URL}/favorites/toggle`, null, {
-          params: { userId: Number(userId), placeId: numericPlaceId },
-        })
+      const response = await axios.post(`${API_BASE_URL}/favorites/toggle`, null, {
+        params: { userId: Number(userId), placeId: numericPlaceId },
+      })
 
-        console.log("즐겨찾기 토글 응답:", response.data)
+      console.log("즐겨찾기 토글 응답:", response.data)
 
-        if (response.data.success) {
-          if (response.data.isAdded) {
-            setFavorites((prevFavorites) => {
-              return [...prevFavorites, numericPlaceId]
-            })
-            showNotification("즐겨찾기에 추가되었습니다.")
-          } else {
-            setFavorites((prevFavorites) => {
-              return prevFavorites.filter((id) => Number(id) !== numericPlaceId)
-            })
-            showNotification("즐겨찾기가 해제되었습니다.")
-          }
+      if (response.data.success) {
+        if (response.data.isAdded) {
+          setFavorites((prevFavorites) => {
+            return [...prevFavorites, numericPlaceId]
+          })
+          showNotification("즐겨찾기에 추가되었습니다.")
+        } else {
+          setFavorites((prevFavorites) => {
+            return prevFavorites.filter((id) => Number(id) !== numericPlaceId)
+          })
+          showNotification("즐겨찾기가 해제되었습니다.")
         }
-      } catch (error) {
-        console.error("즐겨찾기 처리 오류:", error)
-        showNotification("즐겨찾기 업데이트 중 오류가 발생했습니다.", "error")
       }
-    },
-    [isLoggedIn, navigate, location],
-  )
+    } catch (error) {
+      console.error("즐겨찾기 처리 오류:", error)
+      showNotification("즐겨찾기 업데이트 중 오류가 발생했습니다.", "error")
+    }
+  },
+  [isLoggedIn, navigate, location],
+)
 
   const handleResetFilters = () => {
     setRegionFilter("")
@@ -605,15 +612,14 @@ function PlaceListPage() {
                   e.target.src = "/assets/default-pet-place.jpg"
                 }}
               />
-              {isLoggedIn && (
-                <button
-                  className="btn-favorite"
-                  onClick={(e) => handleFavoriteToggle(place.placeId, e)}
-                  aria-label={favorite ? "즐겨찾기 삭제" : "즐겨찾기 추가"}
-                >
-                  <i className={`bi ${favorite ? "bi-heart-fill" : "bi-heart"}`}></i>
-                </button>
-              )}
+              {/* Always show favorite button, regardless of login status */}
+              <button
+                className="btn-favorite"
+                onClick={(e) => handleFavoriteToggle(place.placeId, e)}
+                aria-label={favorite ? "즐겨찾기 삭제" : "즐겨찾기 추가"}
+              >
+                <i className={`bi ${favorite ? "bi-heart-fill" : "bi-heart"}`}></i>
+              </button>
             </div>
             <div className="card-body">
               <span className="place-category-badge">{place.industryMain}</span>
@@ -689,14 +695,22 @@ function PlaceListPage() {
 
   // Render notification toast
   const renderNotification = () => {
-    if (!notification.show) return null
-
+    if (!notification.show) return null;
+  
     return (
-      <div className={`place-notification ${notification.type === "error" ? "place-notification-error" : ""}`}>
-        <div className="place-notification-content">{notification.message}</div>
+      <div className="modal-overlay">
+        <div className="modal-content">
+          <div className="modal-message">{notification.message}</div>
+          <button 
+            className="modal-button"
+            onClick={() => setNotification({ show: false, message: "", type: "success" })}
+          >
+            확인
+          </button>
+        </div>
       </div>
-    )
-  }
+    );
+  };
 
   // Render recommended places with proper favorite state
   const renderRecommendedPlace = (place) => {
@@ -719,18 +733,16 @@ function PlaceListPage() {
                 e.target.src = "/assets/default-pet-place.jpg"
               }}
             />
-            {isLoggedIn && (
-              <button
-                className="btn-favorite"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handleFavoriteToggle(place.placeId, e)
-                }}
-                aria-label={isFavorite ? "즐겨찾기 삭제" : "즐겨찾기 추가"}
-              >
-                <i className={`bi ${isFavorite ? "bi-heart-fill" : "bi-heart"}`}></i>
-              </button>
-            )}
+<button
+  className="btn-favorite"
+  onClick={(e) => {
+    e.stopPropagation()
+    handleFavoriteToggle(place.placeId, e)
+  }}
+  aria-label={isFavorite ? "즐겨찾기 삭제" : "즐겨찾기 추가"}
+>
+  <i className={`bi ${isFavorite ? "bi-heart-fill" : "bi-heart"}`}></i>
+</button>
           </div>
           <div className="card-body">
             <span className="place-category-badge">{place.industryMain}</span>
