@@ -5,11 +5,18 @@
   --text-color: #2c3e50;
   --light-bg: #f0f9fa;
   --border-color: #d1eeef;
+  --page-bg: #fbfbe9; /* 홈페이지 배경색 변수 수정 */
 }
 
 /* 전체 글씨 크기 증가 */
 body {
   font-size: 1.1rem;
+  background-color: #fbfbe9 !important; /* 직접 body에도 적용 */
+}
+
+/* 홈페이지 전체 배경색 설정 */
+.home-page {
+  background-color: #fbfbe9 !important; /* !important 추가 */
 }
 
 /* 둥근 배너 스타일 */
@@ -195,7 +202,7 @@ body {
 
 /* 지도 섹션 */
 .map-section {
-  background: white;
+  background-color: #fbfbe9 !important; /* !important 추가 */
   padding: 3rem 0;
   box-shadow: inset 0 5px 10px rgba(0, 0, 0, 0.03);
 }
@@ -305,7 +312,7 @@ body {
 
 /* 리뷰 섹션 */
 .review-section {
-  background-color: white;
+  background-color: #fbfbe9 !important; /* !important 추가 */
   padding: 3rem 0;
 }
 
@@ -640,7 +647,7 @@ body {
 
 /* 커뮤니티 섹션 - 새로운 스타일 */
 .community-section {
-  background-color: white;
+  background-color: #fbfbe9 !important; /* !important 추가 */
   position: relative;
   overflow: hidden;
   padding: 3rem 0;
@@ -847,6 +854,12 @@ body {
 .community-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.community-card .card-body {
+  padding: 1.5rem;
+  position: relative;
+  z-index: 1; /* 말풍선 0,0,0.12);
 }
 
 .community-card .card-body {

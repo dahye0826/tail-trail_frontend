@@ -12,6 +12,14 @@ import Footer from "../../components/Footer"
 import KakaoMap from "../../components/KakaoMap"
 
 const HomePage = () => {
+  // 페이지 배경색 설정
+  useEffect(() => {
+    document.body.style.backgroundColor = "#fbfbe9"
+    return () => {
+      document.body.style.backgroundColor = ""
+    }
+  }, [])
+
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [communityPosts, setCommunityPosts] = useState([])
   const [loading, setLoading] = useState(true)
@@ -85,7 +93,6 @@ const HomePage = () => {
     fetchPlaces()
   }, [])
 
-
   // (1) 최근 리뷰 데이터 가져오기
   useEffect(() => {
     const fetchReviews = async () => {
@@ -120,7 +127,9 @@ const HomePage = () => {
                 return {
                   ...review,
                   placeImage: placeData.placeImage
-                    ? (placeData.placeImage.startsWith("/") ? `http://localhost:9000${placeData.placeImage}` : `http://localhost:9000/${placeData.placeImage}`)
+                    ? placeData.placeImage.startsWith("/")
+                      ? `http://localhost:9000${placeData.placeImage}`
+                      : `http://localhost:9000/${placeData.placeImage}`
                     : "/placeholder.svg",
                 }
               } catch (error) {
@@ -130,7 +139,7 @@ const HomePage = () => {
                   placeImage: "/placeholder.svg",
                 }
               }
-            })
+            }),
           )
 
           setReviews(updatedReviews)
@@ -169,7 +178,7 @@ const HomePage = () => {
     <>
       <Navbar isLoggedIn={isLoggedIn} />
 
-      <div className="home-page">
+      <div className="home-page" style={{ backgroundColor: "#fbfbe9" }}>
         {/* 메인 배너 섹션 - 둥근 모서리 스타일로 변경 */}
         <Container className="py-4">
           <div className="rounded-banner">
@@ -426,7 +435,7 @@ const HomePage = () => {
         </div>
 
         {/* 최근 리뷰 섹션 - 카드 형식으로 변경  */}
-        <div className="review-section py-4" style={{ backgroundColor: "white" }}>
+        <div className="review-section py-4" style={{ backgroundColor: "#fbfbe9" }}>
           <Container>
             <div className="text-center mb-4 d-flex justify-content-between align-items-center">
               <div>
