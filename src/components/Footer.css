@@ -135,5 +135,163 @@
 
 /* Ensure footer background is always white */
 footer.footer {
-  background-color: #ffffff !important;
+  background-color: #ffffff !important;:root {
+    --primary-color: #4ecdc4;
+    --secondary-color: #a5e1e9;
+    --accent-color: #2a9d8f;
+    --text-color: #2c3e50;
+    --light-bg: #f0f9fa;
+    --border-color: #d1eeef;
+    --page-bg: #fbfbe9; /* 홈페이지와 동일한 배경색 변수 추가 */
+  }
+  
+  .footer {
+    background-color: #ffffff;
+    border-top: 1px solid var(--border-color);
+    color: var(--text-color);
+    box-shadow: none;
+    padding: 2rem 0;
+    margin-top: auto; /* 푸터를 페이지 하단으로 밀어내기 위해 추가 */
+    position: relative; /* 푸터 위치 고정을 위해 추가 */
+  }
+  
+  .logo-container {
+    position: relative;
+    height: 200px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .footer-logo {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .footer-subtitle {
+    color: var(--accent-color);
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 1.2rem;
+    margin-top: 2rem;
+  }
+  
+  .footer-links,
+  .footer-contact {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .footer-links li,
+  .footer-contact li {
+    margin-bottom: 0.8rem;
+    font-size: 0.9rem;
+  }
+  
+  .footer-links a,
+  .footer-contact a {
+    color: var(--text-color);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  
+  .footer-links a:hover {
+    color: var(--primary-color);
+  }
+  
+  .footer-links i,
+  .footer-contact i {
+    color: var(--accent-color);
+    width: 20px;
+    text-align: center;
+    margin-right: 8px;
+  }
+  
+  .footer-bottom {
+    border-top: 1px solid var(--border-color);
+    font-size: 0.85rem;
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+  }
+  
+  .copyright {
+    color: #6c757d;
+    margin-bottom: 0;
+  }
+  
+  .footer-bottom-link {
+    color: #6c757d;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  
+  .footer-bottom-link:hover {
+    color: var(--primary-color);
+  }
+  
+  /* 전체 페이지 구조 설정을 위한 스타일 추가 */
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+  
+  body, #root, .app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #fbfbe9;
+  }
+  
+  main {
+    flex: 1 0 auto;
+  }
+  
+  @media (max-width: 992px) {
+    .footer-logo {
+      margin: 0 auto;
+      height: 150px !important;
+    }
+  
+    .logo-container {
+      height: auto;
+      justify-content: center;
+    }
+  
+    .footer-subtitle {
+      margin-top: 0.5rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .footer-logo {
+      height: 130px !important;
+      margin-left: 0 !important;
+      margin-top: 0 !important;
+    }
+  
+    .footer-subtitle {
+      margin-top: 1rem;
+      margin-bottom: 0.8rem;
+      text-align: center;
+    }
+  
+    .footer-links,
+    .footer-contact {
+      text-align: center;
+    }
+  
+    .footer-bottom {
+      text-align: center;
+    }
+  
+    .footer-bottom .text-md-end {
+      text-align: center !important;
+      margin-top: 0.5rem;
+    }
+  }
+  
+  /* Ensure footer background is always white */
+  footer.footer {
+    background-color: #ffffff !important;
+  }
 }

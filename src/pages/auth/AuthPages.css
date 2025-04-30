@@ -86,4 +86,99 @@
     }
   }
   
+  :root {
+    --primary-color: #4ecdc4;
+    --secondary-color: #a5e1e9;
+    --accent-color: #2a9d8f;
+    --text-color: #2c3e50;
+    --light-bg: #f0f9fa;
+    --border-color: #d1eeef;
+    --page-bg: #fbfbe9; /* 홈페이지와 동일한 배경색 변수 추가 */
+  }
   
+  .auth-background {
+    background-color: #fbfbe9; /* 배경색을 홈페이지와 동일하게 변경 */
+    padding: 1rem 0 3rem;
+    margin-bottom: 0; /* -3rem에서 0으로 변경하여 하단 공백 제거 */
+    min-height: calc(100vh - 400px); /* 푸터가 하단에 위치하도록 최소 높이 설정 */
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .auth-card {
+    background-color: var(--light-bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+  }
+  
+  .auth-card-body {
+    background-color: var(--light-bg);
+  }
+  
+  .auth-title {
+    color: var(--accent-color);
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  
+  .auth-subtitle {
+    color: var(--text-color);
+    font-size: 0.95rem;
+  }
+  
+  .pet-info-title {
+    color: var(--accent-color);
+    font-weight: 600;
+  }
+  
+  .form-control,
+  .form-select {
+    border-color: var(--border-color);
+    background-color: white;
+  }
+  
+  .form-control:focus,
+  .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(78, 205, 196, 0.25);
+  }
+  
+  .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+  }
+  
+  .btn-primary:disabled {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    opacity: 0.65;
+  }
+  
+  .auth-link {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .auth-link:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+  }
+
+  /* App 전체 배경색 설정 - 필요시 추가 */
+  body, #root, .app {
+    background-color: #fbfbe9;
+  }
+  
+  @media (max-width: 768px) {
+    .auth-card-body {
+      padding: 1.5rem !important;
+    }
+  }
