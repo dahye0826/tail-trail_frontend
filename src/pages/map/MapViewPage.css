@@ -16,16 +16,18 @@
   --tag-bg: #e8f5f5;
   --tag-color: #2a9d8f;
   --input-height: 48px; /* 모든 입력 요소의 높이 통일 */
+  --page-bg: #fbfbe9; /* HomePage와 동일한 배경색 변수 추가 */
 }
 
 .map-view-background {
-  background-color: white;
+  background-color: #fbfbe9; /* 홈페이지와 같은 배경색으로 변경 */
   min-height: calc(100vh - 150px);
 }
 
 .container-fluid {
   padding-left: 1rem;
   padding-right: 1rem;
+  background-color: #fbfbe9; /* 컨테이너 배경색도 통일 */
 }
 
 /* 사이드바 스타일 */
@@ -365,6 +367,20 @@
   justify-content: center;
 }
 
+/* 하단 영역 배경색 통일 */
+footer, .footer-container {
+  background-color: #fbfbe9 !important;
+}
+
+/* 푸터 영역이 전체 배경색과 일치하도록 */
+.app-container, .map-view-container, #root {
+  background-color: #fbfbe9;
+}
+
+body {
+  background-color: #fbfbe9;
+}
+
 /* 반응형 */
 @media (max-width: 1200px) {
   .sidebar-container {
@@ -383,6 +399,7 @@
 @media (max-width: 768px) {
   .map-view-row {
     flex-direction: column;
+    background-color: #fbfbe9; /* 행 배경색도 통일 */
   }
 
   .sidebar-col {
@@ -390,12 +407,14 @@
     max-width: 100%;
     flex-basis: 100%;
     margin-bottom: 1rem;
+    background-color: #fbfbe9; /* 컬럼 배경색도 통일 */
   }
 
   .map-col {
     width: 100%;
     max-width: 100%;
     flex-basis: 100%;
+    background-color: #fbfbe9; /* 맵 컬럼 배경색도 통일 */
   }
 
   .sidebar-containermap {

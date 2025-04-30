@@ -8,16 +8,17 @@
   --light-bg: #f0f9fa;
   --border-color: #d1eeef;
   --input-height: 48px;
+  --page-bg: #fbfbe9; /* HomePage와 동일한 배경색 변수 추가 */
 }
 
 .places-background {
-  background-color: white; /* 배경은 하얀색으로 유지 */
+  background-color: #fbfbe9; /* 배경색을 HomePage와 같은 색상으로 변경 */
   padding: 30px 0;
   min-height: 85vh;
 }
 
 .places-content-wrapper {
-  background-color: var(--light-bg); /* 카드 배경을 연한 민트색으로 변경 */
+  background-color: white; /* 내부 큰 박스 배경색을 하얀색으로 변경 */
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   padding: 30px;
@@ -429,7 +430,7 @@
 
 .place-list-container {
   animation: fadeIn 0.5s ease;
-  background-color: white; /* 리스트 컨테이너 배경은 하얀색으로 */
+  background-color: white; /* 리스트 컨테이너 배경은 하얀색으로 유지 */
   padding: 15px;
   border-radius: 8px;
   border: 1px solid var(--border-color);
