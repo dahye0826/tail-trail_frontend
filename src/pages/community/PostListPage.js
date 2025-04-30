@@ -23,50 +23,48 @@ function PostListPage() {
     const user = JSON.parse(localStorage.getItem("user"))
     console.log("현재 로그인한 사용자 (이 페이지):", user?.userName || "비로그인 상태")
   }, [])
-  
-  const navigate = useNavigate()
 
+  const navigate = useNavigate()
 
   useEffect(() => {
     const userId = localStorage.getItem("userId")
     const userName = localStorage.getItem("userName")
     const loggedIn = localStorage.getItem("isLoggedIn") === "true" && !!userId
-  
+
     setIsLoggedIn(loggedIn)
-  
+
     console.log("✅ 현재 로그인한 사용자:", userName || "비로그인 상태")
   }, [])
 
-       const handleSearch = async () => {
-        console.log("검색 실행됨")
-        if (!searchTerm.trim()) return
-      
-      
-        try {
-          setLoading(true)
-          const response = await axios.get("http://localhost:9000/api/community", {
-            params: {
-              search: searchTerm,
-              page: currentPage - 1,
-              size: 10,
-            },
-          })
-      
-          const formattedPosts = response.data.content.map((post) => ({
-            ...post,
-            createdAt: post.createdAt.split("T")[0],
-          }))
-      
-          setPosts(formattedPosts)
-          setCurrentPage(1)
-          setTotalPages(response.data.totalPages)
-          setIsSearching(true)
-          setLoading(false)
-        } catch (error) {
-          console.error("검색오류:", error)
-          setLoading(false)
-        }
-      }
+  const handleSearch = async () => {
+    console.log("검색 실행됨")
+    if (!searchTerm.trim()) return
+
+    try {
+      setLoading(true)
+      const response = await axios.get("http://localhost:9000/api/community", {
+        params: {
+          search: searchTerm,
+          page: currentPage - 1,
+          size: 10,
+        },
+      })
+
+      const formattedPosts = response.data.content.map((post) => ({
+        ...post,
+        createdAt: post.createdAt.split("T")[0],
+      }))
+
+      setPosts(formattedPosts)
+      setCurrentPage(1)
+      setTotalPages(response.data.totalPages)
+      setIsSearching(true)
+      setLoading(false)
+    } catch (error) {
+      console.error("검색오류:", error)
+      setLoading(false)
+    }
+  }
 
   //페이지 변경 또는 검색 상태 변경 시 자동으로 API를 요청해서 게시글을 불러오는 역할
   useEffect(() => {
@@ -144,17 +142,17 @@ function PostListPage() {
       {/*네비게이션 바 컴포넌트*/}
       <Navbar isLoggedIn={isLoggedIn} />
 
-      <div className="container mt-4 custom-table">
+      <div className="container mt-4 post-container">
         <div className="post-header text-center">
           <h2 className="mb-4">우리의 발자국 이야기</h2>
-          <p className="subtitle mb-5">함께한 발걸음이 추억이 되는 곳</p>
+          <p className="post-subtitle mb-5">함께한 발걸음이 추억이 되는 곳</p>
         </div>
 
-        <div className="search-container mb-4">
+        <div className="post-search mb-4">
           <div className="d-flex align-items-center position-relative">
             {/* 글쓰기 버튼 - 왼쪽 고정 */}
             <div className="position-absolute start-0">
-              <button className="btn btn-primary write-btn" onClick={handleWriteClick}>
+              <button className="btn post-btn-primary post-write-btn" onClick={handleWriteClick}>
                 <i className="bi bi-pencil-square me-1"></i> 글쓰기
               </button>
             </div>
@@ -170,24 +168,29 @@ function PostListPage() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyDown={handleKeyDown}
               />
-              <button className="btn btn-primary search-btn" type="button" onClick={handleSearch} title="검색">
+              <button
+                className="btn post-btn-primary post-search-btn"
+                type="button"
+                onClick={handleSearch}
+                title="검색"
+              >
                 <i className="bi bi-search"></i>
               </button>
-              <button className="reset-btn ms-2" type="button" onClick={hanleResetSearch} title="검색 초기화">
+              <button className="post-reset-btn ms-2" type="button" onClick={hanleResetSearch} title="검색 초기화">
                 <i className="bi bi-arrow-counterclockwise me-1"></i> 초기화
               </button>
             </div>
           </div>
         </div>
 
-        <div className="post-list-container">
+        <div className="post-list">
           {loading ? (
             <LoadingSpinner text="게시글을 불러오는 중입니다..." />
           ) : posts.length > 0 ? (
-            posts.map((post) => (
+            posts.map((post, index) => (
               <div
                 key={post.postId}
-                className="post-list-item p-3 border-bottom"
+                className={`post-item p-3 border-bottom ${index % 2 === 1 ? "even-row" : ""}`}
                 onClick={() => handlePostClick(post.postId)}
                 style={{ cursor: "pointer" }}
               >
@@ -199,12 +202,12 @@ function PostListPage() {
                   <div className="d-flex">
                     <span className="me-2">{post.userName} </span>
                     <span className="me-3">{post.createdAt}</span>
-                    <span className="comment-count">
+                    <span className="post-comment-count">
                       <i className="bi bi-chat-left-text me-1"></i> {post.commentCount}
                     </span>
                   </div>
                   <div>
-                    <span className="view-count">
+                    <span className="post-view-count">
                       <i className="bi bi-eye me-1"></i> {post.viewCount}
                     </span>
                   </div>
@@ -220,7 +223,7 @@ function PostListPage() {
 
         <div className="d-flex justify-content-center mt-4">
           <nav aria-label="Page navigation">
-            <ul className="pagination">
+            <ul className="pagination post-pagination">
               <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
                 <button className="page-link" onClick={() => handlePageChange(1)} aria-label="First">
                   <i className="bi bi-chevron-double-left"></i>
@@ -255,7 +258,7 @@ function PostListPage() {
         </div>
       </div>
 
-      {/* 푸터 컴포넌트 */}
+      {/* 푸터 컴포넌넌트 */}
       <Footer />
     </>
   )

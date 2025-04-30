@@ -220,7 +220,7 @@ function PostDetailPage() {
 
           {/* 첨부 이미지 표시 */}
           {post.imageUrls && post.imageUrls.length > 0 && (
-            <div className="post-images-section mt-4 mb-4">
+            <div className="post-images-section mt-4">
               {post.imageUrls.map((image, index) => (
                 <div key={index} className="mb-5">
                   <img

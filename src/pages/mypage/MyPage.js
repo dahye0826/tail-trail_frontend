@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { FaPen, FaUser } from "react-icons/fa"
@@ -6,11 +8,11 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import "./MyPageStyles.css"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
-import { userAPI } from "../../services/api"  // api.js에서 userAPI만 가져옵니다
-import { visitedAPI } from "../../services/api"  // api.js에서 visitedAPI만 가져옵니다
+import { userAPI } from "../../services/api" // api.js에서 userAPI만 가져옵니다
+import { visitedAPI } from "../../services/api" // api.js에서 visitedAPI만 가져옵니다
 
 const MyPage = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   const [userData, setUserData] = useState({
     userName: "",
     email: "",
@@ -22,45 +24,45 @@ const MyPage = () => {
     type: "",
     breed: "",
     petAge: "",
-    role: ""
-  });
+    role: "",
+  })
 
   const [stats, setStats] = useState({
     posts: 0,
     visited_places: 0,
-    favorites: 0
-  });
+    favorites: 0,
+  })
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         // 로컬 스토리지에서 사용자 정보 확인
-        const loginStatus = localStorage.getItem("isLoggedIn") === "true";
-        setIsLoggedIn(loginStatus);
-        
+        const loginStatus = localStorage.getItem("isLoggedIn") === "true"
+        setIsLoggedIn(loginStatus)
+
         if (!loginStatus) {
-          console.log("로그인 상태 아님, 리다이렉트");
-          navigate("/login");
-          return;
+          console.log("로그인 상태 아님, 리다이렉트")
+          navigate("/login")
+          return
         }
-        
-        const userId = localStorage.getItem("userId");
+
+        const userId = localStorage.getItem("userId")
         if (!userId) {
-          console.log("사용자 ID 없음, 리다이렉트");
-          navigate("/login");
-          return;
+          console.log("사용자 ID 없음, 리다이렉트")
+          navigate("/login")
+          return
         }
-        
-        console.log("사용자 데이터 로딩 시작, userId:", userId);
-        
+
+        console.log("사용자 데이터 로딩 시작, userId:", userId)
+
         // 사용자 프로필 정보 가져오기
-        const profileResponse = await userAPI.getProfile(userId);
-        console.log("프로필 응답:", profileResponse);
-        
+        const profileResponse = await userAPI.getProfile(userId)
+        console.log("프로필 응답:", profileResponse)
+
         if (profileResponse.data) {
           setUserData({
             userName: profileResponse.data.userName || "",
@@ -73,40 +75,40 @@ const MyPage = () => {
             type: profileResponse.data.type || "",
             breed: profileResponse.data.breed || "",
             petAge: profileResponse.data.petAge || "",
-            role: profileResponse.data.role || "user"
-          });
+            role: profileResponse.data.role || "user",
+          })
         }
-        
+
         // 방문 이력 수 가져오기
-        const visitedResponse = await visitedAPI.getMyVisitedPlaces(userId, 1, 1);
-        const visitedCount = visitedResponse?.data?.totalElements || 0;
-        
+        const visitedResponse = await visitedAPI.getMyVisitedPlaces(userId, 1, 1)
+        const visitedCount = visitedResponse?.data?.totalElements || 0
+
         // 기타 통계 데이터 가져오기
-        const statsResponse = await userAPI.getUserStats(userId);
-        console.log("통계 응답:", statsResponse);
-        
+        const statsResponse = await userAPI.getUserStats(userId)
+        console.log("통계 응답:", statsResponse)
+
         if (statsResponse.data) {
           setStats({
             posts: statsResponse.data.postCount || 0,
             visited_places: visitedCount,
-            favorites: statsResponse.data.favoriteCount || 0
-          });
+            favorites: statsResponse.data.favoriteCount || 0,
+          })
         }
-        
-        setLoading(false);
+
+        setLoading(false)
       } catch (err) {
-        console.error("데이터 가져오기 오류:", err);
-        setError("사용자 데이터를 가져오는데 실패했습니다.");
-        setLoading(false);
-        
+        console.error("데이터 가져오기 오류:", err)
+        setError("사용자 데이터를 가져오는데 실패했습니다.")
+        setLoading(false)
+
         // 오류 발생 시 기본 데이터로 대체 (테스트용)
-        provideMockData();
+        provideMockData()
       }
-    };
-    
+    }
+
     // 테스트용 더미 데이터 함수
     const provideMockData = () => {
-      console.log("더미 데이터 사용");
+      console.log("더미 데이터 사용")
       setUserData({
         userName: "김반려",
         email: "pet@example.com",
@@ -118,38 +120,38 @@ const MyPage = () => {
         type: "강아지",
         breed: "말티즈",
         petAge: 3,
-        role: "user"
-      });
-      
+        role: "user",
+      })
+
       setStats({
         posts: 5,
         visited_places: 8,
-        favorites: 3
-      });
-    };
+        favorites: 3,
+      })
+    }
 
-    fetchUserData();
-  }, [navigate]);
+    fetchUserData()
+  }, [navigate])
 
   const handleDeleteAccount = async () => {
-    if (!window.confirm("정말로 회원탈퇴 하시겠습니까?")) return;
-    const userId = localStorage.getItem("userId");
+    if (!window.confirm("정말로 회원탈퇴 하시겠습니까?")) return
+    const userId = localStorage.getItem("userId")
     try {
-      await userAPI.deleteUser(userId);
-      alert("회원탈퇴가 완료되었습니다.");
-      localStorage.clear();
-      navigate("/");
+      await userAPI.deleteUser(userId)
+      alert("회원탈퇴가 완료되었습니다.")
+      localStorage.clear()
+      navigate("/")
     } catch (error) {
-      alert("회원탈퇴에 실패했습니다.");
+      alert("회원탈퇴에 실패했습니다.")
     }
-  };
+  }
 
   // JSX는 변경 없이 동일하게 유지
   return (
     <>
       <Navbar isLoggedIn={isLoggedIn} />
 
-      <div className="mypage-background">
+      <div className="mypage-wrapper">
         {/* 이하 기존 JSX 코드와 동일 */}
         <div className="container py-5">
           <div className="row">
@@ -218,16 +220,18 @@ const MyPage = () => {
                         <div className="col-md-9">
                           <h4 className="mb-2">{userData.userName}님</h4>
                           <p className="text-muted mb-1">{userData.email}</p>
-                          
+
                           {userData.userPhone && (
                             <p className="text-muted mb-1">
-                              <i className="bi bi-telephone me-2"></i>{userData.userPhone}
+                              <i className="bi bi-telephone me-2"></i>
+                              {userData.userPhone}
                             </p>
                           )}
-                          
+
                           {userData.userAddress && (
                             <p className="text-muted mb-1">
-                              <i className="bi bi-geo-alt me-2"></i>{userData.userAddress}
+                              <i className="bi bi-geo-alt me-2"></i>
+                              {userData.userAddress}
                             </p>
                           )}
 
@@ -300,7 +304,9 @@ const MyPage = () => {
                       </Link>
                     </div>
 
-                    <button className="btn btn-danger" onClick={handleDeleteAccount}>회원탈퇴</button>
+                    <button className="btn btn-danger mt-4" onClick={handleDeleteAccount}>
+                      회원탈퇴
+                    </button>
                   </>
                 )}
               </div>
@@ -311,7 +317,7 @@ const MyPage = () => {
 
       <Footer />
     </>
-  );
-};
+  )
+}
 
-export default MyPage;
+export default MyPage

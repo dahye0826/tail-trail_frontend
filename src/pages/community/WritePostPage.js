@@ -29,19 +29,18 @@ function WritePostPage() {
   const searchResultsRef = useRef(null)
   const selectedItemRef = useRef(null)
 
+  useEffect(() => {
+    const userId = localStorage.getItem("userId")
+    const userName = localStorage.getItem("userName")
 
-useEffect(() => {
-  const userId = localStorage.getItem("userId")
-  const userName = localStorage.getItem("userName")
-
-  if (userId && userName) {
-    setIsLoggedIn(true)
-    console.log("✅ 현재 로그인 사용자:", userName)
-  } else {
-    setIsLoggedIn(false)
-    console.log("❌ 비로그인 상태")
-  }
-}, [])
+    if (userId && userName) {
+      setIsLoggedIn(true)
+      console.log("✅ 현재 로그인 사용자:", userName)
+    } else {
+      setIsLoggedIn(false)
+      console.log("❌ 비로그인 상태")
+    }
+  }, [])
   const navigate = useNavigate()
 
   // 선택된 결과 항목이 보이도록 자동 스크롤 처리
@@ -153,7 +152,7 @@ useEffect(() => {
     const formData = new FormData()
     formData.append("postTitle", title)
     formData.append("postContent", content)
-    formData.append("userId", userId) 
+    formData.append("userId", userId)
 
     images.forEach((image) => {
       formData.append("postImages", image)
@@ -185,37 +184,38 @@ useEffect(() => {
     <>
       <Navbar isLoggedIn={isLoggedIn} />
 
-      <div className="container mt-4 write-post-container">
+      <div className="container mt-4 post-write-container">
         <div className="row">
           <div className="col-lg-8 mx-auto">
-            <div className="card shadow-sm">
-              <div className="card-header bg-white">
+            <div className="card shadow-sm post-card">
+              <div className="card-header bg-white post-card-header">
                 <h2 className="text-center mb-0">추억 적기</h2>
               </div>
               <div className="card-body">
                 <form onSubmit={handleSubmit}>
                   {/* 제목 입력창 */}
                   <div className="mb-3">
-                    <label htmlFor="posttitle" className="form-label">
+                    <label htmlFor="posttitle" className="form-label post-form-label">
                       제목
                     </label>
                     <input
                       type="text"
-                      className="form-control"
+                      className="form-control post-form-control"
                       id="posttitle"
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       placeholder="제목을 입력하세요"
                       required
+                      style={{ borderColor: "var(--primary-color)" }}
                     />
                   </div>
 
                   {/* 장소 자동완성 입력 및 선택 */}
                   <div className="mb-4">
-                    <label className="form-label">장소 (선택사항)</label>
+                    <label className="form-label post-form-label">장소 (선택사항)</label>
 
                     {selectedLocation && (
-                      <div className="selected-location-card mb-2">
+                      <div className="post-location-card mb-2">
                         <div className="card">
                           <div className="card-body py-2">
                             <div className="d-flex justify-content-between align-items-center">
@@ -238,11 +238,12 @@ useEffect(() => {
                     <div className="input-group mb-2">
                       <input
                         type="text"
-                        className="form-control"
+                        className="form-control post-form-control"
                         placeholder="장소를 검색하세요"
                         value={searchTerm}
                         onChange={handleSearchChange}
                         onKeyDown={handleKeyDown}
+                        style={{ borderColor: "var(--primary-color)" }}
                       />
                       <button
                         type="button"
@@ -269,11 +270,11 @@ useEffect(() => {
 
                     {/* 검색 결과 리스트 */}
                     {searchResults.length > 0 && (
-                      <div className="search-results-containerpost mb-3">
-                        <div className="search-results-header">
+                      <div className="post-search-results-container mb-3">
+                        <div className="post-search-results-header">
                           <small className="text-muted">검색 결과 ({searchResults.length})</small>
                         </div>
-                        <div className="list-group search-results-scrollable" ref={searchResultsRef}>
+                        <div className="list-group post-search-results-scrollable" ref={searchResultsRef}>
                           {searchResults.map((place, index) => (
                             <button
                               key={place.placeId}
@@ -296,11 +297,11 @@ useEffect(() => {
 
                   {/* 내용 입력 */}
                   <div className="mb-3">
-                    <label htmlFor="postContent" className="form-label">
+                    <label htmlFor="postContent" className="form-label post-form-label">
                       내용
                     </label>
                     <textarea
-                      className="form-control"
+                      className="form-control post-form-control"
                       id="postContent"
                       rows="15"
                       value={content}
@@ -312,12 +313,12 @@ useEffect(() => {
 
                   {/* 이미지 업로드 */}
                   <div className="mb-3">
-                    <label htmlFor="postImages" className="form-label">
+                    <label htmlFor="postImages" className="form-label post-form-label">
                       이미지 첨부 (선택사항)
                     </label>
                     <input
                       type="file"
-                      className="form-control"
+                      className="form-control post-file-input"
                       id="postImages"
                       accept="image/*"
                       onChange={handleImageChange}
@@ -328,20 +329,18 @@ useEffect(() => {
                   {/* 이미지 미리보기 */}
                   {images.length > 0 && (
                     <div className="mb-3">
-                      <label className="form-label">선택한 이미지</label>
-                      <div className="d-flex flex-wrap gap-2">
+                      <label className="form-label post-form-label">선택한 이미지</label>
+                      <div className="post-image-preview-container">
                         {images.map((image, index) => (
-                          <div key={index} className="position-relative">
+                          <div key={index} className="post-image-preview-item">
                             <img
                               src={URL.createObjectURL(image) || "/placeholder.svg"}
                               alt={`preview-${index}`}
-                              width="100"
-                              height="100"
-                              className="preview-image"
+                              className="post-preview-image"
                             />
                             <button
                               type="button"
-                              className="btn btn-sm btn-danger position-absolute top-0 end-0 remove-image-btn"
+                              className="btn btn-sm btn-danger post-remove-image-btn"
                               onClick={() => handleRemoveImage(index)}
                             >
                               ✕
@@ -353,11 +352,15 @@ useEffect(() => {
                   )}
 
                   {/* 등록 / 취소 버튼 */}
-                  <div className="d-flex justify-content-between mt-4">
-                    <button type="button" className="btn btn-outline-secondary" onClick={() => navigate("/community")}>
+                  <div className="d-flex justify-content-between mt-4 post-button-group">
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary post-cancel-btn"
+                      onClick={() => navigate("/community")}
+                    >
                       취소
                     </button>
-                    <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                    <button type="submit" className="btn btn-primary post-submit-btn" disabled={isSubmitting}>
                       {isSubmitting ? (
                         <>
                           <span
