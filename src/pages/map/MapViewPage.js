@@ -396,13 +396,6 @@ function MapViewPage() {
         </div>
       </div>
 
-      {/* 모바일 토글 버튼 - 더 이상 필요하지 않음 */}
-      {/* {isMobile && (
-        <button className="sidebar-toggle" onClick={toggleSidebar}>
-          <i className={`bi ${sidebarVisible ? "bi-map" : "bi-list"}`}></i>
-        </button>
-      )} */}
-
       <Footer />
     </div>
   )

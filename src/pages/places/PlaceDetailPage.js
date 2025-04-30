@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect, useCallback, useRef } from "react"
 import { useParams, useNavigate, Link, useLocation } from "react-router-dom"
 import axios from "axios"
@@ -15,6 +17,7 @@ function PlaceDetailPage() {
   const [place, setPlace] = useState(null)
   const [loading, setLoading] = useState(true)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const location = useLocation()
   const [showReviewForm, setShowReviewForm] = useState(false)
   const [isEditMode, setIsEditMode] = useState(false) // 수정 모드인지 새 리뷰 작성 모드인지 구분
   const [currentEditReviewId, setCurrentEditReviewId] = useState(null) // 현재 수정 중인 리뷰 ID
@@ -31,7 +34,6 @@ function PlaceDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const reviewRef = useRef(null)
-  const location = useLocation()
   const [averageRating, setAverageRating] = useState(0)
   const [reviewList, setReviewList] = useState([])
   const [showReportDropdown, setShowReportDropdown] = useState({})
@@ -111,13 +113,13 @@ function PlaceDetailPage() {
 
   // Function to show notification similar to PlaceListPage
   const showNotification = (message, type = "success") => {
-    setNotification({ show: true, message, type });
-    
+    setNotification({ show: true, message, type })
+
     // Auto hide after 3 seconds
     setTimeout(() => {
-      setNotification({ show: false, message: "", type: "success" });
-    }, 3000);
-  };
+      setNotification({ show: false, message: "", type: "success" })
+    }, 3000)
+  }
 
   // 방문 후기 제출
   const handleReviewSubmit = async (e) => {
@@ -393,7 +395,6 @@ function PlaceDetailPage() {
     </div>
   )
 
-
   const renderPetSizeIcons = (categories) => {
     if (!categories?.length) return null
 
@@ -456,40 +457,31 @@ function PlaceDetailPage() {
   }
 
   // 방문 후기 폼 렌더링 - 수정된 버튼 스타일 적용
-const renderReviewForm = () => (
-  <form onSubmit={isEditMode ? handleReviewUpdate : handleReviewSubmit} className="place-detail-review-form">
-    {renderStarRating()}
-    <div className="mb-3">
-      <label className="form-label">후기 내용</label>
-      <textarea
-        className="form-control"
-        rows="4"
-        value={newReview.note}
-        onChange={(e) => setNewReview({ ...newReview, note: e.target.value })}
-        placeholder="방문 후기를 작성해주세요"
-        required
-      ></textarea>
-    </div>
-    {/* 수정된 버튼 스타일: 취소 버튼과 등록하기 버튼을 동일한 크기로 설정 */}
-    <div className="d-flex justify-content-end">
-      <button 
-        type="button" 
-        className="btn btn-secondary me-2" 
-        onClick={resetFormState}
-        style={{ width: '100px' }}
-      >
-        취소
-      </button>
-      <button 
-        type="submit" 
-        className="btn btn-primary"
-        style={{ width: '100px' }}
-      >
-        {isEditMode ? "수정하기" : "등록하기"}
-      </button>
-    </div>
-  </form>
-)
+  const renderReviewForm = () => (
+    <form onSubmit={isEditMode ? handleReviewUpdate : handleReviewSubmit} className="place-detail-review-form">
+      {renderStarRating()}
+      <div className="mb-3">
+        <label className="form-label">후기 내용</label>
+        <textarea
+          className="form-control"
+          rows="4"
+          value={newReview.note}
+          onChange={(e) => setNewReview({ ...newReview, note: e.target.value })}
+          placeholder="방문 후기를 작성해주세요"
+          required
+        ></textarea>
+      </div>
+      {/* 수정된 버튼 스타일: 취소 버튼과 등록하기 버튼을 동일한 크기로 설정 */}
+      <div className="d-flex justify-content-end">
+        <button type="button" className="btn btn-secondary me-2" onClick={resetFormState} style={{ width: "100px" }}>
+          취소
+        </button>
+        <button type="submit" className="btn btn-primary" style={{ width: "100px" }}>
+          {isEditMode ? "수정하기" : "등록하기"}
+        </button>
+      </div>
+    </form>
+  )
 
   // 방문 후기 섹션 렌더링
   const renderReviewSection = () => {
@@ -709,8 +701,8 @@ const renderReviewForm = () => (
         <p style={{ fontSize: "1.2rem" }}>아직 등록된 방문후기가 없습니다.</p>
       ) : (
         reviewList.map((review, idx) => {
-          const isCurrentUserReview = isLoggedIn && Number(localStorage.getItem("userId")) === review.userId;
-  
+          const isCurrentUserReview = isLoggedIn && Number(localStorage.getItem("userId")) === review.userId
+
           return (
             <div key={idx} className="place-detail-review-item">
               <div className="place-detail-review-header">
@@ -719,27 +711,27 @@ const renderReviewForm = () => (
                 <span className="place-detail-review-dates">
                   방문일: {review.visitDate} | 작성일: {review.createdAt}
                 </span>
-  
+
                 {/* 작성자인 경우 수정/삭제 버튼 표시 - 스타일 업데이트 */}
                 {isCurrentUserReview && (
-  <div className="place-detail-review-actions">
-    <button 
-      className="btn btn-sm btn-link" 
-      onClick={() => handleEditReview(review)}
-      style={{ textDecoration: 'none', color: '#0d6efd' }}
-    >
-      수정
-    </button>
-    <button
-      className="btn btn-sm btn-link text-danger"
-      onClick={() => handleReviewDelete(review.visitId)}
-      style={{ textDecoration: 'none' }}
-    >
-      삭제
-    </button>
-  </div>
-)}
-  
+                  <div className="place-detail-review-actions">
+                    <button
+                      className="btn btn-sm btn-link"
+                      onClick={() => handleEditReview(review)}
+                      style={{ textDecoration: "none", color: "#0d6efd" }}
+                    >
+                      수정
+                    </button>
+                    <button
+                      className="btn btn-sm btn-link text-danger"
+                      onClick={() => handleReviewDelete(review.visitId)}
+                      style={{ textDecoration: "none" }}
+                    >
+                      삭제
+                    </button>
+                  </div>
+                )}
+
                 {/* 작성자가 아닌 경우 신고 버튼 표시 */}
                 {isLoggedIn && !isCurrentUserReview && (
                   <div className="place-detail-report-dropdown-container">
@@ -747,7 +739,7 @@ const renderReviewForm = () => (
                       className="btn btn-sm btn-link text-secondary place-detail-report-btn"
                       onClick={() => handleReportToggle(review.visitId)}
                     >
-                      <i className="bi bi-flag"></i> 
+                      <i className="bi bi-flag"></i>
                     </button>
                     {showReportDropdown[review.visitId] && (
                       <div className="place-detail-report-dropdown">
@@ -783,24 +775,22 @@ const renderReviewForm = () => (
               </div>
               <div className="place-detail-review-content">{review.note}</div>
             </div>
-          );
+          )
         })
       )}
     </div>
-  );
-  
+  )
+
   // Render notification toast similar to PlaceListPage
   const renderNotification = () => {
-    if (!notification.show) return null;
-    
+    if (!notification.show) return null
+
     return (
       <div className={`place-notification ${notification.type === "error" ? "place-notification-error" : ""}`}>
-        <div className="place-notification-content">
-          {notification.message}
-        </div>
+        <div className="place-notification-content">{notification.message}</div>
       </div>
-    );
-  };
+    )
+  }
 
   if (loading) {
     return (
@@ -821,11 +811,11 @@ const renderReviewForm = () => (
   return (
     <>
       <Navbar isLoggedIn={isLoggedIn} />
-      
+
       {/* Add notification toast */}
       {renderNotification()}
 
-      <div className="place-detail-background">
+      <div className="place-detail-background" style={{ backgroundColor: "#fbfbe9" }}>
         <div className="container py-4 place-detail-container">
           {/* Back button */}
           <button className="place-detail-btn-outline-secondary mb-3" onClick={() => navigate("/places")}>

@@ -339,7 +339,7 @@ const HomePage = () => {
             {/* 회사 소개 섹션 추가 */}
             <div className="company-intro text-center mb-5">
               <h2 className="fw-bold section-title mb-3">이음길에 오신 것을 환영합니다</h2>
-              <div className="welcome-message">
+              <div className="welcome-message bg-white p-4 rounded shadow-sm">
                 <i className="bi bi-quote quote-icon quote-left"></i>
                 <p className="lead company-description">
                   반려동물의 시간은 우리와 다르기에 더 소중합니다. 이곳은 반려동물과 동반할 수 있는 카페, 여행지,

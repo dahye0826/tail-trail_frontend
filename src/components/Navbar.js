@@ -65,14 +65,14 @@ function Navbar() {
   // console.log("로그인 상태:", isLoggedIn, "관리자 상태:", isAdmin)
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light mb-4" style={{ padding: 0 }}>
+    <nav className="navbar navbar-expand-lg navbar-light mb-4" style={{ padding: 0}}>
       <div className="container">
         <Link className="navbar-brand" to="/">
           <img
             src={process.env.PUBLIC_URL + "/images/weblogo2.png" || "/placeholder.svg"}
             alt="이음길"
             className="navbar-logo me-2"
-            style={{ height: "79px", width: "auto", display: "inline-block" }}
+            style={{ height: "74px", width: "auto", display: "inline-block" }}
           />
         </Link>
 
