@@ -126,11 +126,9 @@ function MapViewPage() {
       
       // 모바일 뷰에서는 더 작은 높이로 조정
       if (windowWidth <= 768) {
-        setMapHeight("calc(100vh - 400px)");
+        setMapHeight("300px"); // 모바일에서 맵 높이 고정
         // 모바일에서는 기본적으로 맵을 보여줌
-        if (!sidebarVisible) {
-          setSidebarVisible(false);
-        }
+        setSidebarVisible(true);
       } else {
         setMapHeight("calc(100vh - 150px)");
         setSidebarVisible(true);
@@ -207,9 +205,6 @@ function MapViewPage() {
 
   const handlePlaceSelect = (place) => {
     setSelectedPlace(place)
-    if (isMobile) {
-      setSidebarVisible(false)
-    }
   }
 
   const handleViewDetail = (placeId) => {
@@ -236,13 +231,52 @@ function MapViewPage() {
 
       <div className="map-view-background">
         <div className="container-fluid py-4">
+          {isMobile && (
+            <div className="mobile-map-container mb-4">
+              <h4 className="sidebar-title mb-3">함께 가는 지도</h4>
+              <div className="mobile-map-wrapper">
+                {loading ? (
+                  <div className="text-center py-5">
+                    <div className="spinner-border text-primary" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                    <p className="mt-3">지도를 불러오는 중...</p>
+                  </div>
+                ) : (
+                  <KakaoMap
+                    readOnly={false}
+                    initialLocation={null}
+                    markerPositions={filteredPlaces.map((place) => ({
+                      id: place.id,
+                      lat: place.lat,
+                      lng: place.lng,
+                      name: place.name,
+                      address: place.address,
+                      category: place.category,
+                      rating: averageRatings[place.id] || 0.0,
+                    }))}
+                    selectedPlace={selectedPlace}
+                    height="300px"
+                    showSearchBar={false}
+                    defaultLevel={selectedPlace ? 3 : 7}
+                    showInfoCard={true}
+                    onLocationSelect={handlePlaceSelect}
+                    review={selectedPlace?.review}
+                  />
+                )}
+              </div>
+            </div>
+          )}
+          
           <div className="row map-view-row g-3">
             {/* 사이드바 */}
-            <div className={`col-md-4 col-lg-3 sidebar-col ${isMobile && !sidebarVisible ? "d-none" : ""}`}>
+            <div className={`col-md-4 col-lg-3 sidebar-col`}>
               <div className="sidebar-containermap">
-                <div className="sidebar-header">
-                  <h4 className="sidebar-title">함께 가는 지도</h4>
-                </div>
+                {!isMobile && (
+                  <div className="sidebar-header">
+                    <h4 className="sidebar-title">함께 가는 지도</h4>
+                  </div>
+                )}
 
                 <div className="filter-section">
                   <div className="input-group">
@@ -322,50 +356,52 @@ function MapViewPage() {
               </div>
             </div>
 
-            {/* 지도 */}
-            <div className={`col-md-8 col-lg-9 map-col ${isMobile && sidebarVisible ? "d-none" : ""}`}>
-              <div className="map-container">
-                {loading ? (
-                  <div className="text-center py-5">
-                    <div className="spinner-border text-primary" role="status">
-                      <span className="visually-hidden">Loading...</span>
+            {/* 지도 (데스크톱 전용) */}
+            {!isMobile && (
+              <div className="col-md-8 col-lg-9 map-col">
+                <div className="map-container">
+                  {loading ? (
+                    <div className="text-center py-5">
+                      <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
+                      <p className="mt-3">지도를 불러오는 중...</p>
                     </div>
-                    <p className="mt-3">지도를 불러오는 중...</p>
-                  </div>
-                ) : (
-                  <KakaoMap
-                    readOnly={false}
-                    initialLocation={null}
-                    markerPositions={filteredPlaces.map((place) => ({
-                      id: place.id,
-                      lat: place.lat,
-                      lng: place.lng,
-                      name: place.name,
-                      address: place.address,
-                      category: place.category,
-                      rating: averageRatings[place.id] || 0.0,
-                    }))}
-                    selectedPlace={selectedPlace}
-                    height={mapHeight}
-                    showSearchBar={false}
-                    defaultLevel={selectedPlace ? 3 : 7}
-                    showInfoCard={true}
-                    onLocationSelect={handlePlaceSelect}
-                    review={selectedPlace?.review}
-                  />
-                )}
+                  ) : (
+                    <KakaoMap
+                      readOnly={false}
+                      initialLocation={null}
+                      markerPositions={filteredPlaces.map((place) => ({
+                        id: place.id,
+                        lat: place.lat,
+                        lng: place.lng,
+                        name: place.name,
+                        address: place.address,
+                        category: place.category,
+                        rating: averageRatings[place.id] || 0.0,
+                      }))}
+                      selectedPlace={selectedPlace}
+                      height={mapHeight}
+                      showSearchBar={false}
+                      defaultLevel={selectedPlace ? 3 : 7}
+                      showInfoCard={true}
+                      onLocationSelect={handlePlaceSelect}
+                      review={selectedPlace?.review}
+                    />
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* 모바일 토글 버튼 */}
-      {isMobile && (
+      {/* 모바일 토글 버튼 - 더 이상 필요하지 않음 */}
+      {/* {isMobile && (
         <button className="sidebar-toggle" onClick={toggleSidebar}>
           <i className={`bi ${sidebarVisible ? "bi-map" : "bi-list"}`}></i>
         </button>
-      )}
+      )} */}
 
       <Footer />
     </div>
