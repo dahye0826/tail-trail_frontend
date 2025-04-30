@@ -111,20 +111,34 @@ function MapViewPage() {
   const [categoryFilter, setCategoryFilter] = useState("")
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
   const [sidebarVisible, setSidebarVisible] = useState(true)
+  const [mapHeight, setMapHeight] = useState("calc(100vh - 150px)")
   const navigate = useNavigate()
 
   const [cities, setCities] = useState([])
   const [categories, setCategories] = useState([])
   const [averageRatings, setAverageRatings] = useState({})
-  // 화면 크기 변경 감지
+  
+  // 화면 크기 변경 감지 및 맵 높이 조정
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768)
-      if (window.innerWidth > 768) {
-        setSidebarVisible(true)
+      const windowWidth = window.innerWidth;
+      setIsMobile(windowWidth <= 768)
+      
+      // 모바일 뷰에서는 더 작은 높이로 조정
+      if (windowWidth <= 768) {
+        setMapHeight("calc(100vh - 400px)");
+        // 모바일에서는 기본적으로 맵을 보여줌
+        if (!sidebarVisible) {
+          setSidebarVisible(false);
+        }
+      } else {
+        setMapHeight("calc(100vh - 150px)");
+        setSidebarVisible(true);
       }
     }
 
+    // 초기 로드 시와 리사이즈 시 실행
+    handleResize();
     window.addEventListener("resize", handleResize)
     return () => window.removeEventListener("resize", handleResize)
   }, [])
@@ -217,12 +231,13 @@ function MapViewPage() {
   }
 
   return (
-    <>
+    <div className="map-page-wrapper">
       <Navbar isLoggedIn={isLoggedIn} />
 
       <div className="map-view-background">
         <div className="container-fluid py-4">
-          <div className="row map-view-row">
+          <div className="row map-view-row g-3">
+            {/* 사이드바 */}
             <div className={`col-md-4 col-lg-3 sidebar-col ${isMobile && !sidebarVisible ? "d-none" : ""}`}>
               <div className="sidebar-containermap">
                 <div className="sidebar-header">
@@ -281,7 +296,7 @@ function MapViewPage() {
                   ) : (
                     <div className="places-list-items-scrollable">
                       {filteredPlaces.map((place) => {
-                        const placeRating = averageRatings[place.id] || 0.0 // ⭐ 여기에 별점 연결
+                        const placeRating = averageRatings[place.id] || 0.0
 
                         return (
                           <div
@@ -307,6 +322,7 @@ function MapViewPage() {
               </div>
             </div>
 
+            {/* 지도 */}
             <div className={`col-md-8 col-lg-9 map-col ${isMobile && sidebarVisible ? "d-none" : ""}`}>
               <div className="map-container">
                 {loading ? (
@@ -330,7 +346,7 @@ function MapViewPage() {
                       rating: averageRatings[place.id] || 0.0,
                     }))}
                     selectedPlace={selectedPlace}
-                    height="calc(100vh - 150px)"
+                    height={mapHeight}
                     showSearchBar={false}
                     defaultLevel={selectedPlace ? 3 : 7}
                     showInfoCard={true}
@@ -344,6 +360,7 @@ function MapViewPage() {
         </div>
       </div>
 
+      {/* 모바일 토글 버튼 */}
       {isMobile && (
         <button className="sidebar-toggle" onClick={toggleSidebar}>
           <i className={`bi ${sidebarVisible ? "bi-map" : "bi-list"}`}></i>
@@ -351,7 +368,7 @@ function MapViewPage() {
       )}
 
       <Footer />
-    </>
+    </div>
   )
 }
 export default MapViewPage

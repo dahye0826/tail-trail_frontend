@@ -15,19 +15,42 @@
   --result-card-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   --tag-bg: #e8f5f5;
   --tag-color: #2a9d8f;
-  --input-height: 48px; /* 모든 입력 요소의 높이 통일 */
-  --page-bg: #fbfbe9; /* HomePage와 동일한 배경색 변수 추가 */
+  --input-height: 48px;
+  --page-bg: #fbfbe9;
+}
+
+/* 전체 맵 페이지 래퍼 추가 */
+.map-page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--page-bg);
 }
 
 .map-view-background {
-  background-color: #fbfbe9; /* 홈페이지와 같은 배경색으로 변경 */
-  min-height: calc(100vh - 150px);
+  background-color: var(--page-bg);
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .container-fluid {
   padding-left: 1rem;
   padding-right: 1rem;
-  background-color: #fbfbe9; /* 컨테이너 배경색도 통일 */
+  background-color: var(--page-bg);
+  flex: 1 0 auto;
+}
+
+/* 행과 열 간격 조정 */
+.map-view-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -0.5rem;
+  height: 100%;
+}
+
+.sidebar-col, .map-col {
+  padding: 0 0.5rem;
 }
 
 /* 사이드바 스타일 */
@@ -36,15 +59,14 @@
   border-radius: var(--sidebar-radius);
   box-shadow: var(--sidebar-shadow);
   padding: 24px 20px;
-  height: calc(101vh - 140px);
+  height: calc(100vh - 140px);
   overflow-y: auto;
   border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   gap: var(--sidebar-gap);
   width: 100%;
-  min-width: 450px;
-  max-width: 550px;
+  min-width: 100%;
   position: relative;
   z-index: 10;
 }
@@ -180,8 +202,8 @@
 
 /* 드롭다운 아이템 선택 색상 변경 */
 .dropdown-item.selected {
-  background-color: #d4f0e9; /* 연하고 톤다운된 민트색 */
-  color: #2a9d8f; /* 텍스트 색상을 민트색 계열로 변경 */
+  background-color: #d4f0e9;
+  color: #2a9d8f;
   font-weight: 500;
 }
 
@@ -345,6 +367,9 @@
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border: 1px solid var(--border-color);
+  height: 100%;
+  min-height: 400px;
+  width: 100%;
 }
 
 /* 모바일 토글 버튼 */
@@ -369,29 +394,26 @@
 
 /* 하단 영역 배경색 통일 */
 footer, .footer-container {
-  background-color: #fbfbe9 !important;
+  background-color: var(--page-bg) !important;
+  flex-shrink: 0;
 }
 
-/* 푸터 영역이 전체 배경색과 일치하도록 */
-.app-container, .map-view-container, #root {
-  background-color: #fbfbe9;
-}
-
-body {
-  background-color: #fbfbe9;
+/* 맵 영역이 전체 높이를 채우도록 */
+.map-col {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 140px);
 }
 
 /* 반응형 */
 @media (max-width: 1200px) {
-  .sidebar-container {
-    min-width: 400px;
+  .sidebar-containermap {
     max-width: 450px;
   }
 }
 
 @media (max-width: 992px) {
-  .sidebar-container {
-    min-width: 350px;
+  .sidebar-containermap {
     max-width: 400px;
   }
 }
@@ -399,34 +421,30 @@ body {
 @media (max-width: 768px) {
   .map-view-row {
     flex-direction: column;
-    background-color: #fbfbe9; /* 행 배경색도 통일 */
+    background-color: var(--page-bg);
   }
 
+  .sidebar-col, .map-col {
+    width: 100%;
+    max-width: 100%;
+    flex-basis: 100%;
+    background-color: var(--page-bg);
+  }
+  
   .sidebar-col {
-    width: 100%;
-    max-width: 100%;
-    flex-basis: 100%;
     margin-bottom: 1rem;
-    background-color: #fbfbe9; /* 컬럼 배경색도 통일 */
-  }
-
-  .map-col {
-    width: 100%;
-    max-width: 100%;
-    flex-basis: 100%;
-    background-color: #fbfbe9; /* 맵 컬럼 배경색도 통일 */
+    height: auto;
   }
 
   .sidebar-containermap {
     height: 350px;
-    min-width: 100%;
     max-width: 100%;
     margin-bottom: 1rem;
   }
 
   .map-container {
-    height: calc(100vh - 520px);
-    min-height: 400px;
+    height: calc(100vh - 400px);
+    min-height: 350px;
   }
 
   .sidebar-toggle {
@@ -436,16 +454,26 @@ body {
   .sidebar-hidden {
     display: none;
   }
+  
+  /* 모바일에서 맵 컬럼 높이 조정 */
+  .map-col {
+    height: calc(100vh - 400px);
+  }
 }
 
 @media (max-width: 576px) {
-  .sidebar-container {
+  .sidebar-containermap {
     height: 300px;
     padding: 16px 12px;
   }
 
   .map-container {
-    height: calc(100vh - 470px);
-    min-height: 350px;
+    height: calc(100vh - 350px);
+    min-height: 300px;
+  }
+  
+  /* 작은 모바일에서 맵 컬럼 높이 조정 */
+  .map-col {
+    height: calc(100vh - 350px);
   }
 }

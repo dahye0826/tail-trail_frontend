@@ -17,6 +17,7 @@ function KakaoMap({
   useCluster = true,
 }) {
   const mapRef = useRef(null)
+  const mapContainerRef = useRef(null)
   const [map, setMap] = useState(null)
   const [searchKeyword, setSearchKeyword] = useState("")
   const [searchResults, setSearchResults] = useState([])
@@ -27,6 +28,48 @@ function KakaoMap({
   const clustererRef = useRef(null)
   const markersRef = useRef([])
   const [averageRatings, setAverageRatings] = useState({})
+  const [mapDimensions, setMapDimensions] = useState({ width: '100%', height })
+
+  // 맵 리사이즈 처리를 위한 ResizeObserver 추가
+  useEffect(() => {
+    if (!mapContainerRef.current) return;
+    
+    const resizeObserver = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        if (entry.target === mapContainerRef.current) {
+          if (map) {
+            // 지도 크기가 변경되면 지도 영역을 다시 그려줌
+            map.relayout();
+            
+            // 마커가 있다면 해당 영역으로 지도 이동
+            if (markerPositions && markerPositions.length > 0) {
+              const bounds = new window.kakao.maps.LatLngBounds();
+              
+              markerPositions.forEach(position => {
+                bounds.extend(new window.kakao.maps.LatLng(
+                  Number(position.lat), 
+                  Number(position.lng)
+                ));
+              });
+              
+              map.setBounds(bounds);
+            }
+          }
+        }
+      }
+    });
+    
+    resizeObserver.observe(mapContainerRef.current);
+    
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [map, markerPositions]);
+
+  // height prop이 변경될 때 적용
+  useEffect(() => {
+    setMapDimensions(prev => ({ ...prev, height }));
+  }, [height]);
 
   // 별점 렌더링 함수 추가
   function renderStarRating(rating) {
@@ -169,6 +212,9 @@ function KakaoMap({
           setSelectedLocation(initialLocation)
           setSelectedMarker({ marker })
         }
+        
+        // 지도가 로드된 후 리사이즈 이벤트 발생시키기
+        kakaoMap.relayout();
       })
     }
 
@@ -264,6 +310,15 @@ function KakaoMap({
     if (clustererRef.current) {
       clustererRef.current.addMarkers(markers)
     }
+    
+    // 모든 마커가 보이도록 지도 영역 조정
+    if (markers.length > 0) {
+      const bounds = new window.kakao.maps.LatLngBounds()
+      markerPositions.forEach(position => {
+        bounds.extend(new window.kakao.maps.LatLng(Number(position.lat), Number(position.lng)))
+      })
+      map.setBounds(bounds)
+    }
   }, [map, markerPositions, onLocationSelect, useCluster])
 
   useEffect(() => {
@@ -292,8 +347,12 @@ function KakaoMap({
 
   useEffect(() => {
     const fetchAverageRatings = async () => {
-      const response = await axios.get("http://localhost:9000/api/visited-place/average-ratings")
-      setAverageRatings(response.data)
+      try {
+        const response = await axios.get("http://localhost:9000/api/visited-place/average-ratings")
+        setAverageRatings(response.data)
+      } catch (error) {
+        console.error("평균 평점을 가져오는데 실패했습니다:", error)
+      }
     }
 
     fetchAverageRatings()
@@ -379,14 +438,18 @@ function KakaoMap({
   }
 
   return (
-    <div className="kakao-map-container" style={{ position: "relative" }}>
+    <div 
+      className="kakao-map-container" 
+      style={{ position: "relative" }}
+      ref={mapContainerRef}
+    >
       {/* 지도 */}
       <div
         id="kakao-map"
         ref={mapRef}
         style={{
-          width: "100%",
-          height: height || "400px",
+          width: mapDimensions.width,
+          height: mapDimensions.height,
           border: "1px solid #dee2e6",
           borderRadius: "4px",
         }}
