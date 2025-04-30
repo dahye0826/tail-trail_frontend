@@ -65,7 +65,7 @@ function Navbar() {
   // console.log("로그인 상태:", isLoggedIn, "관리자 상태:", isAdmin)
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light mb-4">
+    <nav className="navbar navbar-expand-lg navbar-light mb-4" style={{ padding: 0 }}>
       <div className="container">
         <Link className="navbar-brand" to="/">
           <img

@@ -9,7 +9,6 @@
 
 /* 배경색 관련 스타일 수정 */
 .mypage-wrapper {
-  background-color: var(--light-bg);
   padding: 1rem 0 3rem;
   margin-bottom: -3rem;
   min-height: calc(100vh - 60px);
