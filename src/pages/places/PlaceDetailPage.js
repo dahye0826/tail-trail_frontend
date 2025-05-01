@@ -126,14 +126,16 @@ function PlaceDetailPage() {
     e.preventDefault()
     const userId = localStorage.getItem("userId")
     if (!userId) {
-      alert("로그인이 필요합니다.")
-      navigate("/login")
+      showNotification("로그인이 필요합니다.", "error")
+      setTimeout(() => {
+        navigate("/login")
+      }, 1500)
       return
     }
 
     // 이미 리뷰를 작성한 경우 중복 작성 방지
     if (userHasReview) {
-      alert("이미 리뷰를 작성하셨습니다. 기존 리뷰를 수정해주세요.")
+      showNotification("이미 리뷰를 작성하셨습니다. 기존 리뷰를 수정해주세요.", "error")
       return
     }
 
@@ -317,15 +319,23 @@ function PlaceDetailPage() {
   // 즐겨찾기 토글 함수
   const toggleFavorite = async () => {
     if (!isLoggedIn) {
-      alert("로그인이 필요한 서비스입니다.")
-      navigate("/login")
+      showNotification("로그인이 필요한 서비스입니다.", "error")
+      
+      // 지연 후 로그인 페이지로 이동
+      setTimeout(() => {
+        navigate("/login")
+      }, 1500)
       return
     }
 
     const userId = localStorage.getItem("userId")
     if (!userId) {
-      alert("로그인이 필요한 서비스입니다.")
-      navigate("/login")
+      showNotification("로그인이 필요한 서비스입니다.", "error")
+      
+      // 지연 후 로그인 페이지로 이동
+      setTimeout(() => {
+        navigate("/login")
+      }, 1500)
       return
     }
 
@@ -680,8 +690,12 @@ function PlaceDetailPage() {
 
   const handleReport = async (reviewId, reason) => {
     if (!isLoggedIn) {
-      alert("로그인이 필요한 서비스입니다.")
-      navigate("/login")
+      showNotification("로그인이 필요한 서비스입니다.", "error")
+      
+      // 지연 후 로그인 페이지로 이동
+      setTimeout(() => {
+        navigate("/login")
+      }, 1500)
       return
     }
 
