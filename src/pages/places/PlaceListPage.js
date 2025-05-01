@@ -427,7 +427,11 @@ function PlaceListPage() {
   };
 
   // Event handlers
-  const handleSearch = () => setCurrentPage(1)
+  const handleSearch = () =>{ 
+     console.log("검색어:", `"${searchTerm}"`) 
+     setCurrentPage(1)}
+  
+  
 
   const handlePageChange = useCallback(
     (pageNumber) => {

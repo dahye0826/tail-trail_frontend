@@ -195,11 +195,11 @@ function EditPostPage() {
     <>
       <Navbar isLoggedIn={true} />
 
-      <div className="container mt-4 write-post-container">
+      <div className="container mt-4 post-write-container">
         <div className="row">
           <div className="col-lg-8 mx-auto">
             <div className="card shadow-sm">
-              <div className="card-header bg-white">
+              <div className="post-card-header bg-white">
                 <h2 className="text-center mb-0">추억 적기</h2>
               </div>
               <div className="card-body">

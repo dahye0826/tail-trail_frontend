@@ -327,20 +327,23 @@ function WritePostPage() {
                   </div>
 
                   {/* 이미지 미리보기 */}
+                  
                   {images.length > 0 && (
                     <div className="mb-3">
                       <label className="form-label post-form-label">선택한 이미지</label>
-                      <div className="post-image-preview-container">
+                      <div className="d-flex flex-wrap gap-2">
                         {images.map((image, index) => (
-                          <div key={index} className="post-image-preview-item">
+                          <div key={index} className="position-relative">
                             <img
-                              src={URL.createObjectURL(image) || "/placeholder.svg"}
+                              src={URL.createObjectURL(image)}
                               alt={`preview-${index}`}
-                              className="post-preview-image"
+                              width="100"
+                              height="100"
+                              className="preview-image"
                             />
                             <button
                               type="button"
-                              className="btn btn-sm btn-danger post-remove-image-btn"
+                              className="btn btn-sm btn-danger position-absolute top-0 end-0 remove-image-btn"
                               onClick={() => handleRemoveImage(index)}
                             >
                               ✕
@@ -350,7 +353,6 @@ function WritePostPage() {
                       </div>
                     </div>
                   )}
-
                   {/* 등록 / 취소 버튼 */}
                   <div className="d-flex justify-content-between mt-4 post-button-group">
                     <button
