@@ -194,6 +194,12 @@
   color: #6c757d;
 }
 
+.mention-dropdown-item.focused {
+  background-color: #e0f7f5;
+  font-weight: bold;
+  cursor: pointer;
+}
+
 /* 댓글 목록 스타일 */
 .comments-list {
   display: flex;
