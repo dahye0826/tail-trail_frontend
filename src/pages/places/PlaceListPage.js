@@ -417,13 +417,14 @@ function PlaceListPage() {
 
   // Function to show notification
   const showNotification = (message, type = "success") => {
-    setNotification({ show: true, message, type })
-
+    console.log("Showing notification:", message, type);
+    setNotification({ show: true, message, type });
+  
     // Auto hide after 3 seconds
     setTimeout(() => {
-      setNotification({ show: false, message: "", type: "success" })
-    }, 3000)
-  }
+      setNotification({ show: false, message: "", type: "success" });
+    }, 3000);
+  };
 
   // Event handlers
   const handleSearch = () => setCurrentPage(1)
@@ -443,51 +444,67 @@ function PlaceListPage() {
   const handlePlaceClick = useCallback((placeId) => navigate(`/places/place/${placeId}`), [navigate])
 
 // Improved favorite toggle handler
+// 1. First, ensure the renderNotification function is properly implemented
+// Replace the current renderNotification function in PlaceListPage.js with this:
+
+const renderNotification = () => {
+  if (!notification.show) return null;
+
+  return (
+    <div className={`place-notification ${notification.type === "error" ? "place-notification-error" : ""}`}>
+      <div className="place-notification-content">{notification.message}</div>
+    </div>
+  );
+};
+
+// 2. Make sure the handleFavoriteToggle function uses the notification state correctly
+// Find the handleFavoriteToggle function in PlaceListPage.js and modify:
+
 const handleFavoriteToggle = useCallback(
   async (placeId, e) => {
-    e.stopPropagation()
+    e.stopPropagation();
     if (!isLoggedIn) {
       // Show notification
-      setNotification({ show: true, message: "로그인이 필요한 서비스입니다.", type: "error" })
+      setNotification({ show: true, message: "로그인이 필요한 서비스입니다.", type: "error" });
       
       // Wait a moment before redirecting (give time to see the notification)
       setTimeout(() => {
-        navigate("/login", { state: { from: location } })
-      }, 1500) // Wait 1.5 seconds before redirecting
+        navigate("/login", { state: { from: location } });
+      }, 1500); // Wait 1.5 seconds before redirecting
       
-      return
+      return;
     }
 
     try {
-      const userId = localStorage.getItem("userId")
-      const numericPlaceId = Number(placeId)
+      const userId = localStorage.getItem("userId");
+      const numericPlaceId = Number(placeId);
 
       const response = await axios.post(`${API_BASE_URL}/favorites/toggle`, null, {
         params: { userId: Number(userId), placeId: numericPlaceId },
-      })
+      });
 
-      console.log("즐겨찾기 토글 응답:", response.data)
+      console.log("즐겨찾기 토글 응답:", response.data);
 
       if (response.data.success) {
         if (response.data.isAdded) {
           setFavorites((prevFavorites) => {
-            return [...prevFavorites, numericPlaceId]
-          })
-          showNotification("즐겨찾기에 추가되었습니다.")
+            return [...prevFavorites, numericPlaceId];
+          });
+          showNotification("즐겨찾기에 추가되었습니다.");
         } else {
           setFavorites((prevFavorites) => {
-            return prevFavorites.filter((id) => Number(id) !== numericPlaceId)
-          })
-          showNotification("즐겨찾기가 해제되었습니다.")
+            return prevFavorites.filter((id) => Number(id) !== numericPlaceId);
+          });
+          showNotification("즐겨찾기가 해제되었습니다.");
         }
       }
     } catch (error) {
-      console.error("즐겨찾기 처리 오류:", error)
-      showNotification("즐겨찾기 업데이트 중 오류가 발생했습니다.", "error")
+      console.error("즐겨찾기 처리 오류:", error);
+      showNotification("즐겨찾기 업데이트 중 오류가 발생했습니다.", "error");
     }
   },
   [isLoggedIn, navigate, location],
-)
+);
 
   const handleResetFilters = () => {
     setRegionFilter("")
@@ -694,24 +711,7 @@ const handleFavoriteToggle = useCallback(
   }
 
   // Render notification toast
-  const renderNotification = () => {
-    if (!notification.show) return null;
-  
-    return (
-      <div className="modal-overlay">
-        <div className="modal-content">
-          <div className="modal-message">{notification.message}</div>
-          <button 
-            className="modal-button"
-            onClick={() => setNotification({ show: false, message: "", type: "success" })}
-          >
-            확인
-          </button>
-        </div>
-      </div>
-    );
-  };
-
+  // Render notification toast - matches PlaceDetailPage style
   // Render recommended places with proper favorite state
   const renderRecommendedPlace = (place) => {
     const isFavorite = isFavorited(place.placeId)
