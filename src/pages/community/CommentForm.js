@@ -13,6 +13,7 @@ function CommentForm({ postId, onCommentAdded, isLoggedIn, userId, commentUsers 
   const [mentionStartPos, setMentionStartPos] = useState(0)
   const textareaRef = useRef(null)
   const mentionListRef = useRef(null)
+  const [focusedIndex, setFocusedIndex] = useState(0)
 
   // 드롭다운 외부 클릭 시 닫기
   useEffect(() => {
@@ -98,6 +99,21 @@ function CommentForm({ postId, onCommentAdded, isLoggedIn, userId, commentUsers 
       }
     }, 0)
   }
+  const handleKeyDown = (e) => {
+    if (showMentionList && filteredUsers.length > 0) {
+      if (e.key === "ArrowDown") {
+        e.preventDefault()
+        setFocusedIndex((prev) => (prev + 1) % filteredUsers.length)
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault()
+        setFocusedIndex((prev) => (prev - 1 + filteredUsers.length) % filteredUsers.length)
+      } else if (e.key === "Enter") {
+        const selectedUser = filteredUsers[focusedIndex]
+        handleMentionSelect(selectedUser)
+        e.preventDefault() // Enter로 줄 바꿈 방지
+      }
+    }
+  }
 
   // 댓글 작성 처리
   const handleSubmit = async (e) => {
@@ -153,6 +169,7 @@ function CommentForm({ postId, onCommentAdded, isLoggedIn, userId, commentUsers 
             value={content}
             onChange={handleContentChange}
             onClick={handleTextareaClick}
+            onKeyDown={handleKeyDown} 
             disabled={!isLoggedIn || isSubmitting}
           ></textarea>
 
@@ -162,9 +179,9 @@ function CommentForm({ postId, onCommentAdded, isLoggedIn, userId, commentUsers 
                 // user가 객체인지 문자열인지 확인
                 const userName = typeof user === "string" ? user : user.userName
                 const userId = typeof user === "string" ? index : user.userId
-
+                const isFocused = index === focusedIndex
                 return (
-                  <div key={userId} className="mention-dropdown-item" onClick={() => handleMentionSelect(user)}>
+                  <div key={userId}  className={`mention-dropdown-item ${isFocused ? "focused" : ""}`} onClick={() => handleMentionSelect(user)}>
                     <div className="d-flex align-items-center">
                       <div className="comment-avatar me-2">{userName.charAt(0)}</div>
                       <div className="fw-bold">{userName}</div>
