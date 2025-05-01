@@ -20,7 +20,7 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
       if (!currentUser) return
 
       try {
-        const response = await axios.get("http://localhost:9000/api/report/check", {
+        const response = await axios.get("http://localhost:9000/api/report", {
           params: {
             userId: currentUser.userId,
             targetId: comment.commentId,

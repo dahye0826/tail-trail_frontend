@@ -70,7 +70,7 @@ function PostDetailPage() {
 
         if (userId && isLoggedIn) {
           try {
-            const reportCheck = await axios.get(`http://localhost:9000/api/report/check`, {
+            const reportCheck = await axios.get(`http://localhost:9000/api/report`, {
               params: {
                 userId: Number(userId),
                 targetId: response.data.postId,

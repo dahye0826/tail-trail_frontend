@@ -4,18 +4,25 @@ import { useState, useRef, useEffect } from "react"
 import axios from "axios"
 import "./CommentSection.css"
 
-function CommentForm({ postId, onCommentAdded, isLoggedIn, userId,commentUsers = [] }) {
+function CommentForm({ postId, onCommentAdded, isLoggedIn, userId, commentUsers = [] }) {
   const [content, setContent] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isMentionOpen, setIsMentionOpen] = useState(false)
+  const [showMentionList, setShowMentionList] = useState(false)
+  const [mentionQuery, setMentionQuery] = useState("")
+  const [filteredUsers, setFilteredUsers] = useState([])
+  const [mentionStartPos, setMentionStartPos] = useState(0)
   const textareaRef = useRef(null)
-  const dropdownRef = useRef(null)
+  const mentionListRef = useRef(null)
 
   // 드롭다운 외부 클릭 시 닫기
   useEffect(() => {
     function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsMentionOpen(false)
+      if (
+        mentionListRef.current &&
+        !mentionListRef.current.contains(event.target) &&
+        textareaRef.current !== event.target
+      ) {
+        setShowMentionList(false)
       }
     }
 
@@ -25,33 +32,71 @@ function CommentForm({ postId, onCommentAdded, isLoggedIn, userId,commentUsers =
     }
   }, [])
 
-  // 멘션 토글 버튼 클릭 처리
-  const toggleMentionDropdown = () => {
-    setIsMentionOpen(!isMentionOpen)
+  // 텍스트 변경 감지 및 @ 처리
+  const handleContentChange = (e) => {
+    const newContent = e.target.value
+    setContent(newContent)
+
+    // @ 문자 감지 및 멘션 처리
+    const cursorPosition = e.target.selectionStart
+    const textBeforeCursor = newContent.substring(0, cursorPosition)
+    const atIndex = textBeforeCursor.lastIndexOf("@")
+
+    if (atIndex !== -1) {
+      const lastSpaceBeforeAt = textBeforeCursor.substring(0, atIndex).lastIndexOf(" ")
+      const isAtStartOrAfterSpace =
+        atIndex === 0 || lastSpaceBeforeAt === atIndex - 1 || textBeforeCursor[atIndex - 1] === "\n"
+
+      if (isAtStartOrAfterSpace) {
+        const query = textBeforeCursor.substring(atIndex + 1)
+
+        if (query.includes(" ") || query.includes("\n")) {
+          setShowMentionList(false)
+        } else {
+          setMentionQuery(query)
+          setMentionStartPos(atIndex)
+
+          // 사용자 필터링 (commentUsers prop 사용)
+          let filtered = []
+          if (query) {
+            filtered = commentUsers.filter((user) => {
+              const userName = typeof user === "string" ? user : user.userName
+              return userName.toLowerCase().includes(query.toLowerCase())
+            })
+          } else {
+            filtered = commentUsers
+          }
+
+          setFilteredUsers(filtered.length > 0 ? filtered : commentUsers)
+          setShowMentionList(commentUsers.length > 0)
+        }
+      } else {
+        setShowMentionList(false)
+      }
+    } else {
+      setShowMentionList(false)
+    }
   }
 
   // 멘션 선택 처리
-  const handleMentionSelect = (userName) => {
+  const handleMentionSelect = (user) => {
+    // user가 객체인지 문자열인지 확인
+    const userName = typeof user === "string" ? user : user.userName
 
-    const mention = `@${userName} `;
-    const contentWithoutOldMention = content.replace(/^@([\uAC00-\uD7A3\w]+)\s+/, "");
+    const beforeMention = content.substring(0, mentionStartPos)
+    const afterMention = content.substring(mentionStartPos + mentionQuery.length + 1)
+    const newContent = `${beforeMention}@${userName} ${afterMention}`
+    setContent(newContent)
+    setShowMentionList(false)
 
-    const newContent = mention + contentWithoutOldMention;
-    setContent(newContent);
-  
-    setTimeout(()=>{
-      if(textareaRef.current){
-        textareaRef.current.focus();
-        textareaRef.current.setSelectionRange(
-          mention.length,
-          mention.length
-        )
+    // 커서 위치 조정
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.focus()
+        const cursorPosition = mentionStartPos + userName.length + 2 // @ + userName + space
+        textareaRef.current.setSelectionRange(cursorPosition, cursorPosition)
       }
-    },0);
-    
-
-    // 멘션 선택 후 드롭다운 닫기
-    setIsMentionOpen(false)
+    }, 0)
   }
 
   // 댓글 작성 처리
@@ -74,9 +119,9 @@ function CommentForm({ postId, onCommentAdded, isLoggedIn, userId,commentUsers =
       const response = await axios.post("http://localhost:9000/api/comments", {
         postId,
         content,
-        userId
+        userId,
       })
-      onCommentAdded(response.data);
+      onCommentAdded(response.data)
       setContent("")
     } catch (error) {
       console.error("댓글 작성 오류:", error)
@@ -95,40 +140,43 @@ function CommentForm({ postId, onCommentAdded, isLoggedIn, userId,commentUsers =
 
   return (
     <div className="comment-form-container">
-      {/* 멘션 드롭다운 영역 */}
-      <div className="mention-dropdown-container" ref={dropdownRef}>
-        <button
-          type="button"
-          className="btn btn-outline-secondary mention-dropdown-toggle"
-          onClick={toggleMentionDropdown}
-          disabled={!isLoggedIn}
-        >
-          @언급하기{isMentionOpen ? "▲" : "▼"}
-        </button>
-
-        {isMentionOpen && commentUsers.length > 0 && (
-          <div className="mention-dropdown-menu">
-            {commentUsers.map((user, index) => (
-              <div key={index} className="mention-dropdown-item" onClick={() => handleMentionSelect(user.userName || user)}>
-                @{user.userName || user}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
       <form onSubmit={handleSubmit}>
-        <textarea
-          ref={textareaRef}
-          className="form-control"
-          placeholder={isLoggedIn ? "댓글을 작성해주세요..." : "댓글을 작성하려면 로그인이 필요합니다."}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          onClick={handleTextareaClick}
-          disabled={!isLoggedIn || isSubmitting}
-        ></textarea>
+        <div className="position-relative">
+          <textarea
+            ref={textareaRef}
+            className="form-control"
+            placeholder={
+              isLoggedIn
+                ? "댓글을 작성해주세요... (@를 입력하여 사용자 언급)"
+                : "댓글을 작성하려면 로그인이 필요합니다."
+            }
+            value={content}
+            onChange={handleContentChange}
+            onClick={handleTextareaClick}
+            disabled={!isLoggedIn || isSubmitting}
+          ></textarea>
 
-        <div className="d-flex">
+          {showMentionList && filteredUsers.length > 0 && (
+            <div ref={mentionListRef} className="mention-dropdown-menu">
+              {filteredUsers.map((user, index) => {
+                // user가 객체인지 문자열인지 확인
+                const userName = typeof user === "string" ? user : user.userName
+                const userId = typeof user === "string" ? index : user.userId
+
+                return (
+                  <div key={userId} className="mention-dropdown-item" onClick={() => handleMentionSelect(user)}>
+                    <div className="d-flex align-items-center">
+                      <div className="comment-avatar me-2">{userName.charAt(0)}</div>
+                      <div className="fw-bold">{userName}</div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        <div className="d-flex mt-2">
           <button type="submit" className="btn btn-primary" disabled={!isLoggedIn || isSubmitting || !content.trim()}>
             {isSubmitting ? "등록 중..." : "댓글 등록"}
           </button>
