@@ -1,9 +1,13 @@
+/* KakaoMap.css */
+
+/* 지도 컨테이너 스타일 */
 .kakao-map-container {
   width: 100%;
   position: relative;
   margin-bottom: 1rem;
 }
 
+/* 검색 영역 스타일 */
 .map-search-container {
   margin-bottom: 0.75rem;
   position: relative;
@@ -11,13 +15,13 @@
   font-size: 1rem;
 }
 
-/* 검색 버튼 스타일 개선 */
+/* 검색 버튼 스타일 */
 .search-btn {
   padding: 0.5rem 1rem;
   font-weight: 500;
 }
 
-/* 검색 중 로딩 표시 */
+/* 검색 중 로딩 표시 스타일 */
 .search-loading {
   display: flex;
   align-items: center;
@@ -26,7 +30,7 @@
   color: #6c757d;
 }
 
-/* 검색 결과 컨테이너 */
+/* 검색 결과 컨테이너 스타일 */
 .search-results-container {
   position: absolute;
   z-index: 1000;
@@ -38,12 +42,14 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* 검색 결과 헤더 스타일 */
 .search-results-header {
   padding: 0.5rem 0.75rem;
   background-color: #f8f9fa;
   border-bottom: 1px solid #dee2e6;
 }
 
+/* 검색 결과 목록 스타일 */
 .search-results {
   max-height: 300px;
   overflow-y: auto;
@@ -51,6 +57,7 @@
   border: none;
 }
 
+/* 검색 결과 항목 스타일 */
 .search-result-item {
   padding: 0.75rem;
   cursor: pointer;
@@ -68,18 +75,21 @@
   background-color: #f0f9fa;
 }
 
+/* 검색 결과 장소명 스타일 */
 .search-result-name {
   font-weight: 600;
   color: #2c3e50;
   margin-bottom: 0.25rem;
 }
 
+/* 검색 결과 주소 스타일 */
 .search-result-address {
   font-size: 0.85rem;
   color: #6c757d;
   margin-bottom: 0.25rem;
 }
 
+/* 검색 결과 카테고리 스타일 */
 .search-result-category {
   font-size: 0.8rem;
   color: #4ecdc4;
@@ -89,11 +99,13 @@
   border-radius: 12px;
 }
 
+/* 검색 오류 메시지 스타일 */
 .search-error {
   margin-bottom: 0;
   font-size: 0.9rem;
 }
 
+/* 지도 뷰 스타일 */
 .map-view {
   border-radius: 4px;
   overflow: hidden;
@@ -108,7 +120,7 @@
   text-align: right;
 }
 
-/* 장소 정보 카드 */
+/* 장소 정보 카드 스타일 */
 .place-info-card {
   position: absolute;
   left: 24px;
@@ -124,6 +136,7 @@
   gap: 12px;
 }
 
+/* 장소 정보 제목 스타일 */
 .place-info-title {
   font-size: 18px;
   font-weight: bold;
@@ -134,6 +147,7 @@
   gap: 6px;
 }
 
+/* 장소 정보 주소 스타일 */
 .place-info-address {
   font-size: 14px;
   color: #666;
@@ -143,6 +157,7 @@
   margin-bottom: 2px;
 }
 
+/* 장소 정보 카테고리 스타일 */
 .place-info-category {
   font-size: 14px;
   color: #4ecdc4;
@@ -154,18 +169,21 @@
   margin-bottom: 4px;
 }
 
+/* 장소 정보 아이콘 스타일 */
 .place-info-icon {
   color: #4ecdc4;
   font-size: 18px;
   margin-right: 4px;
 }
 
+/* 장소 정보 버튼 컨테이너 스타일 */
 .place-info-btns {
   margin-top: 8px;
   display: flex;
   gap: 8px;
 }
 
+/* 장소 정보 버튼 스타일 */
 .place-info-btn {
   background: #4ecdc4;
   color: #fff;
@@ -177,11 +195,12 @@
   cursor: pointer;
   transition: background 0.18s;
 }
+
 .place-info-btn:hover {
   background: #38b8ab;
 }
 
-/* 별점 스타일 추가 */
+/* 별점 스타일 */
 .star-rating {
   display: flex;
   align-items: center;
@@ -193,11 +212,12 @@
   margin-right: 1px;
 }
 
+/* 장소 정보 별점 스타일 */
 .place-info-rating {
   margin-bottom: 5px;
 }
 
-/* 클러스터 스타일 */
+/* 클러스터 마커 스타일 */
 .cluster-marker {
   color: #fff;
   background: #4ecdc4;

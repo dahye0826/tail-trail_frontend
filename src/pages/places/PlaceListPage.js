@@ -9,16 +9,17 @@ import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 import axios from "axios"
 
+// API 및 서버 관련 상수
 const API_BASE_URL = "http://localhost:9000/api"
 const ML_SERVER_URL = "http://localhost:9001"
 
 function PlaceListPage() {
-  // State management
+  // State 관리
   const [places, setPlaces] = useState([])
   const [loading, setLoading] = useState(true)
   const [partialLoading, setPartialLoading] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [userName, setUserName] = useState("") // 사용자 이름 상태 추가
+  const [userName, setUserName] = useState("") // 사용자 이름 상태
   const [searchTerm, setSearchTerm] = useState("")
   const [regionFilter, setRegionFilter] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("")
@@ -35,14 +36,15 @@ function PlaceListPage() {
   const [error, setError] = useState(null)
   const [recommendedPlaces, setRecommendedPlaces] = useState([])
   const [loadingRecommendations, setLoadingRecommendations] = useState(false)
-  // Add notification state
+  // 알림 상태
   const [notification, setNotification] = useState({ show: false, message: "", type: "success" })
 
   const navigate = useNavigate()
   const location = useLocation()
   const placesPerPage = 9
 
-  // Constants
+  // 상수 정의
+  // 카테고리 매핑 (카테고리와 세부 카테고리 연결)
   const categoryMapping = useMemo(
     () => ({
       여행지: ["여행지"],
@@ -55,7 +57,7 @@ function PlaceListPage() {
     [],
   )
 
-  // 카테고리와 API 매핑을 위한 새로운 상수 추가
+  // 카테고리와 API 매핑을 위한 상수
   const categoryApiMapping = useMemo(
     () => ({
       여행지: "여행지",
@@ -68,6 +70,7 @@ function PlaceListPage() {
     [],
   )
 
+  // 반려견 크기 옵션
   const petSizes = useMemo(
     () => [
       { value: "small", label: "소형견" },
@@ -77,8 +80,9 @@ function PlaceListPage() {
     [],
   )
 
-  // Initialize data and check login status
+  // 데이터 초기화 및 로그인 상태 확인
   useEffect(() => {
+    // 로그인 상태 확인 함수
     const checkLoginStatus = () => {
       const userId = localStorage.getItem("userId")
       const loggedIn = !!userId
@@ -98,7 +102,7 @@ function PlaceListPage() {
       return loggedIn
     }
 
-    // 사용자 이름 가져오기
+    // 사용자 이름 가져오기 함수
     const fetchUserName = async (userId) => {
       try {
         const response = await axios.get(`${API_BASE_URL}/users/${userId}`)
@@ -117,12 +121,13 @@ function PlaceListPage() {
       }
     }
 
+    // 초기 데이터 로드 함수
     const fetchInitialData = async () => {
       try {
         // 먼저 로그인 상태 확인
         const isUserLoggedIn = checkLoginStatus()
 
-        // Load cities and categories
+        // 도시 및 카테고리 데이터 로드
         const [citiesResponse, categoriesResponse] = await Promise.all([
           axios.get(`${API_BASE_URL}/places/cities`),
           axios.get(`${API_BASE_URL}/places/categories`),
@@ -136,14 +141,14 @@ function PlaceListPage() {
           await fetchFavorites()
         }
       } catch (error) {
-        console.error("Error fetching initial data:", error)
+        console.error("초기 데이터 로드 오류:", error)
       }
     }
 
     fetchInitialData()
   }, [])
 
-  // Add event listener for page visibility to refresh favorites when returning to the page
+  // 페이지 가시성 변경 시 즐겨찾기 새로고침
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible" && isLoggedIn) {
@@ -153,7 +158,7 @@ function PlaceListPage() {
 
     document.addEventListener("visibilitychange", handleVisibilityChange)
 
-    // Cleanup
+    // 정리 함수
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange)
     }
@@ -164,7 +169,7 @@ function PlaceListPage() {
     const handleStorageChange = () => {
       const userId = localStorage.getItem("userId")
       const newLoginStatus = !!userId
-      console.log("Storage changed - New login status:", newLoginStatus)
+      console.log("로컬 스토리지 변경 - 새로운 로그인 상태:", newLoginStatus)
       setIsLoggedIn(newLoginStatus)
 
       // 로그인 상태가 변경되면 사용자 이름도 업데이트
@@ -189,7 +194,7 @@ function PlaceListPage() {
     }
   }, [])
 
-  // Focus event to reload favorites when returning to this page
+  // 페이지 포커스 시 즐겨찾기 새로고침
   useEffect(() => {
     const handleFocus = () => {
       if (isLoggedIn) {
@@ -204,14 +209,14 @@ function PlaceListPage() {
     }
   }, [isLoggedIn])
 
-  // location.pathname 변경 시 즐겨찾기 새로고침
+  // 경로 변경 시 즐겨찾기 새로고침
   useEffect(() => {
     if (isLoggedIn) {
       fetchFavorites()
     }
   }, [isLoggedIn, location.pathname])
 
-  // Improved fetch favorites function
+  // 즐겨찾기 데이터 가져오기 함수
   const fetchFavorites = async () => {
     try {
       const userId = localStorage.getItem("userId")
@@ -221,7 +226,7 @@ function PlaceListPage() {
         return
       }
 
-      // Direct API call instead of using favoriteAPI service which might have issues
+      // 직접 API 호출
       const response = await axios.get(`${API_BASE_URL}/favorites`, {
         params: {
           userId: Number(userId),
@@ -235,7 +240,7 @@ function PlaceListPage() {
       if (response.data) {
         let favoritesList = []
 
-        // Handle different API response structures
+        // 다양한 API 응답 구조 처리
         if (Array.isArray(response.data)) {
           favoritesList = response.data
         } else if (response.data.favorites && Array.isArray(response.data.favorites)) {
@@ -244,7 +249,7 @@ function PlaceListPage() {
           favoritesList = response.data.content
         }
 
-        // Extract placeId from favorite items and convert to numbers
+        // 장소 ID 추출 및 숫자로 변환
         const favoriteIds = favoritesList
           .map((item) => {
             if (typeof item === "number") return item
@@ -265,7 +270,7 @@ function PlaceListPage() {
     }
   }
 
-  // Update subcategories when category changes
+  // 카테고리 변경 시 서브카테고리 업데이트
   useEffect(() => {
     if (categoryFilter) {
       setSubCategories(categoryMapping[categoryFilter] || [])
@@ -275,24 +280,24 @@ function PlaceListPage() {
     }
   }, [categoryFilter, categoryMapping])
 
-  // Calculate pet size categories
+  // 반려견 크기 카테고리 계산 함수
   const calculatePetSizeCategories = useCallback((petSizeStr) => {
     if (!petSizeStr) return []
 
     const sizes = []
     const lowerPetSize = petSizeStr.toLowerCase()
 
-    // Universal indicators
+    // 모든 크기 포함 여부 확인
     if (lowerPetSize.includes("모두") || lowerPetSize.includes("전체")) {
       return ["small", "medium", "large"]
     }
 
-    // Text-based indicators
+    // 텍스트 기반 지표
     if (lowerPetSize.includes("소형")) sizes.push("small")
     if (lowerPetSize.includes("중형")) sizes.push("medium")
     if (lowerPetSize.includes("대형")) sizes.push("large")
 
-    // Weight-based parsing
+    // 무게 기반 파싱
     const weightMatch = lowerPetSize.match(/(\d+)\s*kg/)
     if (weightMatch) {
       const weight = Number.parseInt(weightMatch[1])
@@ -304,13 +309,12 @@ function PlaceListPage() {
     return [...new Set(sizes)]
   }, [])
 
-  // Fetch places data with filters - MapViewPage 방식으로 수정
+  // 필터 적용하여 장소 데이터 가져오기
   const fetchPlaces = useCallback(async () => {
     try {
       setPartialLoading(true)
       
-
-      // Prepare filter parameters
+      // 필터 파라미터 준비
       const params = {
         page: currentPage,
         size: placesPerPage,
@@ -319,14 +323,14 @@ function PlaceListPage() {
         petSize: petSizeFilter || undefined,
       }
 
-      // MapViewPage 방식으로 카테고리 필터링 로직 수정
+      // 카테고리 필터링 로직
       if (subCategoryFilter) {
         params.industry = subCategoryFilter
       } else if (categoryFilter) {
         params.industry = categoryApiMapping[categoryFilter] || categoryFilter
       }
 
-      // 디버깅을 위한 로그 추가
+      // 디버깅 로그
       console.log("필터 적용:", {
         categoryFilter,
         subCategoryFilter,
@@ -346,7 +350,7 @@ function PlaceListPage() {
       }
       setError(null)
     } catch (error) {
-      console.error("Error fetching places:", error)
+      console.error("장소 데이터 로드 오류:", error)
       setError(
         error.response
           ? `서버 오류: ${error.response.status}`
@@ -359,13 +363,14 @@ function PlaceListPage() {
       setLoading(false)
       setPartialLoading(false)
     }
-  }, [currentPage, searchTerm, categoryFilter, subCategoryFilter, regionFilter, petSizeFilter, placesPerPage])
+  }, [currentPage, searchTerm, categoryFilter, subCategoryFilter, regionFilter, petSizeFilter, placesPerPage, categoryApiMapping])
 
+  // 장소 데이터 로드
   useEffect(() => {
     fetchPlaces()
   }, [fetchPlaces])
 
-  // Process pet size information
+  // 반려견 크기 정보 처리
   useEffect(() => {
     if (!places.length) return
 
@@ -415,24 +420,25 @@ function PlaceListPage() {
     }
   }, [isLoggedIn])
 
-  // Function to show notification
+  // 알림 표시 함수
   const showNotification = (message, type = "success") => {
-    console.log("Showing notification:", message, type);
+    console.log("알림 표시:", message, type);
     setNotification({ show: true, message, type });
   
-    // Auto hide after 3 seconds
+    // 3초 후 자동 숨김
     setTimeout(() => {
       setNotification({ show: false, message: "", type: "success" });
     }, 3000);
   };
 
-  // Event handlers
-  const handleSearch = () =>{ 
-     console.log("검색어:", `"${searchTerm}"`) 
-     setCurrentPage(1)}
+  // 이벤트 핸들러
+  // 검색 핸들러
+  const handleSearch = () => { 
+    console.log("검색어:", `"${searchTerm}"`) 
+    setCurrentPage(1)
+  }
   
-  
-
+  // 페이지 변경 핸들러
   const handlePageChange = useCallback(
     (pageNumber) => {
       if (pageNumber < 1 || pageNumber > totalPages || pageNumber === currentPage) return
@@ -445,71 +451,68 @@ function PlaceListPage() {
     [currentPage, totalPages],
   )
 
+  // 장소 클릭 핸들러
   const handlePlaceClick = useCallback((placeId) => navigate(`/places/place/${placeId}`), [navigate])
 
-// Improved favorite toggle handler
-// 1. First, ensure the renderNotification function is properly implemented
-// Replace the current renderNotification function in PlaceListPage.js with this:
+  // 알림 렌더링 함수
+  const renderNotification = () => {
+    if (!notification.show) return null;
 
-const renderNotification = () => {
-  if (!notification.show) return null;
+    return (
+      <div className={`place-notification ${notification.type === "error" ? "place-notification-error" : ""}`}>
+        <div className="place-notification-content">{notification.message}</div>
+      </div>
+    );
+  };
 
-  return (
-    <div className={`place-notification ${notification.type === "error" ? "place-notification-error" : ""}`}>
-      <div className="place-notification-content">{notification.message}</div>
-    </div>
-  );
-};
-
-// 2. Make sure the handleFavoriteToggle function uses the notification state correctly
-// Find the handleFavoriteToggle function in PlaceListPage.js and modify:
-
-const handleFavoriteToggle = useCallback(
-  async (placeId, e) => {
-    e.stopPropagation();
-    if (!isLoggedIn) {
-      // Show notification
-      setNotification({ show: true, message: "로그인이 필요한 서비스입니다.", type: "error" });
-      
-      // Wait a moment before redirecting (give time to see the notification)
-      setTimeout(() => {
-        navigate("/login", { state: { from: location } });
-      }, 1500); // Wait 1.5 seconds before redirecting
-      
-      return;
-    }
-
-    try {
-      const userId = localStorage.getItem("userId");
-      const numericPlaceId = Number(placeId);
-
-      const response = await axios.post(`${API_BASE_URL}/favorites/toggle`, null, {
-        params: { userId: Number(userId), placeId: numericPlaceId },
-      });
-
-      console.log("즐겨찾기 토글 응답:", response.data);
-
-      if (response.data.success) {
-        if (response.data.isAdded) {
-          setFavorites((prevFavorites) => {
-            return [...prevFavorites, numericPlaceId];
-          });
-          showNotification("즐겨찾기에 추가되었습니다.");
-        } else {
-          setFavorites((prevFavorites) => {
-            return prevFavorites.filter((id) => Number(id) !== numericPlaceId);
-          });
-          showNotification("즐겨찾기가 해제되었습니다.");
-        }
+  // 즐겨찾기 토글 핸들러
+  const handleFavoriteToggle = useCallback(
+    async (placeId, e) => {
+      e.stopPropagation();
+      if (!isLoggedIn) {
+        // 알림 표시
+        setNotification({ show: true, message: "로그인이 필요한 서비스입니다.", type: "error" });
+        
+        // 잠시 후 리디렉션 (알림을 볼 시간 제공)
+        setTimeout(() => {
+          navigate("/login", { state: { from: location } });
+        }, 1500); // 1.5초 후 리디렉션
+        
+        return;
       }
-    } catch (error) {
-      console.error("즐겨찾기 처리 오류:", error);
-      showNotification("즐겨찾기 업데이트 중 오류가 발생했습니다.", "error");
-    }
-  },
-  [isLoggedIn, navigate, location],
-);
 
+      try {
+        const userId = localStorage.getItem("userId");
+        const numericPlaceId = Number(placeId);
+
+        const response = await axios.post(`${API_BASE_URL}/favorites/toggle`, null, {
+          params: { userId: Number(userId), placeId: numericPlaceId },
+        });
+
+        console.log("즐겨찾기 토글 응답:", response.data);
+
+        if (response.data.success) {
+          if (response.data.isAdded) {
+            setFavorites((prevFavorites) => {
+              return [...prevFavorites, numericPlaceId];
+            });
+            showNotification("즐겨찾기에 추가되었습니다.");
+          } else {
+            setFavorites((prevFavorites) => {
+              return prevFavorites.filter((id) => Number(id) !== numericPlaceId);
+            });
+            showNotification("즐겨찾기가 해제되었습니다.");
+          }
+        }
+      } catch (error) {
+        console.error("즐겨찾기 처리 오류:", error);
+        showNotification("즐겨찾기 업데이트 중 오류가 발생했습니다.", "error");
+      }
+    },
+    [isLoggedIn, navigate, location],
+  );
+
+  // 필터 초기화 핸들러
   const handleResetFilters = () => {
     setRegionFilter("")
     setCategoryFilter("")
@@ -519,7 +522,8 @@ const handleFavoriteToggle = useCallback(
     setCurrentPage(1)
   }
 
-  // Helper rendering functions
+  // 헬퍼 렌더링 함수
+  // 반려견 크기 태그 렌더링
   const renderPetSizeTags = useCallback(
     (placeId) => {
       const sizes = petSizeDisplay[placeId] || []
@@ -542,10 +546,10 @@ const handleFavoriteToggle = useCallback(
     [petSizeDisplay, petSizeFilter],
   )
 
-  // Render pagination items
+  // 페이지네이션 아이템 렌더링
   const renderPaginationItems = useCallback(() => {
     const items = []
-    const maxPageButtons = 5 // Reduced from 10 for cleaner UI
+    const maxPageButtons = 5 // 깔끔한 UI를 위해 10에서 5로 축소
 
     let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2))
     const endPage = Math.min(totalPages, startPage + maxPageButtons - 1)
@@ -554,7 +558,7 @@ const handleFavoriteToggle = useCallback(
       startPage = Math.max(1, endPage - maxPageButtons + 1)
     }
 
-    // First and previous buttons
+    // 처음 및 이전 버튼
     items.push(
       <li key="first" className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
         <button className="page-link" onClick={() => handlePageChange(1)} aria-label="First">
@@ -568,7 +572,7 @@ const handleFavoriteToggle = useCallback(
       </li>,
     )
 
-    // Page numbers
+    // 페이지 번호
     for (let i = startPage; i <= endPage; i++) {
       items.push(
         <li key={i} className={`page-item ${currentPage === i ? "active" : ""}`}>
@@ -579,7 +583,7 @@ const handleFavoriteToggle = useCallback(
       )
     }
 
-    // Next and last buttons
+    // 다음 및 마지막 버튼
     items.push(
       <li key="next" className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
         <button className="page-link" onClick={() => handlePageChange(currentPage + 1)} aria-label="Next">
@@ -596,7 +600,7 @@ const handleFavoriteToggle = useCallback(
     return items
   }, [currentPage, totalPages, handlePageChange])
 
-  // Improved isFavorited function
+  // 즐겨찾기 여부 확인 함수
   const isFavorited = useCallback(
     (placeId) => {
       const numericPlaceId = Number(placeId)
@@ -605,9 +609,10 @@ const handleFavoriteToggle = useCallback(
     [favorites],
   )
 
+  // 장소 카드 렌더링 함수
   const renderPlaceCard = useCallback(
     (place) => {
-      // Ensure placeId is a number for consistent comparison
+      // 일관된 비교를 위해 placeId가 숫자인지 확인
       const favorite = isFavorited(place.placeId)
 
       const handleCardClick = () => {
@@ -633,7 +638,7 @@ const handleFavoriteToggle = useCallback(
                   e.target.src = "/assets/default-pet-place.jpg"
                 }}
               />
-              {/* Always show favorite button, regardless of login status */}
+              {/* 로그인 상태와 무관하게 즐겨찾기 버튼 표시 */}
               <button
                 className="btn-favorite"
                 onClick={(e) => handleFavoriteToggle(place.placeId, e)}
@@ -661,9 +666,10 @@ const handleFavoriteToggle = useCallback(
         </div>
       )
     },
-    [isLoggedIn, isFavorited, handleFavoriteToggle, handlePlaceClick, renderPetSizeTags],
+    [isFavorited, handleFavoriteToggle, handlePlaceClick, renderPetSizeTags],
   )
 
+  // 커스텀 드롭다운 컴포넌트
   const CustomDropdown = ({ options, value, onChange, placeholder }) => {
     const [isOpen, setIsOpen] = useState(false)
     const dropdownRef = useRef(null)
@@ -714,9 +720,7 @@ const handleFavoriteToggle = useCallback(
     )
   }
 
-  // Render notification toast
-  // Render notification toast - matches PlaceDetailPage style
-  // Render recommended places with proper favorite state
+  // 추천 장소 렌더링 함수
   const renderRecommendedPlace = (place) => {
     const isFavorite = isFavorited(place.placeId)
 
@@ -737,16 +741,16 @@ const handleFavoriteToggle = useCallback(
                 e.target.src = "/assets/default-pet-place.jpg"
               }}
             />
-<button
-  className="btn-favorite"
-  onClick={(e) => {
-    e.stopPropagation()
-    handleFavoriteToggle(place.placeId, e)
-  }}
-  aria-label={isFavorite ? "즐겨찾기 삭제" : "즐겨찾기 추가"}
->
-  <i className={`bi ${isFavorite ? "bi-heart-fill" : "bi-heart"}`}></i>
-</button>
+            <button
+              className="btn-favorite"
+              onClick={(e) => {
+                e.stopPropagation()
+                handleFavoriteToggle(place.placeId, e)
+              }}
+              aria-label={isFavorite ? "즐겨찾기 삭제" : "즐겨찾기 추가"}
+            >
+              <i className={`bi ${isFavorite ? "bi-heart-fill" : "bi-heart"}`}></i>
+            </button>
           </div>
           <div className="card-body">
             <span className="place-category-badge">{place.industryMain}</span>
@@ -760,23 +764,23 @@ const handleFavoriteToggle = useCallback(
     )
   }
 
-  // 사용자 이름 표시 텍스트 생성
+  // 개인화된 메시지 생성 함수
   const getPersonalizedMessage = () => {
     if (!isLoggedIn) return "좋아할만한 장소"
     return `${userName || "회원"}님이 좋아할 만한 장소를 찾아봤어요!`
   }
 
-  // Render main component
+  // 메인 컴포넌트 렌더링
   return (
     <>
       <Navbar isLoggedIn={isLoggedIn} />
-      {/* Notification Toast */}
+      {/* 알림 토스트 */}
       {renderNotification()}
 
       <div className="places-background">
         <div className="container mt-4 mb-5">
           <div className="places-content-wrapper">
-            {/* Header */}
+            {/* 헤더 */}
             <div className="post-header text-center">
               <h2 className="mb-4">반려동물과 함께하는 장소</h2>
               <p className="subtitle mb-5">반려동물과 함께 방문할 수 있는 다양한 장소를 찾아보세요.</p>
@@ -806,7 +810,7 @@ const handleFavoriteToggle = useCallback(
               </div>
             )}
 
-            {/* Filters and search */}
+            {/* 필터 및 검색 */}
             <div className="filter-container p-3 mb-4 rounded shadow-sm">
               <div className="row g-3">
                 <div className="col-md-3">
@@ -885,7 +889,7 @@ const handleFavoriteToggle = useCallback(
                 </div>
               </div>
 
-              {/* Filter control buttons */}
+              {/* 필터 컨트롤 버튼 */}
               <div className="d-flex justify-content-between mt-3">
                 <div>
                   <button className="reset-btn" type="button" onClick={handleResetFilters} title="검색 초기화">
@@ -895,7 +899,7 @@ const handleFavoriteToggle = useCallback(
               </div>
             </div>
 
-            {/* Search results summary */}
+            {/* 검색 결과 요약 */}
             {!loading && places && (
               <div className="search-summary mb-3">
                 <p className="m-0">
@@ -909,7 +913,7 @@ const handleFavoriteToggle = useCallback(
               </div>
             )}
 
-            {/* Place list */}
+            {/* 장소 목록 */}
             <div className="place-list-container">
               {loading ? (
                 <div className="text-center py-5">
@@ -940,7 +944,7 @@ const handleFavoriteToggle = useCallback(
               )}
             </div>
 
-            {/* Pagination */}
+            {/* 페이지네이션 */}
             {!loading && places && places.length > 0 && (
               <nav aria-label="Page navigation" className="mt-4">
                 <ul className="pagination justify-content-center">{renderPaginationItems()}</ul>

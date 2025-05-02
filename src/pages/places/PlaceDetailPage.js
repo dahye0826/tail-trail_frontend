@@ -11,9 +11,11 @@ import Footer from "../../components/Footer"
 import KakaoMap from "../../components/KakaoMap"
 import { usePlaceViewTracker } from "../../api/PlaceViewTracker"
 
+// API 기본 URL
 const API_BASE_URL = "http://localhost:9000/api"
 
 function PlaceDetailPage() {
+  // 상태 관리
   const [place, setPlace] = useState(null)
   const [loading, setLoading] = useState(true)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -38,10 +40,10 @@ function PlaceDetailPage() {
   const [reviewList, setReviewList] = useState([])
   const [showReportDropdown, setShowReportDropdown] = useState({})
   const [hoverRating, setHoverRating] = useState(0)
-  // Add notification state similar to PlaceListPage
+  // 알림 상태
   const [notification, setNotification] = useState({ show: false, message: "", type: "success" })
 
-  // Format incoming place data
+  // 장소 데이터 포맷팅 함수
   const formatPlaceData = useCallback((placeData) => {
     return {
       id: placeData.placeId,
@@ -82,7 +84,7 @@ function PlaceDetailPage() {
   }, [])
 
   const userId = localStorage.getItem("userId")
-  // 트래킹 로직 (추천 알고리즘 구현)
+  // 장소 조회 트래킹 (추천 알고리즘 구현)
   usePlaceViewTracker({
     placeId: Number(id),
     userId: Number(userId),
@@ -111,17 +113,17 @@ function PlaceDetailPage() {
     checkUserReview()
   }, [reviewList, checkUserReview])
 
-  // Function to show notification similar to PlaceListPage
+  // 알림 표시 함수
   const showNotification = (message, type = "success") => {
     setNotification({ show: true, message, type })
 
-    // Auto hide after 3 seconds
+    // 3초 후 자동 숨김
     setTimeout(() => {
       setNotification({ show: false, message: "", type: "success" })
     }, 3000)
   }
 
-  // 방문 후기 제출
+  // 방문 후기 제출 함수
   const handleReviewSubmit = async (e) => {
     e.preventDefault()
     const userId = localStorage.getItem("userId")
@@ -178,7 +180,7 @@ function PlaceDetailPage() {
     }
   }
 
-  // 방문 후기 수정
+  // 방문 후기 수정 함수
   const handleReviewUpdate = async (e) => {
     e.preventDefault()
     if (!currentEditReviewId) return
@@ -220,7 +222,7 @@ function PlaceDetailPage() {
     }
   }
 
-  // 방문 후기 삭제
+  // 방문 후기 삭제 함수
   const handleReviewDelete = async (reviewId) => {
     if (!reviewId || !window.confirm("방문 후기를 삭제하시겠습니까?")) return
 
@@ -360,6 +362,7 @@ function PlaceDetailPage() {
     }
   }
 
+  // 장소 데이터 가져오기
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -378,13 +381,14 @@ function PlaceDetailPage() {
     fetchData()
   }, [id, formatPlaceData])
 
+  // 해시 링크 스크롤 처리
   useEffect(() => {
     if (location.hash === "#review" && reviewRef.current) {
       reviewRef.current.scrollIntoView({ behavior: "smooth" })
     }
   }, [location])
 
-  // Render stars for ratings
+  // 별점 렌더링 함수
   const renderStars = (rating) => (
     <>
       {[...Array(Math.floor(rating))].map((_, i) => (
@@ -405,6 +409,7 @@ function PlaceDetailPage() {
     </div>
   )
 
+  // 반려견 크기 아이콘 렌더링
   const renderPetSizeIcons = (categories) => {
     if (!categories?.length) return null
 
@@ -465,7 +470,7 @@ function PlaceDetailPage() {
     )
   }
 
-  // 방문 후기 폼 렌더링 - 수정된 버튼 스타일 적용
+  // 방문 후기 폼 렌더링
   const renderReviewForm = () => (
     <form onSubmit={isEditMode ? handleReviewUpdate : handleReviewSubmit} className="place-detail-review-form">
       {renderStarRating()}
@@ -638,18 +643,21 @@ function PlaceDetailPage() {
     </div>
   )
 
+  // 에러 메시지 추출 함수
   const extractErrorMessage = (error, fallback = "오류가 발생했습니다.") => {
     const data = error?.response?.data
 
     if (!data) return fallback
 
-    if (typeof data === "string") return data // 이게 핵심!
+    if (typeof data === "string") return data
     if (typeof data === "object") {
       return data.message || data.error || fallback
     }
 
     return fallback
   }
+
+  // 신고 드롭다운 토글 핸들러
   const handleReportToggle = (reviewId) => {
     setShowReportDropdown((prev) => ({
       ...prev,
@@ -657,8 +665,7 @@ function PlaceDetailPage() {
     }))
   }
 
-
-  // 로컬 스토리지에서 신고 여부를 확인하는 함수 추가
+  // 로컬 스토리지에서 신고 여부를 확인하는 함수
   const isReported = (reviewId) => {
     const key = `VISITEDPLACE_${reviewId}`
     const reportedItems = JSON.parse(localStorage.getItem("reportedItems") || "{}")
@@ -666,7 +673,7 @@ function PlaceDetailPage() {
     return reportedItems[key] === true
   }
 
-  // useEffect에서 리뷰 목록을 가져오는 부분 수정
+  // 리뷰 목록 가져오기
   useEffect(() => {
     const fetchReviews = async () => {
       try {
@@ -688,6 +695,7 @@ function PlaceDetailPage() {
     fetchReviews()
   }, [id])
 
+  // 리뷰 신고 핸들러
   const handleReport = async (reviewId, reason) => {
     if (!isLoggedIn) {
       showNotification("로그인이 필요한 서비스입니다.", "error")
@@ -699,8 +707,7 @@ function PlaceDetailPage() {
       return
     }
 
-    // 이미 신고한 경우 버튼 클릭 자체가 안 되게 만들었지만,
-    // 혹시라도 중복 요청이 발생했을 때 대비한 추가 방어 코드
+    // 이미 신고한 경우 방어 코드
     const reportedItems = JSON.parse(localStorage.getItem("reportedItems") || "{}")
     if (reportedItems[`VISITEDPLACE_${reviewId}`]) {
       showNotification("이미 이 후기를 신고하셨습니다.", "error")
@@ -725,9 +732,9 @@ function PlaceDetailPage() {
       localStorage.setItem("reportedItems", JSON.stringify(reportedItems))
 
       const key = `VISITEDPLACE_${reviewId}`
-    reportedItems[key] = true
-    localStorage.setItem("reportedItems", JSON.stringify(reportedItems))
-    console.log("✅ 저장 확인:", key, localStorage.getItem("reportedItems"))
+      reportedItems[key] = true
+      localStorage.setItem("reportedItems", JSON.stringify(reportedItems))
+      console.log("✅ 저장 확인:", key, localStorage.getItem("reportedItems"))
 
       // UI 업데이트
       setReviewList((prevList) =>
@@ -773,6 +780,7 @@ function PlaceDetailPage() {
     }
   }
 
+  // 리뷰 목록 렌더링
   const renderReviewList = () => (
     <div>
       {reviewList.length === 0 ? (
@@ -790,7 +798,7 @@ function PlaceDetailPage() {
                   방문일: {review.visitDate} | 작성일: {review.createdAt}
                 </span>
 
-                {/* 작성자인 경우 수정/삭제 버튼 표시 - 스타일 업데이트 */}
+                {/* 작성자인 경우 수정/삭제 버튼 표시 */}
                 {isCurrentUserReview && (
                   <div className="place-detail-review-actions">
                     <button
@@ -869,7 +877,7 @@ function PlaceDetailPage() {
     </div>
   )
 
-  // Render notification toast similar to PlaceListPage
+  // 알림 토스트 렌더링
   const renderNotification = () => {
     if (!notification.show) return null
 
@@ -880,6 +888,7 @@ function PlaceDetailPage() {
     )
   }
 
+  // 로딩 중 표시
   if (loading) {
     return (
       <>
@@ -896,21 +905,22 @@ function PlaceDetailPage() {
     )
   }
 
+  // 메인 렌더링
   return (
     <>
       <Navbar isLoggedIn={isLoggedIn} />
 
-      {/* Add notification toast */}
+      {/* 알림 토스트 */}
       {renderNotification()}
 
       <div className="place-detail-background" style={{ backgroundColor: "#fbfbe9" }}>
         <div className="container py-4 place-detail-container">
-          {/* Back button */}
+          {/* 뒤로가기 버튼 */}
           <button className="place-detail-btn-outline-secondary mb-3" onClick={() => navigate("/places")}>
             <i className="bi bi-arrow-left me-1"></i> 목록으로
           </button>
 
-          {/* Place header and image */}
+          {/* 장소 헤더와 이미지 */}
           {!loading && place && (
             <>
               {renderImageSection()}
@@ -926,7 +936,7 @@ function PlaceDetailPage() {
                     {place.description}
                   </p>
                   <div className="mb-3">
-                    {/* Pet size icons */}
+                    {/* 반려견 크기 아이콘 */}
                     {renderPetSizeIcons(place.petSizeCategories)}
 
                     {place.amenities?.length > 0 && (
@@ -942,7 +952,7 @@ function PlaceDetailPage() {
                 </div>
               </div>
 
-              {/* Place information */}
+              {/* 장소 정보 */}
               <div className="card mb-4 place-detail-info-card">
                 <div className="card-body">
                   <div className="place-detail-row">
@@ -1008,7 +1018,7 @@ function PlaceDetailPage() {
                 {renderReviewSection()}
               </div>
 
-              {/* Map */}
+              {/* 지도 */}
               {renderMap()}
             </>
           )}
