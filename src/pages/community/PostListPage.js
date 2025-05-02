@@ -33,7 +33,7 @@ function PostListPage() {
 
     setIsLoggedIn(loggedIn)
 
-    console.log("✅ 현재 로그인한 사용자:", userName || "비로그인 상태")
+    console.log("현재 로그인한 사용자:", userName || "비로그인 상태")
   }, [])
 
   const handleSearch = async () => {
@@ -49,12 +49,10 @@ function PostListPage() {
           size: 10,
         },
       })
-
       const formattedPosts = response.data.content.map((post) => ({
         ...post,
         createdAt: post.createdAt.split("T")[0],
       }))
-
       setPosts(formattedPosts)
       setCurrentPage(1)
       setTotalPages(response.data.totalPages)

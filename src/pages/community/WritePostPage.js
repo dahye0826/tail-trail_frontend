@@ -35,10 +35,10 @@ function WritePostPage() {
 
     if (userId && userName) {
       setIsLoggedIn(true)
-      console.log("✅ 현재 로그인 사용자:", userName)
+      console.log("현재 로그인 사용자:", userName)
     } else {
       setIsLoggedIn(false)
-      console.log("❌ 비로그인 상태")
+      console.log("비로그인 상태")
     }
   }, [])
   const navigate = useNavigate()
@@ -66,15 +66,13 @@ function WritePostPage() {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index))
   }
 
-  // 장소 검색 요청 함수
+  
   const searchPlaces = async () => {
     if (!searchTerm.trim()) {
       setSearchResults([])
       return
     }
-
     setIsSearching(true)
-
     try {
       const response = await axios.get(
         `http://localhost:9000/api/places/search?keyword=${encodeURIComponent(searchTerm)}`,
@@ -99,10 +97,8 @@ function WritePostPage() {
     }
   }
 
-  // 키보드 입력 이벤트 처리
   const handleKeyDown = (e) => {
     if (searchResults.length === 0) return
-
     if (e.key === "ArrowUp") {
       e.preventDefault()
       setSelectedResultIndex((prev) => (prev <= 0 ? searchResults.length - 1 : prev - 1))
@@ -122,7 +118,6 @@ function WritePostPage() {
     }
   }
 
-  // 장소 선택 처리 함수
   const handlePlaceSelect = (place) => {
     setSelectedLocation({
       id: place.placeId,
@@ -153,11 +148,9 @@ function WritePostPage() {
     formData.append("postTitle", title)
     formData.append("postContent", content)
     formData.append("userId", userId)
-
     images.forEach((image) => {
       formData.append("postImages", image)
     })
-
     if (selectedLocation && selectedLocation.id) {
       formData.append("placeId", selectedLocation.id)
     }
