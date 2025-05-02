@@ -7,6 +7,7 @@ import Footer from "../../components/Footer"
 import { useEffect, useState, useRef } from "react"
 import axios from "axios"
 
+
 function EditPostPage() {
   const { id } = useParams() // URL 파라미터에서 게시글 ID 추출
   const navigate = useNavigate()
@@ -41,7 +42,7 @@ function EditPostPage() {
         setExistingImages(response.data.imageUrls || [])
 
         if (response.data.placeId && response.data.placeName) {
-          setSelectedLocation({ id: response.data.placeId, name: response.data.placeName })
+          setSelectedLocation({ id: response.data.placeId, name: response.data.placeName,address: response.data.roadAddress })
         }
         setLoading(false)
       } catch (err) {
@@ -129,17 +130,15 @@ function EditPostPage() {
       alert("제목과 내용은 필수입니다.")
       return
     }
+
     const userId = localStorage.getItem("userId")
-
-
-  
     const formData = new FormData()
     formData.append("postTitle", title)
     formData.append("postContent", content)
     if (selectedLocation && selectedLocation.id) {
       formData.append("placeId", selectedLocation.id)
     }
-    formData.append("userId", userId) // 항상 실행
+    formData.append("userId", userId) 
     formData.append("remainImages", JSON.stringify(Array.isArray(existingImages) ? existingImages : []))
     images.forEach((image) => formData.append("postImages", image))
 
@@ -221,11 +220,11 @@ function EditPostPage() {
 
                   {/* 장소 선택 영역 - DB 검색 방식으로 변경 */}
                   <div className="mb-4">
-                    <label className="form-label">장소 (선택사항)</label>
+                  <label className="form-label post-form-label">장소 (선택사항)</label>
 
                     {/* 선택된 장소가 있으면 표시 */}
                     {selectedLocation && (
-                      <div className="selected-location-card mb-2">
+                      <div className="post-location-card mb-2">
                         <div className="card">
                           <div className="card-body py-2">
                             <div className="d-flex justify-content-between align-items-center">
@@ -249,11 +248,12 @@ function EditPostPage() {
                     <div className="input-group mb-2">
                       <input
                         type="text"
-                        className="form-control"
+                        className="form-control post-form-control"
                         placeholder="장소를 검색하세요"
                         value={searchTerm}
                         onChange={handleSearchChange}
                         onKeyDown={handleKeyDown}
+                        style={{ borderColor: "var(--primary-color)" }}
                       />
                       <button
                         type="button"
@@ -281,11 +281,11 @@ function EditPostPage() {
 
                     {/* 검색 결과 표시 - 스크롤 가능한 컨테이너로 변경 */}
                     {searchResults.length > 0 && (
-                      <div className="search-results-containerpost mb-3">
-                        <div className="search-results-header">
+                   <div className="post-search-results-container mb-3">
+                        <div className="post-search-results-header">
                           <small className="text-muted">검색 결과 ({searchResults.length})</small>
                         </div>
-                        <div className="list-group search-results-scrollable" ref={searchResultsRef}>
+                        <div className="list-group post-search-results-scrollable" ref={searchResultsRef}>
                           {searchResults.map((place, index) => (
                             <button
                               key={place.placeId}
@@ -295,7 +295,7 @@ function EditPostPage() {
                               onMouseEnter={() => setSelectedResultIndex(index)}
                               ref={selectedResultIndex === index ? selectedItemRef : null}
                             >
-                              <div className="d-flex w-100 justify-content-between">
+                               <div className="d-flex w-100 justify-content-between">
                                 <h6 className="mb-1">{place.placeName}</h6>
                               </div>
                               <p className="mb-1 small text-muted">{place.roadAddress}</p>

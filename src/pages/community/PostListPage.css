@@ -188,3 +188,91 @@
 .post-view-count i {
   color: #0d6efd;
 }
+
+/* 정렬 드롭다운 스타일 */
+.post-sort-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.post-sort-btn {
+  background-color: white;
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  padding: 0.375rem 0.75rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.post-sort-btn:hover {
+  background-color: var(--light-bg);
+}
+
+.post-sort-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 1000;
+  min-width: 10rem;
+  padding: 0.5rem 0;
+  margin: 0.125rem 0 0;
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.post-sort-dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.post-sort-dropdown-item:hover {
+  background-color: var(--light-bg);
+}
+
+.post-sort-dropdown-item.active {
+  background-color: var(--light-bg);
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+  .post-search {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .post-search .position-absolute {
+    position: relative !important;
+    margin-bottom: 10px;
+    width: 100%;
+  }
+
+  .post-search .input-group {
+    width: 100% !important;
+    margin: 10px 0;
+  }
+
+  .post-sort-dropdown {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .post-sort-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .post-sort-dropdown-menu {
+    width: 100%;
+  }
+}
