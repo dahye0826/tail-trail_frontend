@@ -205,7 +205,7 @@ function WritePostPage() {
 
                   {/* 장소 자동완성 입력 및 선택 */}
                   <div className="mb-4">
-                    <label className="form-label post-form-label">장소 (선택사항)</label>
+                  <label className="form-label post-form-label">장소 (선택사항)</label>
 
                     {selectedLocation && (
                       <div className="post-location-card mb-2">
