@@ -20,6 +20,18 @@ function PlaceListPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userName, setUserName] = useState("") // 사용자 이름 상태 추가
   const [searchTerm, setSearchTerm] = useState("")
+  
+  // 로그인 상태 확인 및 초기화
+  useEffect(() => {
+    const userId = localStorage.getItem("userId")
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true"
+    const userName = localStorage.getItem("userName")
+    
+    console.log('Initial check:', { userId, isLoggedIn, userName })
+    
+    setIsLoggedIn(isLoggedIn)
+    setUserName(userName)
+  }, [])
   const [regionFilter, setRegionFilter] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("")
   const [subCategoryFilter, setSubCategoryFilter] = useState("")
@@ -390,10 +402,12 @@ function PlaceListPage() {
 
       try {
         setLoadingRecommendations(true)
-
-        const response = await axios.post(`${ML_SERVER_URL}/recommend`, { userId })
-
-        if (response.data && response.data.recommendedPlaceIds) {
+        console.log('Sending request to:', `${ML_SERVER_URL}/api/ml/recommend`)
+        console.log('Request data:', { userId })
+        
+        const response = await axios.post(`${ML_SERVER_URL}/api/ml/recommend`, { userId })
+        
+        if (response.data && response.data.success && response.data.recommendedPlaceIds) {
           const top3Ids = response.data.recommendedPlaceIds.slice(0, 3)
 
           const placeDetailsPromises = top3Ids.map((placeId) => axios.get(`${API_BASE_URL}/places/${placeId}`))
@@ -404,13 +418,20 @@ function PlaceListPage() {
           setRecommendedPlaces(placeDetails)
         }
       } catch (error) {
-        console.error("추천 장소 로드 실패:", error)
+        console.error("추천 장소 로드 실패:", {
+          message: error.message,
+          status: error.response?.status,
+          data: error.response?.data
+        })
       } finally {
         setLoadingRecommendations(false)
       }
     }
 
+    console.log('Is logged in:', isLoggedIn)
     if (isLoggedIn) {
+      const userId = localStorage.getItem("userId")
+      console.log('User ID from localStorage:', userId)
       loadRecommendations()
     }
   }, [isLoggedIn])
