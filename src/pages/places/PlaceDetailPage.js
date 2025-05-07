@@ -322,7 +322,7 @@ function PlaceDetailPage() {
   const toggleFavorite = async () => {
     if (!isLoggedIn) {
       showNotification("로그인이 필요한 서비스입니다.", "error")
-      
+
       // 지연 후 로그인 페이지로 이동
       setTimeout(() => {
         navigate("/login")
@@ -333,7 +333,7 @@ function PlaceDetailPage() {
     const userId = localStorage.getItem("userId")
     if (!userId) {
       showNotification("로그인이 필요한 서비스입니다.", "error")
-      
+
       // 지연 후 로그인 페이지로 이동
       setTimeout(() => {
         navigate("/login")
@@ -667,9 +667,9 @@ function PlaceDetailPage() {
 
   // 로컬 스토리지에서 신고 여부를 확인하는 함수
   const isReported = (reviewId) => {
-    const key = `VISITEDPLACE_${reviewId}`
+    const userId = localStorage.getItem("userId")
+    const key = `VISITEDPLACE_${userId}_${reviewId}`
     const reportedItems = JSON.parse(localStorage.getItem("reportedItems") || "{}")
-    console.log("⛳ reviewId:", reviewId, "stored:", reportedItems[key])
     return reportedItems[key] === true
   }
 
@@ -699,7 +699,7 @@ function PlaceDetailPage() {
   const handleReport = async (reviewId, reason) => {
     if (!isLoggedIn) {
       showNotification("로그인이 필요한 서비스입니다.", "error")
-      
+
       // 지연 후 로그인 페이지로 이동
       setTimeout(() => {
         navigate("/login")
@@ -709,34 +709,31 @@ function PlaceDetailPage() {
 
     // 이미 신고한 경우 방어 코드
     const reportedItems = JSON.parse(localStorage.getItem("reportedItems") || "{}")
-    if (reportedItems[`VISITEDPLACE_${reviewId}`]) {
+    const userId = localStorage.getItem("userId")
+    const key = `VISITEDPLACE_${userId}_${reviewId}`
+    
+    // 이미 신고한 경우
+    if (reportedItems[key]) {
       showNotification("이미 이 후기를 신고하셨습니다.", "error")
       return
     }
-
+    
     if (!window.confirm(`이 후기를 '${reason}' 사유로 신고하시겠습니까?`)) return
-
+    
     try {
-      const userId = localStorage.getItem("userId")
       const reportData = {
         userId: Number(userId),
         targetId: reviewId,
         targetType: "VISITEDPLACE",
         reason: reason,
       }
-
+    
       await axios.post(`${API_BASE_URL}/report`, reportData)
-
-      // 로컬 스토리지에 신고 기록 저장
-      reportedItems[`VISITEDPLACE_${reviewId}`] = true
-      localStorage.setItem("reportedItems", JSON.stringify(reportedItems))
-
-      const key = `VISITEDPLACE_${reviewId}`
+    
+    
       reportedItems[key] = true
       localStorage.setItem("reportedItems", JSON.stringify(reportedItems))
-      console.log("✅ 저장 확인:", key, localStorage.getItem("reportedItems"))
-
-      // UI 업데이트
+    
       setReviewList((prevList) =>
         prevList.map((r) =>
           r.visitId === reviewId

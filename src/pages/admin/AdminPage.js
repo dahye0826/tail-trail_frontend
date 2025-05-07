@@ -11,13 +11,12 @@ import "./AdminPage.css"
 function AdminPage() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("dashboard")
-  const { user, loading } = useAuth() // ✅ useAuth 훅에서 role 가져오기
-
-  // 관리자 체크용 useEffect (최상단)
+  const { user, loading } = useAuth() 
+ 
   useEffect(() => {
     if (loading) return
     if (!user || user.role?.toLowerCase() !== "admin") {
-      navigate("/") // 관리자가 아니면 홈으로 리디렉트
+      navigate("/") 
     }
   }, [user, loading, navigate])
 

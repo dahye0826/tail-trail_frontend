@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect, useMemo } from "react"
 import axios from "axios"
 import CommentItem from "./CommentItem"
@@ -29,10 +27,7 @@ function CommentSection({ postId, isLoggedIn, postAuthor }) {
           setComments(response.data)
           console.log("로딩 시작")
 
-          // 댓글 작성자 목록 추출 (멘션 제안용)
           const uniqueUsers = [...new Set(response.data.map((comment) => comment.userName).filter(Boolean))]
-
-          // 현재 로그인한 사용자와 게시글 작성자 추가
           const allUsers = [...uniqueUsers]
 
           setCommentUsers(allUsers)
@@ -70,10 +65,10 @@ function CommentSection({ postId, isLoggedIn, postAuthor }) {
   // 댓글 추가 처리
   const handleCommentAdded = (newComment) => {
     setComments((prevComments) => {
-      // 이�� 같은 commentId가 있는지 확인
+
       const alreadyExists = prevComments.some((c) => c.commentId === newComment.commentId)
-      if (alreadyExists) return prevComments // 있으면 추가 ��� 함
-      return [newComment, ...prevComments] // 없으면 추가
+      if (alreadyExists) return prevComments 
+      return [newComment, ...prevComments] 
     })
 
     // 새 사용자 추가 (아직 목록에 없는 경우)

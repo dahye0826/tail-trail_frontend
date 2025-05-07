@@ -49,7 +49,8 @@
   height: 100%;
 }
 
-.sidebar-col, .map-col {
+.sidebar-col,
+.map-col {
   padding: 0 0.5rem;
 }
 
@@ -360,6 +361,41 @@
   margin-bottom: 5px;
 }
 
+/* 별점 정렬 버튼 스타일 */
+.rating-sort-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.rating-sort-button:hover {
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.rating-sort-button.active {
+  background-color: #ffc107;
+  color: #212529;
+  border-color: #ffc107;
+}
+
+.rating-sort-button i {
+  color: #ffc107;
+}
+
+.rating-sort-button.active i {
+  color: #212529;
+}
+
 /* 지도 컨테이너 스타일 */
 .map-container {
   position: relative;
@@ -390,7 +426,8 @@
 }
 
 /* 하단 영역 배경색 통일 */
-footer, .footer-container {
+footer,
+.footer-container {
   background-color: var(--page-bg) !important;
   flex-shrink: 0;
 }
@@ -421,13 +458,14 @@ footer, .footer-container {
     background-color: var(--page-bg);
   }
 
-  .sidebar-col, .map-col {
+  .sidebar-col,
+  .map-col {
     width: 100%;
     max-width: 100%;
     flex-basis: 100%;
     background-color: var(--page-bg);
   }
-  
+
   .sidebar-containermap {
     height: 350px;
     max-width: 100%;

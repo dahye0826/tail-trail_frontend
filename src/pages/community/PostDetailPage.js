@@ -123,7 +123,6 @@ function PostDetailPage() {
     }
   }
 
-  // 신고 처리
   const handleReport = async (reason) => {
     if (post.isReported) {
       alert("이미 신고하셨습니다!")
@@ -133,7 +132,7 @@ function PostDetailPage() {
 
     const confirmReport = window.confirm(`이 게시물을 "${reason}" 사유로 신고하시겠습니까?`)
     if (!confirmReport) {
-      return // 취소 누르면 신고 요청 안 보내고 끝냄
+      return 
     }
 
     try {
