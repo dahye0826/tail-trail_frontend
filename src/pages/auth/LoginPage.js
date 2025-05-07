@@ -46,9 +46,10 @@ const LoginPage = () => {
         if (response.data.profile) {
           localStorage.setItem("userProfile", response.data.profile)
         }
+        setIsLoggedIn(true)
 
         if (response.data.role === "admin") {
-          navigate("/admin")
+          window.location.href = "/admin"
         } else {
           navigate("/mypage")
         }

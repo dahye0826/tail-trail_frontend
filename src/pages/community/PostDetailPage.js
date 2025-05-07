@@ -20,6 +20,7 @@ function PostDetailPage() {
   const hasFetched = useRef(false)
   const [currentUser, setCurrentUser] = useState(null)
   const reportDropdownRef = useRef(null)
+  
   const isMyPost = currentUser && post && Number(currentUser.userId) === post.userId
 
   useEffect(() => {
@@ -58,8 +59,8 @@ function PostDetailPage() {
   useEffect(() => {
     const fetchPostDetail = async () => {
       try {
-        if (hasFetched.current) return // 이미 실행했으면 중단
-        hasFetched.current = true // 처음 실행일 경우 true로 변경
+        if (hasFetched.current) return
+        hasFetched.current = true
 
         const response = await axios.get(`http://localhost:9000/api/community/${id}`)
         console.log("응답 데이터:", response.data)
@@ -122,7 +123,6 @@ function PostDetailPage() {
     }
   }
 
-  // 신고 처리
   const handleReport = async (reason) => {
     if (post.isReported) {
       alert("이미 신고하셨습니다!")
@@ -132,7 +132,7 @@ function PostDetailPage() {
 
     const confirmReport = window.confirm(`이 게시물을 "${reason}" 사유로 신고하시겠습니까?`)
     if (!confirmReport) {
-      return // 취소 누르면 신고 요청 안 보내고 끝냄
+      return 
     }
 
     try {
@@ -166,6 +166,8 @@ function PostDetailPage() {
       </>
     )
   }
+
+
 
   return (
     <>
@@ -261,25 +263,14 @@ function PostDetailPage() {
             </div>
           )}
 
-          {/* 수정/삭제 버튼은 가장 아래에 배치 */}
           {isMyPost && (
-            <div className="post-actions mt-4">
-              <div style={{ display: "flex", gap: "8px" }}>
-                <button
-                  className="btn btn-outline-secondary"
-                  onClick={handleEditClick}
-                  style={{ width: "80px", height: "38px" }}
-                >
-                  <i className="bi bi-pencil-square me-1"></i> 수정
-                </button>
-                <button
-                  className="btn btn-outline-danger"
-                  onClick={handleDeleteClick}
-                  style={{ width: "80px", height: "38px" }}
-                >
-                  <i className="bi bi-trash me-1"></i> 삭제
-                </button>
-              </div>
+            <div className="post-actions mt-4 d-flex justify-content-end gap-2">
+              <button className="btn btn-outline-secondary" onClick={handleEditClick}>
+                <i className="bi bi-pencil-square me-1" /> 수정
+              </button>
+              <button className="btn btn-outline-danger" onClick={handleDeleteClick}>
+                <i className="bi bi-trash me-1" /> 삭제
+              </button>
             </div>
           )}
 
@@ -294,3 +285,5 @@ function PostDetailPage() {
 }
 
 export default PostDetailPage
+
+

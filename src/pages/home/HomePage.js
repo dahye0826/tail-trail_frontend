@@ -29,13 +29,12 @@ const HomePage = () => {
   const [reviews, setReviews] = useState([])
   const [reviewsLoading, setReviewsLoading] = useState(true)
 
-  // 로그인 상태 확인
   useEffect(() => {
     const token = localStorage.getItem("token")
     setIsLoggedIn(!!token)
   }, [])
 
-  // 커뮤니티 게시글 가져오기
+
   useEffect(() => {
     const fetchCommunityPosts = async () => {
       try {
@@ -44,7 +43,7 @@ const HomePage = () => {
         const response = await axios.get("http://localhost:9000/api/community", {
           params: {
             page: 0,
-            size: 4, // 최신 게시글 4개만 가져오기
+            size: 4, 
           },
         })
 
@@ -61,7 +60,7 @@ const HomePage = () => {
         setLoading(false)
       } catch (error) {
         console.error("커뮤니티 게시글 로딩 오류:", error)
-        setLoading(false) // 로딩만 false로 전환
+        setLoading(false) 
       }
     }
 
@@ -114,7 +113,7 @@ const HomePage = () => {
     fetchReviews()
   }, [])
 
-  // (2) 리뷰에 placeImage 추가 보완 (== 여기에 붙이세요)
+  // (2)placeImage 
   useEffect(() => {
     const fetchReviewImages = async () => {
       if (reviews.length > 0) {
@@ -152,38 +151,15 @@ const HomePage = () => {
     fetchReviewImages()
   }, [reviews.length])
 
-  // 별점에 따른 클래스 이름 반환 함수
-  const getRatingClass = (rating) => {
-    if (!rating) return "rating-3"
-    const roundedRating = Math.round(rating)
-    return `rating-${roundedRating}`
-  }
-
-  // 장소 카테고리에 따른 썸네일 이미지 URL 반환 함수
-  const getCategoryThumbnail = (category) => {
-    const categoryMap = {
-      카페: "/images/cafe-thumb.jpg",
-      식당: "/images/restaurant-thumb.jpg",
-      펜션: "/images/pension-thumb.jpg",
-      호텔: "/images/hotel-thumb.jpg",
-      모텔: "/images/motel-thumb.jpg",
-      공원: "/images/park-thumb.jpg",
-      해변: "/images/beach-thumb.jpg",
-    }
-
-    return categoryMap[category] || "/images/default-thumb.jpg"
-  }
 
   return (
     <>
       <Navbar isLoggedIn={isLoggedIn} />
 
       <div className="home-page" style={{ backgroundColor: "#fbfbe9" }}>
-        {/* 메인 배너 섹션 - 둥근 모서리 스타일로 변경 */}
         <Container className="py-4">
           <div className="rounded-banner">
             <Carousel fade interval={5000} indicators={false} className="banner-carousel">
-              {/* 첫 번째 슬라이드 - lawon 이미지 (메인) */}
               <Carousel.Item>
                 <div
                   className="banner-image lawon-image"
@@ -192,19 +168,17 @@ const HomePage = () => {
                   }}
                 >
                   <div className="banner-overlay"></div>
-                  {/* 데스크톱용 배너 콘텐츠 */}
                   <div className="banner-content">
                     <h1 className="fw-bold">이음길</h1>
                     <p className="lead">꼬리를 따라 이어지는 여행길</p>
                   </div>
-
-                  {/* 모바일용 배너 콘텐츠 */}
+                  
+                  
                   <div className="banner-content-mobile">
                     <h1 className="fw-bold">이음길</h1>
                     <p className="lead">꼬리를 따라 이어지는 여행길</p>
                   </div>
-
-                  {/* 모바일 뷰에서 표시될 로그인/회원가입 버튼 */}
+                  
                   <div className="mobile-auth-buttons">
                     {isLoggedIn ? (
                       <Button
@@ -336,7 +310,6 @@ const HomePage = () => {
         {/* 지도 검색 섹션 - 커뮤니티 섹션보다 앞으로 이동 */}
         <div className="map-section py-4 mt-3">
           <Container>
-            {/* 회사 소개 섹션 추가 */}
             <div className="company-intro text-center mb-5">
               <h2 className="fw-bold section-title mb-3">이음길에 오신 것을 환영합니다</h2>
               <div className="welcome-message bg-white p-4 rounded shadow-sm">
@@ -373,8 +346,6 @@ const HomePage = () => {
                   defaultLevel={6}
                   showRegisteredPlaces={false}
                 />
-
-                {/* 확장 아이콘 버튼으로 교체 */}
                 <div className="position-absolute" style={{ top: "15px", right: "15px", zIndex: 1000 }}>
                   <Link to="/map" className="btn btn-light shadow-sm rounded-circle p-2" title="지도로 확장">
                     <i className="bi bi-arrows-fullscreen fs-4"></i>
@@ -470,7 +441,6 @@ const HomePage = () => {
                                 e.target.src = "/placeholder.svg"
                               }}
                             />
-
                             {/* 별점 뱃지 */}
                             <div className="rating-badge">
                               <i className="bi bi-star-fill"></i>
@@ -479,7 +449,6 @@ const HomePage = () => {
                             {/* 카테고리 뱃지 */}
                             {review.industrySub && <div className="category-badge">{review.industrySub}</div>}
                           </div>
-
                           {/* 리뷰 내용 */}
                           <div className="review-content">
                             {/* 장소 이름 */}
@@ -487,12 +456,10 @@ const HomePage = () => {
                               <i className="bi bi-geo-alt-fill"></i>
                               {review.placeName}
                             </h5>
-
                             {/* 리뷰 텍스트 말풍선 */}
                             <div className="review-bubble">
                               {review.note || "이 장소는 반려동물과 함께하기 정말 좋았어요!"}
                             </div>
-
                             {/* 리뷰 메타 정보 */}
                             <div className="review-meta">
                               <div className="user-profile">

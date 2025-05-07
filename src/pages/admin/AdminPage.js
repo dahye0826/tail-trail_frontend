@@ -11,11 +11,12 @@ import "./AdminPage.css"
 function AdminPage() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("dashboard")
-  const { user, loading } = useAuth(); 
-
+  const { user, loading } = useAuth() 
+ 
   useEffect(() => {
-    if (!loading && (!user || user.role !== "admin")) {
-      navigate("/") // 관리자가 아니면 홈으로
+    if (loading) return
+    if (!user || user.role?.toLowerCase() !== "admin") {
+      navigate("/") 
     }
   }, [user, loading, navigate])
 

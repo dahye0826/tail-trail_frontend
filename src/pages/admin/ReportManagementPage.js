@@ -8,6 +8,7 @@ function ReportManagement() {
   const [reports, setReports] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [groupedReports, setGroupedReports] = useState([])
 
   // 모달 관련 상태
   const [showModal, setShowModal] = useState(false)
@@ -15,13 +16,16 @@ function ReportManagement() {
   const [contentLoading, setContentLoading] = useState(false)
   const [contentData, setContentData] = useState(null)
 
-  // 신고 데이터 불러오기
   useEffect(() => {
     const fetchReports = async () => {
       try {
         setLoading(true)
         const response = await axios.get("http://localhost:9000/api/report")
         setReports(response.data)
+
+        const grouped = groupReportsByContent(response.data)
+        setGroupedReports(grouped)
+
         setError(null)
       } catch (err) {
         console.error("신고 데이터 로딩 오류:", err)
@@ -34,7 +38,37 @@ function ReportManagement() {
     fetchReports()
   }, [])
 
-  // 신고된 콘텐츠 상세 정보 가져오기
+  const groupReportsByContent = (reports) => {
+    const groupedMap = {}
+
+    reports.forEach((report) => {
+      const contentKey = `${report.targetType}-${report.targetId}`
+
+      if (!groupedMap[contentKey]) {
+        groupedMap[contentKey] = {
+          targetType: report.targetType,
+          targetId: report.targetId,
+          reports: [],
+          reasonCounts: {}, 
+          createdAt: report.createdAt, 
+        }
+      }
+      groupedMap[contentKey].reports.push(report)
+
+      const reason = report.reason
+      if (!groupedMap[contentKey].reasonCounts) {
+        groupedMap[contentKey].reasonCounts = {}
+      }
+      groupedMap[contentKey].reasonCounts[reason] = (groupedMap[contentKey].reasonCounts[reason] || 0) + 1
+
+      if (new Date(report.createdAt) > new Date(groupedMap[contentKey].createdAt)) {
+        groupedMap[contentKey].createdAt = report.createdAt
+      }
+    })
+
+    return Object.values(groupedMap)
+  }
+
   const fetchContentDetails = async (report) => {
     setContentLoading(true)
     setContentData(null)
@@ -104,11 +138,12 @@ function ReportManagement() {
     }
   }
 
-  // 상세보기 버튼 클릭 핸들러
-  const handleViewDetails = (report) => {
-    setSelectedReport(report)
+  
+  const handleViewDetails = (groupedReport) => {
+  
+    setSelectedReport(groupedReport.reports[0])
     setShowModal(true)
-    fetchContentDetails(report)
+    fetchContentDetails(groupedReport.reports[0])
   }
 
   // 모달 닫기 핸들러
@@ -119,14 +154,16 @@ function ReportManagement() {
   }
 
   // 신고 처리 (승인/거부)
-  const handleProcessReport = async (reportId, action, targetType, targetId) => {
-
+  const handleProcessReport = async (groupedReport, action) => {
+    const targetType = groupedReport.targetType
+    const targetId = groupedReport.targetId
     const typeText = getTargetTypeText(targetType)
+
     // 확인 대화상자 표시
     let confirmMessage = ""
     if (action === "approve") {
       confirmMessage = ` 이 ${typeText}을 삭제하겠습니까?`
-    }  else {
+    } else {
       // 삭제된 콘텐츠인 경우 메시지 다르게
       if (contentData?.error) {
         confirmMessage = `콘텐츠는 이미 삭제되었습니다. 신고만 목록에서 제거하시겠습니까?`
@@ -163,14 +200,20 @@ function ReportManagement() {
         }
       }
 
-      // 승인이든 거부든 신고 자체는 삭제
-      await axios.delete(`http://localhost:9000/api/report/${reportId}`)
+ 
+      const deletePromises = groupedReport.reports.map((report) =>
+        axios.delete(`http://localhost:9000/api/report/${report.reportId}`),
+      )
+
+      await Promise.all(deletePromises)
 
       // 처리 후 목록에서 제거
-      setReports((prevReports) => prevReports.filter((report) => report.reportId !== reportId))
+      setGroupedReports((prevGrouped) =>
+        prevGrouped.filter((group) => !(group.targetType === targetType && group.targetId === targetId)),
+      )
 
       // 모달 닫기
-      if (showModal && selectedReport && selectedReport.reportId === reportId) {
+      if (showModal) {
         handleCloseModal()
       }
 
@@ -295,6 +338,29 @@ function ReportManagement() {
     return <p>지원되지 않는 콘텐츠 유형입니다.</p>
   }
 
+  // 인라인 스타일 정의
+  const styles = {
+    reasonItem: {
+      display: "block",
+      marginBottom: "4px",
+      color: "#495057",
+      fontSize: "14px",
+    },
+    reasonCount: {
+      display: "inline-block",
+      marginLeft: "5px",
+      color: "#6c757d",
+      fontWeight: "500",
+    },
+    totalReports: {
+      display: "block",
+      marginTop: "8px",
+      fontSize: "13px",
+      color: "#6c757d",
+      fontStyle: "italic",
+    },
+  }
+
   return (
     <div className="admin-section">
       <div className="admin-section-header">
@@ -314,7 +380,7 @@ function ReportManagement() {
             </div>
           ) : error ? (
             <div className="alert alert-danger">{error}</div>
-          ) : reports.length === 0 ? (
+          ) : groupedReports.length === 0 ? (
             <div className="no-reports">
               <i className="bi bi-check-circle"></i>
               <p>처리할 신고 내역이 없습니다.</p>
@@ -332,19 +398,26 @@ function ReportManagement() {
                   </tr>
                 </thead>
                 <tbody>
-                  {reports.map((report) => (
-                    <tr key={report.reportId}>
+                  {groupedReports.map((groupedReport) => (
+                    <tr key={`${groupedReport.targetType}-${groupedReport.targetId}`}>
                       <td>
                         <span className="badge bg-info">
-                          {getTargetTypeText(report.targetType)} #{report.targetId}
+                          {getTargetTypeText(groupedReport.targetType)} #{groupedReport.targetId}
                         </span>
                       </td>
                       <td>
-                        <span className="report-reason">{report.reason}</span>
+                        {groupedReport.reasonCounts &&
+                          Object.entries(groupedReport.reasonCounts).map(([reason, count], index) => (
+                            <span key={index} style={styles.reasonItem}>
+                              {reason}
+                              <span style={styles.reasonCount}>({count})</span>
+                            </span>
+                          ))}
+                        <span style={styles.totalReports}>총 {groupedReport.reports.length}건의 신고</span>
                       </td>
-                      <td>{formatDate(report.createdAt)}</td>
+                      <td>{formatDate(groupedReport.createdAt)}</td>
                       <td>
-                        <button className="report-btn-view" onClick={() => handleViewDetails(report)}>
+                        <button className="report-btn-view" onClick={() => handleViewDetails(groupedReport)}>
                           <i className="bi bi-eye"></i>상세보기
                         </button>
                       </td>
@@ -352,17 +425,13 @@ function ReportManagement() {
                         <div className="action-buttons">
                           <button
                             className="report-btn-approve"
-                            onClick={() =>
-                              handleProcessReport(report.reportId, "approve", report.targetType, report.targetId)
-                            }
+                            onClick={() => handleProcessReport(groupedReport, "approve")}
                           >
                             승인
                           </button>
                           <button
                             className="report-btn-reject"
-                            onClick={() =>
-                              handleProcessReport(report.reportId, "reject", report.targetType, report.targetId)
-                            }
+                            onClick={() => handleProcessReport(groupedReport, "reject")}
                           >
                             거부
                           </button>
@@ -395,16 +464,20 @@ function ReportManagement() {
               <div className="report-action-buttons">
                 <button
                   className="report-modal-btn-approve"
-                  onClick={() =>
-                    handleProcessReport(
-                      selectedReport.reportId,
-                      "approve",
-                      selectedReport.targetType,
-                      selectedReport.targetId
+                  onClick={() => {
+                    // 현재 보고 있는 콘텐츠의 그룹을 찾아서 처리
+                    const currentGroup = groupedReports.find(
+                      (group) =>
+                        group.targetType === selectedReport.targetType && group.targetId === selectedReport.targetId,
                     )
-                  }
+                    if (currentGroup) {
+                      handleProcessReport(currentGroup, "approve")
+                    }
+                  }}
                   disabled={!!contentData?.error} // 에러가 있으면 비활성화
-                  style={contentData?.error ? { backgroundColor: "#ccc", borderColor: "#ccc", cursor: "not-allowed" } : {}}
+                  style={
+                    contentData?.error ? { backgroundColor: "#ccc", borderColor: "#ccc", cursor: "not-allowed" } : {}
+                  }
                 >
                   <i className="bi bi-check-circle-fill"></i>
                   승인 (콘텐츠 삭제)
@@ -412,14 +485,16 @@ function ReportManagement() {
 
                 <button
                   className="report-modal-btn-reject"
-                  onClick={() =>
-                    handleProcessReport(
-                      selectedReport.reportId,
-                      "reject",
-                      selectedReport.targetType,
-                      selectedReport.targetId
+                  onClick={() => {
+                    // 현재 보고 있는 콘텐츠의 그룹을 찾아서 처리
+                    const currentGroup = groupedReports.find(
+                      (group) =>
+                        group.targetType === selectedReport.targetType && group.targetId === selectedReport.targetId,
                     )
-                  }
+                    if (currentGroup) {
+                      handleProcessReport(currentGroup, "reject")
+                    }
+                  }}
                 >
                   <i className="bi bi-x-circle-fill"></i>
                   {contentData?.error ? "목록에서 신고 제거" : "거부 (콘텐츠 유지)"}

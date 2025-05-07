@@ -210,9 +210,12 @@
   text-align: center;
 }
 
-.post-actions {
-  margin-top: 3rem;
-  padding-top: 1.5rem;
+
+  .post-actions {
+    margin-top: 24px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
   border-top: 1px solid var(--border-color);
 }
 
@@ -229,6 +232,7 @@
   transition: all 0.2s ease;
   margin-bottom: 1.5rem;
   font-weight: 500;
+  
 }
 
 .back-button:hover {

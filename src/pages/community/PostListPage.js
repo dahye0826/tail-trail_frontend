@@ -2,7 +2,7 @@
 
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import "bootstrap-icons/font/bootstrap-icons.css"
 import "bootstrap/dist/css/bootstrap.min.css"
 import "./PostListPage.css"
@@ -16,12 +16,24 @@ function PostListPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState("")
   const [posts, setPosts] = useState([])
+  const [originalPosts, setOriginalPosts] = useState([]) // 원본 데이터 저장
   const [totalPages, setTotalPages] = useState(1)
   const [issearching, setIsSearching] = useState(false)
+  const [sortOption, setSortOption] = useState("latest") // 정렬 옵션 상태 추가: 'latest' 또는 'views'
+  const [dropdownOpen, setDropdownOpen] = useState(false) // 드롭다운 상태 추가
+  const dropdownRef = useRef(null) // 드롭다운 참조 추가
 
+  // 드롭다운 외부 클릭 감지
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"))
-    console.log("현재 로그인한 사용자 (이 페이지):", user?.userName || "비로그인 상태")
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
   }, [])
 
   const navigate = useNavigate()
@@ -32,8 +44,6 @@ function PostListPage() {
     const loggedIn = localStorage.getItem("isLoggedIn") === "true" && !!userId
 
     setIsLoggedIn(loggedIn)
-
-    console.log("✅ 현재 로그인한 사용자:", userName || "비로그인 상태")
   }, [])
 
   const handleSearch = async () => {
@@ -49,13 +59,12 @@ function PostListPage() {
           size: 10,
         },
       })
-
       const formattedPosts = response.data.content.map((post) => ({
         ...post,
         createdAt: post.createdAt.split("T")[0],
       }))
-
       setPosts(formattedPosts)
+      setOriginalPosts(formattedPosts) // 원본 데이터 저장
       setCurrentPage(1)
       setTotalPages(response.data.totalPages)
       setIsSearching(true)
@@ -72,7 +81,9 @@ function PostListPage() {
       setLoading(true)
       try {
         const response = await axios.get("http://localhost:9000/api/community", {
-          params: issearching ? { search: searchTerm, page: currentPage, size: 10 } : { page: currentPage, size: 10 },
+          params: issearching
+            ? { search: searchTerm, page: currentPage - 1, size: 10 }
+            : { page: currentPage - 1, size: 10 },
         })
 
         const formattedPosts = response.data.content.map((post) => ({
@@ -81,6 +92,7 @@ function PostListPage() {
         })) //formattedPosts: 형식을 바꾼 데이터
 
         setPosts(formattedPosts)
+        setOriginalPosts(formattedPosts) // 원본 데이터 저장
         setTotalPages(response.data.totalPages)
         setLoading(false)
       } catch (error) {
@@ -90,6 +102,17 @@ function PostListPage() {
     }
     fetchPosts()
   }, [currentPage, issearching])
+
+  useEffect(() => {
+    if (posts.length > 0) {
+      if (sortOption === "views") {
+        const sortedPosts = [...originalPosts].sort((a, b) => b.viewCount - a.viewCount)
+        setPosts(sortedPosts)
+      } else if (sortOption === "latest") {
+        setPosts([...originalPosts])
+      }
+    }
+  }, [sortOption, originalPosts])
 
   const handleKeyDown = (e) => {
     if (e.key == "Enter") {
@@ -131,10 +154,28 @@ function PostListPage() {
     return pageNumbers
   }
 
-  const hanleResetSearch = () => {
+  const handleResetSearch = () => {
     setSearchTerm("")
     setIsSearching(false)
     setCurrentPage(1)
+  }
+
+ 
+  const handleSortChange = (option) => {
+    setSortOption(option)
+    setDropdownOpen(false) 
+  }
+
+  // 정렬 옵션 텍스트 반환
+  const getSortOptionText = () => {
+    switch (sortOption) {
+      case "latest":
+        return "최신순"
+      case "views":
+        return "조회수순"
+      default:
+        return "정렬"
+    }
   }
 
   return (
@@ -176,9 +217,35 @@ function PostListPage() {
               >
                 <i className="bi bi-search"></i>
               </button>
-              <button className="post-reset-btn ms-2" type="button" onClick={hanleResetSearch} title="검색 초기화">
+              <button className="post-reset-btn ms-2" type="button" onClick={handleResetSearch} title="검색 초기화">
                 <i className="bi bi-arrow-counterclockwise me-1"></i> 초기화
               </button>
+            </div>
+
+            {/* 정렬 드롭다운 - 오른쪽 배치 */}
+            <div className="position-absolute end-0" ref={dropdownRef}>
+              <div className="post-sort-dropdown">
+                <button className="btn post-sort-btn" onClick={() => setDropdownOpen(!dropdownOpen)}>
+                 {getSortOptionText()}{" "}
+                  <i className="bi bi-chevron-down ms-1"></i>
+                </button>
+                {dropdownOpen && (
+                  <div className="post-sort-dropdown-menu">
+                    <div
+                      className={`post-sort-dropdown-item ${sortOption === "latest" ? "active" : ""}`}
+                      onClick={() => handleSortChange("latest")}
+                    >
+                    최신순
+                    </div>
+                    <div
+                      className={`post-sort-dropdown-item ${sortOption === "views" ? "active" : ""}`}
+                      onClick={() => handleSortChange("views")}
+                    >
+                    조회수순
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

@@ -117,26 +117,23 @@ function MapViewPage() {
   const [cities, setCities] = useState([])
   const [categories, setCategories] = useState([])
   const [averageRatings, setAverageRatings] = useState({})
-  
-  // 화면 크기 변경 감지 및 맵 높이 조정
+
+  const [sortByRating, setSortByRating] = useState(false)
+
   useEffect(() => {
     const handleResize = () => {
-      const windowWidth = window.innerWidth;
+      const windowWidth = window.innerWidth
       setIsMobile(windowWidth <= 768)
-      
-      // 모바일 뷰에서는 더 작은 높이로 조정
+
       if (windowWidth <= 768) {
-        setMapHeight("300px"); // 모바일에서 맵 높이 고정
-        // 모바일에서는 기본적으로 맵을 보여줌
-        setSidebarVisible(true);
+        setMapHeight("300px")
+        setSidebarVisible(true)
       } else {
-        setMapHeight("calc(100vh - 150px)");
-        setSidebarVisible(true);
+        setMapHeight("calc(100vh - 150px)")
+        setSidebarVisible(true)
       }
     }
-
-    // 초기 로드 시와 리사이즈 시 실행
-    handleResize();
+    handleResize()
     window.addEventListener("resize", handleResize)
     return () => window.removeEventListener("resize", handleResize)
   }, [])
@@ -167,7 +164,6 @@ function MapViewPage() {
             description: place.description || "상세 정보 없음",
           }
         })
-
         setPlaces(formattedPlaces)
         setCities([...citySet])
         setCategories([...categorySet])
@@ -203,6 +199,15 @@ function MapViewPage() {
     return matchesSearch && matchesRegion && matchesCategory
   })
 
+
+  const sortedPlaces = sortByRating
+    ? [...filteredPlaces].sort((a, b) => {
+        const ratingA = averageRatings[a.id] || 0
+        const ratingB = averageRatings[b.id] || 0
+        return ratingB - ratingA 
+      })
+    : filteredPlaces
+
   const handlePlaceSelect = (place) => {
     setSelectedPlace(place)
   }
@@ -223,6 +228,10 @@ function MapViewPage() {
 
   const toggleSidebar = () => {
     setSidebarVisible(!sidebarVisible)
+  }
+
+  const toggleSortByRating = () => {
+    setSortByRating(!sortByRating)
   }
 
   return (
@@ -246,7 +255,7 @@ function MapViewPage() {
                   <KakaoMap
                     readOnly={false}
                     initialLocation={null}
-                    markerPositions={filteredPlaces.map((place) => ({
+                    markerPositions={sortedPlaces.map((place) => ({
                       id: place.id,
                       lat: place.lat,
                       lng: place.lng,
@@ -267,7 +276,7 @@ function MapViewPage() {
               </div>
             </div>
           )}
-          
+
           <div className="row map-view-row g-3">
             {/* 사이드바 */}
             <div className={`col-md-4 col-lg-3 sidebar-col`}>
@@ -329,7 +338,7 @@ function MapViewPage() {
                     </div>
                   ) : (
                     <div className="places-list-items-scrollable">
-                      {filteredPlaces.map((place) => {
+                      {sortedPlaces.map((place) => {
                         const placeRating = averageRatings[place.id] || 0.0
 
                         return (
@@ -360,6 +369,13 @@ function MapViewPage() {
             {!isMobile && (
               <div className="col-md-8 col-lg-9 map-col">
                 <div className="map-container">
+                  <button
+                    className={`rating-sort-button ${sortByRating ? "active" : ""}`}
+                    onClick={toggleSortByRating}
+                    title="별점 높은 순으로 정렬"
+                  >
+                    <i className="bi bi-star-fill me-1"></i> 별점 순
+                  </button>
                   {loading ? (
                     <div className="text-center py-5">
                       <div className="spinner-border text-primary" role="status">
@@ -371,7 +387,7 @@ function MapViewPage() {
                     <KakaoMap
                       readOnly={false}
                       initialLocation={null}
-                      markerPositions={filteredPlaces.map((place) => ({
+                      markerPositions={sortedPlaces.map((place) => ({
                         id: place.id,
                         lat: place.lat,
                         lng: place.lng,

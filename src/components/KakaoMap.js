@@ -158,7 +158,7 @@ function KakaoMap({
             map: kakaoMap,
           })
 
-          // 마커 클릭 시 선택된 장소 정보 설정
+  
           window.kakao.maps.event.addListener(marker, "click", () => {
             setSelectedLocation(initialLocation)
             setSelectedMarker({ marker })

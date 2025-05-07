@@ -35,10 +35,10 @@ function WritePostPage() {
 
     if (userId && userName) {
       setIsLoggedIn(true)
-      console.log("✅ 현재 로그인 사용자:", userName)
+      console.log("현재 로그인 사용자:", userName)
     } else {
       setIsLoggedIn(false)
-      console.log("❌ 비로그인 상태")
+      console.log("비로그인 상태")
     }
   }, [])
   const navigate = useNavigate()
@@ -66,15 +66,13 @@ function WritePostPage() {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index))
   }
 
-  // 장소 검색 요청 함수
+  
   const searchPlaces = async () => {
     if (!searchTerm.trim()) {
       setSearchResults([])
       return
     }
-
     setIsSearching(true)
-
     try {
       const response = await axios.get(
         `http://localhost:9000/api/places/search?keyword=${encodeURIComponent(searchTerm)}`,
@@ -99,10 +97,8 @@ function WritePostPage() {
     }
   }
 
-  // 키보드 입력 이벤트 처리
   const handleKeyDown = (e) => {
     if (searchResults.length === 0) return
-
     if (e.key === "ArrowUp") {
       e.preventDefault()
       setSelectedResultIndex((prev) => (prev <= 0 ? searchResults.length - 1 : prev - 1))
@@ -122,7 +118,6 @@ function WritePostPage() {
     }
   }
 
-  // 장소 선택 처리 함수
   const handlePlaceSelect = (place) => {
     setSelectedLocation({
       id: place.placeId,
@@ -153,11 +148,9 @@ function WritePostPage() {
     formData.append("postTitle", title)
     formData.append("postContent", content)
     formData.append("userId", userId)
-
     images.forEach((image) => {
       formData.append("postImages", image)
     })
-
     if (selectedLocation && selectedLocation.id) {
       formData.append("placeId", selectedLocation.id)
     }
@@ -212,7 +205,7 @@ function WritePostPage() {
 
                   {/* 장소 자동완성 입력 및 선택 */}
                   <div className="mb-4">
-                    <label className="form-label post-form-label">장소 (선택사항)</label>
+                  <label className="form-label post-form-label">장소 (선택사항)</label>
 
                     {selectedLocation && (
                       <div className="post-location-card mb-2">
@@ -327,20 +320,23 @@ function WritePostPage() {
                   </div>
 
                   {/* 이미지 미리보기 */}
+                  
                   {images.length > 0 && (
                     <div className="mb-3">
                       <label className="form-label post-form-label">선택한 이미지</label>
-                      <div className="post-image-preview-container">
+                      <div className="d-flex flex-wrap gap-2">
                         {images.map((image, index) => (
-                          <div key={index} className="post-image-preview-item">
+                          <div key={index} className="position-relative">
                             <img
-                              src={URL.createObjectURL(image) || "/placeholder.svg"}
+                              src={URL.createObjectURL(image)}
                               alt={`preview-${index}`}
-                              className="post-preview-image"
+                              width="100"
+                              height="100"
+                              className="preview-image"
                             />
                             <button
                               type="button"
-                              className="btn btn-sm btn-danger post-remove-image-btn"
+                              className="btn btn-sm btn-danger position-absolute top-0 end-0 remove-image-btn"
                               onClick={() => handleRemoveImage(index)}
                             >
                               ✕
@@ -350,7 +346,6 @@ function WritePostPage() {
                       </div>
                     </div>
                   )}
-
                   {/* 등록 / 취소 버튼 */}
                   <div className="d-flex justify-content-between mt-4 post-button-group">
                     <button
