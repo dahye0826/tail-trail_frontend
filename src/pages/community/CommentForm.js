@@ -33,36 +33,26 @@ function CommentForm({ postId, onCommentAdded, isLoggedIn, userId, commentUsers 
   const handleContentChange = (e) => {
     const newContent = e.target.value
     setContent(newContent)
+  
 
-    const cursorPosition = e.target.selectionStart
-    const textBeforeCursor = newContent.substring(0, cursorPosition)
-    const atIndex = textBeforeCursor.lastIndexOf("@")
-
-    if (atIndex === -1) {setShowMentionList(false) 
-      return
-    }
-    const lastSpaceBeforeAt = textBeforeCursor.substring(0, atIndex).lastIndexOf(" ")
-    const isAtStartOrAfterSpace =
-      atIndex === 0 || lastSpaceBeforeAt === atIndex - 1 || textBeforeCursor[atIndex - 1] === "\n"
-
-    if (!isAtStartOrAfterSpace) {
+    if (!newContent.startsWith("@")) {
       setShowMentionList(false)
       return
     }
-    const query = textBeforeCursor.substring(atIndex + 1)
-    if (query.includes(" ") || query.includes("\n")) {
-      setShowMentionList(false)
-      return
-    }
-    setMentionQuery(query)
-    setMentionStartPos(atIndex)
+  
+    const afterAt = newContent.slice(1).split(" ")[0] 
+    setMentionQuery(afterAt)
+    setMentionStartPos(0) 
+  
     const filtered = commentUsers.filter((user) => {
       const userName = typeof user === "string" ? user : user.userName
-      return userName.toLowerCase().includes(query.toLowerCase())
+      return userName.toLowerCase().includes(afterAt.toLowerCase())
     })
+  
     setFilteredUsers(filtered.length > 0 ? filtered : commentUsers)
     setShowMentionList(commentUsers.length > 0)
   }
+  
 
   const handleMentionSelect = (user) => {
     const userName = typeof user === "string" ? user : user.userName

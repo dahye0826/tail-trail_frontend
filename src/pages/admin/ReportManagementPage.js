@@ -4,18 +4,21 @@ import axios from "axios"
 import { useState, useEffect } from "react"
 import "./ReportManagementPage.css"
 
+// 신고 관리 페이지의 메인 컴포넌트
 function ReportManagement() {
-  const [reports, setReports] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [groupedReports, setGroupedReports] = useState([])
+  // 상태 관리
+  const [reports, setReports] = useState([]) // 전체 신고 데이터
+  const [loading, setLoading] = useState(true) // 로딩 상태
+  const [error, setError] = useState(null) // 에러 상태
+  const [groupedReports, setGroupedReports] = useState([]) // 그룹화된 신고 데이터
 
   // 모달 관련 상태
-  const [showModal, setShowModal] = useState(false)
-  const [selectedReport, setSelectedReport] = useState(null)
-  const [contentLoading, setContentLoading] = useState(false)
-  const [contentData, setContentData] = useState(null)
+  const [showModal, setShowModal] = useState(false) // 모달 표시 여부
+  const [selectedReport, setSelectedReport] = useState(null) // 선택된 신고
+  const [contentLoading, setContentLoading] = useState(false) // 콘텐츠 로딩 상태
+  const [contentData, setContentData] = useState(null) // 상세 콘텐츠 데이터
 
+  // 컴포넌트 마운트 시 신고 데이터 로드
   useEffect(() => {
     const fetchReports = async () => {
       try {
@@ -38,6 +41,7 @@ function ReportManagement() {
     fetchReports()
   }, [])
 
+  // 신고 데이터를 콘텐츠별로 그룹화하는 함수
   const groupReportsByContent = (reports) => {
     const groupedMap = {}
 
@@ -69,6 +73,7 @@ function ReportManagement() {
     return Object.values(groupedMap)
   }
 
+  // 신고된 콘텐츠의 상세 정보를 가져오는 함수
   const fetchContentDetails = async (report) => {
     setContentLoading(true)
     setContentData(null)
@@ -138,9 +143,8 @@ function ReportManagement() {
     }
   }
 
-  
+  // 신고 상세보기 모달을 여는 핸들러
   const handleViewDetails = (groupedReport) => {
-  
     setSelectedReport(groupedReport.reports[0])
     setShowModal(true)
     fetchContentDetails(groupedReport.reports[0])
@@ -153,7 +157,7 @@ function ReportManagement() {
     setContentData(null)
   }
 
-  // 신고 처리 (승인/거부)
+  // 신고 처리 (승인/거부) 핸들러
   const handleProcessReport = async (groupedReport, action) => {
     const targetType = groupedReport.targetType
     const targetId = groupedReport.targetId
@@ -200,7 +204,6 @@ function ReportManagement() {
         }
       }
 
- 
       const deletePromises = groupedReport.reports.map((report) =>
         axios.delete(`http://localhost:9000/api/report/${report.reportId}`),
       )
@@ -225,7 +228,7 @@ function ReportManagement() {
     }
   }
 
-  // 날짜 포맷팅
+  // 날짜 포맷팅 헬퍼 함수
   const formatDate = (dateString) => {
     const date = new Date(dateString)
     return date.toLocaleDateString("ko-KR", {
@@ -235,7 +238,7 @@ function ReportManagement() {
     })
   }
 
-  // 신고 유형 한글 표시
+  // 신고 유형을 한글로 변환하는 헬퍼 함수
   const getTargetTypeText = (type) => {
     switch (type) {
       case "POST":
@@ -249,7 +252,7 @@ function ReportManagement() {
     }
   }
 
-  // 콘텐츠 렌더링 함수
+  // 콘텐츠 상세 정보를 렌더링하는 함수
   const renderContentDetails = () => {
     if (contentLoading) {
       return (
