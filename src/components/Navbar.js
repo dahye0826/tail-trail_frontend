@@ -1,5 +1,3 @@
-"use client"
-
 import "./Navbar.css"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
@@ -12,28 +10,28 @@ function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
 
-  // 컴포넌트 마운트 시와 location 변경 시 로그인 상태 확인
+
   useEffect(() => {
     checkLoginStatus()
-  }, [location]) // 페이지 변경 시마다 로그인 상태 확인
+  }, [location]) 
 
-  // 로그인 상태 확인 함수
+
   const checkLoginStatus = () => {
     const loginStatus = localStorage.getItem("isLoggedIn") === "true";
     setIsLoggedIn(loginStatus);
   
     if (loginStatus) {
-      // 관리자 상태 확인
+
       const userRole = localStorage.getItem("userRole");
-      console.log("현재 사용자 역할:", userRole); // 디버깅용 로그
+     
   
       if (userRole === "admin") {
-        setIsAdmin(true);    // 관리자면 true
+        setIsAdmin(true);   
       } else {
-        setIsAdmin(false);   // 일반 사용자면 false
+        setIsAdmin(false);   
       }
     } else {
-      setIsAdmin(false);     // 로그인 안 했으면 false
+      setIsAdmin(false);     
     }
   }
 
@@ -61,8 +59,7 @@ function Navbar() {
     }
   }
 
-  // 디버깅용 로그
-  // console.log("로그인 상태:", isLoggedIn, "관리자 상태:", isAdmin)
+
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light mb-4" style={{ padding: 0}}>
@@ -76,7 +73,7 @@ function Navbar() {
           />
         </Link>
 
-        {/* 중앙 네비게이션 메뉴 */}
+
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav me-auto">
             <li className="nav-item mx-2">
@@ -96,7 +93,7 @@ function Navbar() {
             </li>
           </ul>
 
-          {/* 로그인 상태에 따른 우측 메뉴 */}
+
           <div className="d-flex">
             {isLoggedIn ? (
               <>

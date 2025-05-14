@@ -19,7 +19,7 @@
   --page-bg: #fbfbe9;
 }
 
-/* 전체 맵 페이지 래퍼 추가 */
+
 .map-page-wrapper {
   display: flex;
   flex-direction: column;
@@ -41,7 +41,7 @@
   flex: 1 0 auto;
 }
 
-/* 행과 열 간격 조정 */
+
 .map-view-row {
   display: flex;
   flex-wrap: wrap;
@@ -54,7 +54,7 @@
   padding: 0 0.5rem;
 }
 
-/* 사이드바 스타일 */
+
 .sidebar-containermap {
   background-color: var(--sidebar-bg);
   border-radius: var(--sidebar-radius);
@@ -201,7 +201,7 @@
   background-color: var(--light-bg);
 }
 
-/* 드롭다운 아이템 선택 색상 변경 */
+
 .dropdown-item.selected {
   background-color: #d4f0e9;
   color: #2a9d8f;
@@ -218,7 +218,7 @@
   border-bottom-right-radius: 10px;
 }
 
-/* 필터 초기화 버튼 */
+
 .sidebar-reset-btn {
   width: 100%;
   padding: 12px 0;
@@ -237,7 +237,7 @@
   background: #3dbbb4;
 }
 
-/* 검색 결과 리스트 */
+
 .places-list {
   flex: 1 1 auto;
   display: flex;
@@ -281,7 +281,7 @@
   background-color: #aaa;
 }
 
-/* 드롭다운 메뉴 스크롤바 스타일 */
+
 .dropdown-menu::-webkit-scrollbar {
   width: 8px;
 }
@@ -408,7 +408,7 @@
   width: 100%;
 }
 
-/* 모바일 맵 컨테이너 스타일 (새로 추가) */
+
 .mobile-map-container {
   background-color: var(--page-bg);
   padding: 0;
@@ -425,14 +425,13 @@
   height: 300px;
 }
 
-/* 하단 영역 배경색 통일 */
+
 footer,
 .footer-container {
   background-color: var(--page-bg) !important;
   flex-shrink: 0;
 }
 
-/* 맵 영역이 전체 높이를 채우도록 */
 .map-col {
   display: flex;
   flex-direction: column;
@@ -473,7 +472,7 @@ footer,
     padding: 16px;
   }
 
-  /* 모바일 뷰에서는 타이틀 숨기기 (타이틀은 상단 맵에 표시) */
+  
   .sidebar-header {
     display: none;
   }

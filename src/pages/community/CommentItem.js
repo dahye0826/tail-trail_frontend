@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import axios from "axios"
 import "./CommentSection.css"
@@ -14,7 +12,6 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
   // 댓글 작성자인지 확인
   const isAuthor = currentUser?.userId === comment.userId
 
-  // 컴포넌트 마운트 시 신고 여부 확인
   useEffect(() => {
     const checkReportStatus = async () => {
       if (!currentUser) return
@@ -131,10 +128,10 @@ function CommentItem({ comment, onCommentUpdated, onCommentDeleted, currentUser 
 
     try {
       await axios.post("http://localhost:9000/api/report", {
-        targetId: comment.commentId, // 신고할 댓글 ID
-        targetType: "COMMENT", // 댓글이니까 COMMENT
-        reason: reason, // 선택한 신고 사유
-        reporterId: currentUser?.userId, // 현재 로그인한 사용자 ID
+        targetId: comment.commentId, 
+        targetType: "COMMENT",
+        reason: reason, 
+        reporterId: currentUser?.userId,
       })
 
       alert(`댓글이 '${reason}' 사유로 신고되었습니다.`)

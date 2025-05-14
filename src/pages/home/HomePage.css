@@ -5,21 +5,21 @@
   --text-color: #2c3e50;
   --light-bg: #f0f9fa;
   --border-color: #d1eeef;
-  --page-bg: #fbfbe9; /* 홈페이지 배경색 변수 수정 */
+  --page-bg: #fbfbe9; 
 }
 
-/* 전체 글씨 크기 증가 */
+
 body {
   font-size: 1.1rem;
-  background-color: #fbfbe9 !important; /* 직접 body에도 적용 */
+  background-color: #fbfbe9 !important; 
 }
 
-/* 홈페이지 전체 배경색 설정 */
+
 .home-page {
-  background-color: #fbfbe9 !important; /* !important 추가 */
+  background-color: #fbfbe9 !important; 
 }
 
-/* 둥근 배너 스타일 */
+
 .rounded-banner {
   width: 100%;
   margin-bottom: 2rem;
@@ -33,27 +33,27 @@ body {
   overflow: hidden;
 }
 
-/* 배너 이미지 크기 키우기 */
+
 .banner-image {
   position: relative;
   width: 100%;
-  height: 500px; /* 350px에서 500px로 증가 */
+  height: 500px; 
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
 }
 
-/* lawon 이미지 특별 스타일 */
+
 .lawon-image {
   background-position: center center;
 }
 
-/* ddomi 이미지 특별 스타일 - 얼굴이 보이도록 위치 조정 */
+
 .ddomi-image {
   background-position: center 30%;
 }
 
-/* 고양이 이미지 특별 스타일 */
+
 .cat-image {
   background-position: center center;
 }
@@ -67,7 +67,7 @@ body {
   background: linear-gradient(to right, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.1) 100%);
 }
 
-/* 기존 배너 콘텐츠 스타일 (데스크톱용) */
+
 .banner-content {
   position: absolute;
   top: 30%;
@@ -77,59 +77,57 @@ body {
   color: white;
 }
 
-/* 모바일용 배너 콘텐츠 스타일 수정 - 위로 이동 */
+
 .banner-content-mobile {
   position: absolute;
-  top: 30%; /* 60%에서 30%로 변경하여 상단으로 이동 */
+  top: 30%;
   transform: translateY(-50%);
   left: 10%;
   z-index: 2;
   color: white;
 }
 
-/* 기본적으로 모바일 콘텐츠는 숨김 */
+
 .banner-content-mobile {
   display: none;
 }
 
-/* 배너 콘텐츠 크기도 키우기 */
+
 .banner-content h1 {
-  font-size: 3.2rem; /* 2.8rem에서 3.2rem으로 증가 */
+  font-size: 3.2rem; 
   margin-bottom: 1rem;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-  font-family: "TmoneyRoundWindExtraBold", sans-serif; /* 폰트 추가 */
+  font-family: "TmoneyRoundWindExtraBold", sans-serif; 
 }
 
 .banner-content p {
-  font-size: 1.8rem; /* 1.5rem에서 1.8rem으로 증가 */
+  font-size: 1.8rem;
   margin-bottom: 0;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-  font-family: "TmoneyRoundWindExtraBold", sans-serif; /* 폰트 추가 */
+  font-family: "TmoneyRoundWindExtraBold", sans-serif; 
 }
 
-/* 모바일 로그인/회원가입 버튼 스타일 - 하단 배치로 수정 */
 .mobile-auth-buttons {
   position: absolute;
-  top: 75%; /* 70%에서 75%로 변경하여 더 아래로 이동 */
-  left: 50%;
+  top: 75%; 
   transform: translate(-50%, -50%);
   z-index: 10;
-  display: none; /* 기본적으로 숨김 */
-  flex-direction: column; /* 세로로 배치 */
+  display: none; 
+  flex-direction: column; 
   align-items: center;
-  gap: 10px; /* 버튼 사이 간격 */
-  width: 80%; /* 너비 제한 */
-  max-width: 300px; /* 최대 너비 */
+  gap: 10px; 
+  width: 80%; 
+  max-width: 300px;
 }
 
 .mobile-auth-btn {
   font-weight: 600;
   border-radius: 30px;
-  padding: 12px 24px; /* 패딩 증가 */
-  font-size: 1.1rem; /* 글씨 크기 증가 */
+  padding: 12px 24px; 
+  font-size: 1.1rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
-  width: 100%; /* 버튼 너비 100% */
+  width: 100%; 
   text-align: center;
 }
 
@@ -138,13 +136,13 @@ body {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
-/* 서비스 소개 섹션 */
+
 .section-title {
   color: var(--accent-color);
   position: relative;
   display: inline-block;
   margin-bottom: 1rem;
-  font-size: 2.2rem; /* 글씨 크기 증가 */
+  font-size: 2.2rem; 
 }
 
 .section-title::after {
@@ -159,7 +157,7 @@ body {
   border-radius: 3px;
 }
 
-/* 환영 메시지 스타일 */
+
 .welcome-message {
   position: relative;
   padding: 20px 40px;
@@ -182,10 +180,10 @@ body {
 .quote-right {
   bottom: 0;
   right: 0;
-  transform: scaleX(-1); /* 쌍따옴표 좌우반전 */
+  transform: scaleX(-1); 
 }
 
-/* 회사 소개 섹션 스타일 추가 */
+
 .company-intro {
   padding: 20px 0;
 }
@@ -195,14 +193,14 @@ body {
   margin: 0 auto;
   color: #2c3e50;
   line-height: 1.8;
-  font-size: 1.4rem; /* 1.25rem에서 1.4rem으로 증가 */
-  font-weight: 600; /* 굵은 폰트로 변경 */
-  padding: 0 20px; /* 좌우 패딩 추가 */
+  font-size: 1.4rem; 
+  font-weight: 600;
+  padding: 0 20px; 
 }
 
 /* 지도 섹션 */
 .map-section {
-  background-color: #fbfbe9 !important; /* !important 추가 */
+  background-color: #fbfbe9 !important; 
   padding: 3rem 0;
 }
 
@@ -214,7 +212,7 @@ body {
   border: 5px solid white;
 }
 
-/* 지도 위에 버튼을 위한 스타일 */
+
 .map-image-container .position-absolute .btn-primary {
   background-color: rgba(78, 205, 196, 0.9);
   border-color: transparent;
@@ -228,7 +226,7 @@ body {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* 지도 확장 아이콘 버튼 스타일 */
+
 .map-image-container .position-absolute .btn-light {
   background-color: rgba(255, 255, 255, 0.9);
   border: none;
@@ -246,7 +244,7 @@ body {
   color: var(--accent-color);
 }
 
-/* 지도 아이콘 링크 스타일 추가 */
+
 .map-icon-link {
   display: flex;
   align-items: center;
@@ -345,8 +343,7 @@ body {
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
 }
 
-/* 리뷰 카드 스타일을 커뮤니티 카드와 유사하게 변경 */
-/* 리뷰 카드 스타일 개선 - 말풍선 형태와 실제 장소 이미지 추가 */
+
 .review-card {
   background-color: white;
   border-radius: 12px;
@@ -366,7 +363,7 @@ body {
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
 }
 
-/* 장소 이미지 컨테이너 */
+
 .review-image-container {
   width: 100%;
   height: 160px;
@@ -385,7 +382,7 @@ body {
   transform: scale(1.05);
 }
 
-/* 별점 뱃지 스타일 */
+
 .rating-badge {
   position: absolute;
   top: 10px;
@@ -406,7 +403,7 @@ body {
   font-size: 1rem;
 }
 
-/* 카테고리 뱃지 스타일 */
+
 .category-badge {
   position: absolute;
   top: 10px;
@@ -420,7 +417,6 @@ body {
   z-index: 2;
 }
 
-/* 리뷰 내용 컨테이너 */
 .review-content {
   padding: 15px;
   flex-grow: 1;
@@ -428,7 +424,7 @@ body {
   flex-direction: column;
 }
 
-/* 장소 이름 스타일 */
+
 .place-name {
   font-weight: 600;
   font-size: 1.2rem;
@@ -444,7 +440,7 @@ body {
   font-size: 1rem;
 }
 
-/* 리뷰 텍스트 말풍선 스타일 */
+
 .review-bubble {
   background-color: #f8f9fa;
   border-radius: 12px;
@@ -481,7 +477,7 @@ body {
   line-height: 1;
 }
 
-/* 리뷰 메타 정보 (작성자, 날짜) */
+
 .review-meta {
   display: flex;
   justify-content: space-between;
@@ -491,7 +487,7 @@ body {
   border-top: 1px solid #f1f1f1;
 }
 
-/* 사용자 프로필 스타일 */
+
 .user-profile {
   display: flex;
   align-items: center;
@@ -527,7 +523,7 @@ body {
   color: #6c757d;
 }
 
-/* 별점에 따른 색상 변화 */
+
 .rating-5 .category-badge {
   background-color: #ff9800;
 }
@@ -548,7 +544,7 @@ body {
   background-color: #dc3545;
 }
 
-/* 반응형 조정 */
+
 @media (max-width: 768px) {
   .review-image-container {
     height: 140px;
@@ -580,7 +576,7 @@ body {
   text-overflow: ellipsis;
 }
 
-/* 리뷰 위치 스타일 수정 */
+
 .review-location {
   color: #6c757d;
   font-size: 0.9rem;
@@ -594,7 +590,7 @@ body {
   max-width: 100%;
 }
 
-/* 리뷰 텍스트 스타일 수정 */
+
 .review-text {
   font-style: normal;
   line-height: 1.5;
@@ -615,11 +611,11 @@ body {
 
 .review-author {
   color: #6c757d;
-  font-size: 1rem; /* 0.9rem에서 1rem으로 증가 */
+  font-size: 1rem; 
   font-weight: 500;
 }
 
-/* 버튼 스타일 */
+
 .btn-primary {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
@@ -633,7 +629,7 @@ body {
   box-shadow: 0 5px 15px rgba(42, 157, 143, 0.3);
 }
 
-/* 간단한 아이콘 링크 스타일 추가 */
+
 .simple-icon-link {
   text-decoration: none;
   transition: all 0.2s ease;
@@ -644,9 +640,9 @@ body {
   color: var(--accent-color);
 }
 
-/* 커뮤니티 섹션 - 새로운 스타일 */
+
 .community-section {
-  background-color: #fbfbe9 !important; /* !important 추가 */
+  background-color: #fbfbe9 !important; 
   position: relative;
   overflow: hidden;
   padding: 3rem 0;
@@ -761,35 +757,35 @@ body {
   }
 }
 
-/* 반응형 스타일 - 모바일에서 배너 콘텐츠와 버튼 위치 추가 조정 */
+
 @media (max-width: 768px) {
-  /* 모바일 화면에서는 데스크톱 콘텐츠를 숨기고 모바일 콘텐츠를 표시 */
+  
   .banner-content {
     display: none;
   }
 
   .banner-content-mobile {
     display: block;
-    top: 25%; /* 60%에서 25%로 변경 - 상단으로 더 이동 */
+    top: 25%; 
   }
 
-  /* 모바일에서 배너 상단에 패딩 추가하여 네비바에 가려지지 않도록 함 */
+ 
   .rounded-banner {
     margin-top: 20px;
   }
 
   .banner-image {
-    height: 400px; /* 300px에서 400px로 증가 */
+    height: 400px; 
   }
 
-  /* 모바일에서 배너 콘텐츠 텍스트 크기 조정 */
+ 
   .banner-content-mobile h1 {
-    font-size: 2.8rem; /* 텍스트 크기 줄임 */
-    margin-bottom: 0.5rem; /* 마진 줄임 */
+    font-size: 2.8rem; 
+    margin-bottom: 0.5rem; 
   }
 
   .banner-content-mobile p {
-    font-size: 1.5rem; /* 텍스트 크기 줄임 */
+    font-size: 1.5rem; 
   }
 
   .feature-item {
@@ -804,24 +800,22 @@ body {
     font-size: 0.8rem;
   }
 
-  /* 모바일에서 로그인/회원가입 버튼 표시 */
+
   .mobile-auth-buttons {
     display: flex;
-    top: 80%; /* 버튼 위치를 하단으로 이동 */
+    top: 80%; 
   }
 
-  /* 홈페이지 컨테이너에 상단 패딩 추가 */
+  
   .home-page {
     padding-top: 20px;
   }
 
-  /* 배너 컨테이너에 상단 패딩 추가 */
   .py-4 {
     padding-top: 2rem !important;
   }
 }
 
-/* 말풍선 형태의 커뮤니티 카드 스타일 */
 .community-card {
   background-color: white;
   border-radius: 18px;
@@ -829,9 +823,9 @@ body {
   transition: all 0.3s ease;
   height: 100%;
   border: 1px solid var(--border-color);
-  overflow: visible; /* 말풍선 꼬리가 보이도록 변경 */
+  overflow: visible; 
   cursor: pointer;
-  position: relative; /* 말풍선 꼬리 위치 지정을 위해 */
+  position: relative; 
 }
 
 .community-card::after {
@@ -856,13 +850,7 @@ body {
 .community-card .card-body {
   padding: 1.5rem;
   position: relative;
-  z-index: 1; /* 말풍선 0,0,0.12);
-}
-
-.community-card .card-body {
-  padding: 1.5rem;
-  position: relative;
-  z-index: 1; /* 말풍선 꼬리 위에 내용이 보이도록 */
+  z-index: 1;
 }
 
 .community-card .card-title {
@@ -878,7 +866,7 @@ body {
   height: 2.8rem;
 }
 
-/* 커뮤니티 카드 텍스트 색상 변경 */
+
 .community-card .card-text {
   color: #6c757d;
   font-size: 1.05rem;
@@ -897,10 +885,10 @@ body {
   justify-content: space-between;
   font-size: 0.9rem;
   color: #6c757d;
-  margin-top: 0.5rem; /* 메타 정보와 내용 사이 간격 추가 */
+  margin-top: 0.5rem; 
 }
 
-/* 작성자 정보를 말풍선 꼬리 위에 배치 */
+
 .community-card .author {
   display: flex;
   align-items: center;
@@ -922,9 +910,9 @@ body {
   box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
 }
 
-/* 새로운 + 버튼 스타일 추가 */
+
 .plus-btn {
-  font-size: 2.2rem; /* 2rem에서 2.2rem으로 증가 */
+  font-size: 2.2rem; 
   color: var(--primary-color);
   text-decoration: none;
   transition: all 0.3s ease;
@@ -936,13 +924,13 @@ body {
   transform: rotate(90deg);
 }
 
-/* 커뮤니티 섹션 헤더 스타일 수정 */
+
 .community-section .text-center {
   text-align: left !important;
   padding: 0 1rem;
 }
 
-/* 반응형 스타일 추가 */
+
 @media (max-width: 768px) {
   .community-section .text-center {
     flex-direction: column;
@@ -955,23 +943,23 @@ body {
   }
 }
 
-/* 미니 아바타 스타일 */
+
 .mini-avatar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px; /* 18px에서 20px로 증가 */
-  height: 20px; /* 18px에서 20px로 증가 */
-  font-size: 0.8rem; /* 0.7rem에서 0.8rem으로 증가 */
-  background-color: #e8f5f5; /* 연한 민트색 배경으로 변경 */
-  color: #2a9d8f; /* 진한 청록색 글자색으로 변경 */
+  width: 20px; 
+  height: 20px; 
+  font-size: 0.8rem; 
+  background-color: #e8f5f5; 
+  color: #2a9d8f; 
   border-radius: 50%;
   margin-right: 5px;
   font-weight: 600;
 }
 
 .user-name {
-  font-size: 0.9rem; /* 0.8rem에서 0.9rem으로 증가 */
+  font-size: 0.9rem; 
   color: #6c757d;
   font-weight: 500;
 }
@@ -981,7 +969,7 @@ body {
   align-items: center;
 }
 
-/* 리뷰 카드 스타일 추가 */
+
 .review-cards {
   margin-top: 1rem;
 }
@@ -998,13 +986,13 @@ body {
   font-size: 3rem;
 }
 
-/* 리뷰 섹션 헤더 스타일 수정 */
+
 .review-section .text-center {
   text-align: left !important;
   padding: 0 1rem;
 }
 
-/* 반응형 스타일 추가 */
+
 @media (max-width: 768px) {
   .review-section .text-center {
     flex-direction: column;
@@ -1012,7 +1000,7 @@ body {
   }
 }
 
-/* 새로운 커뮤니티 카드 스타일 - 이미지 예시와 같은 형태 */
+
 .community-slider {
   width: 100%;
   overflow-x: auto;
@@ -1022,7 +1010,7 @@ body {
 }
 
 .community-slider::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none; 
 }
 
 .community-cards-container {
@@ -1132,7 +1120,7 @@ body {
 }
 
 .review-date {
-  color: #6c757d; /* 부드러운 회색 */
+  color: #6c757d; 
   font-size: 0.9rem;
   font-weight: 500;
 }

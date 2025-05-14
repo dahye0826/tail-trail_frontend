@@ -1,12 +1,10 @@
-"use client"
-
 import axios from "axios"
 import { useState, useEffect } from "react"
 import "./ReportManagementPage.css"
 
-// 신고 관리 페이지의 메인 컴포넌트
+
 function ReportManagement() {
-  // 상태 관리
+
   const [reports, setReports] = useState([]) // 전체 신고 데이터
   const [loading, setLoading] = useState(true) // 로딩 상태
   const [error, setError] = useState(null) // 에러 상태

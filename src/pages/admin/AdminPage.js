@@ -4,8 +4,8 @@ import { Link, useNavigate } from "react-router-dom"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 import { useAuth } from "../../contexts/AuthContext" 
-import ReportManagement from "./ReportManagementPage" // 신고내역관리 컴포넌트 import
-import UserManagementPage from "./UserManagementPage" // 사용자 관리 컴포넌트 import
+import ReportManagement from "./ReportManagementPage"
+import UserManagementPage from "./UserManagementPage" 
 import "./AdminPage.css"
 
 function AdminPage() {

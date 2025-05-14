@@ -8,7 +8,7 @@
   --light-gray: #f8f9fa;
 }
 
-/* 클래스 이름 변경 및 스타일 수정 */
+
 .post-container {
   background-color: white;
   border-radius: 12px;
@@ -68,7 +68,7 @@
   border-color: var(--border-color);
 }
 
-/* 이 부분이 충돌할 수 있으므로 더 구체적인 선택자로 덮어쓰기 */
+
 .post-detail-container .post-actions .post-btn-outline {
   width: 80px !important;
   display: inline-flex !important;

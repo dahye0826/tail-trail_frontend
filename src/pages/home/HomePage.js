@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { Container, Row, Col, Carousel, Button } from "react-bootstrap"
 import { Link } from "react-router-dom"

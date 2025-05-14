@@ -1,7 +1,3 @@
-"use client"
-
-// MapViewPage.js - PlaceListPage 방식으로 지역/카테고리 옵션 설정 (도로명 주소에서 시(city)만 추출)
-
 import axios from "axios"
 import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"

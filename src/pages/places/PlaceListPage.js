@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect, useCallback, useMemo, useRef } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import "bootstrap-icons/font/bootstrap-icons.css"

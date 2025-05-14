@@ -1,5 +1,3 @@
-"use client"
-
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import { useState, useEffect, useRef } from "react"
@@ -16,14 +14,13 @@ function PostListPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState("")
   const [posts, setPosts] = useState([])
-  const [originalPosts, setOriginalPosts] = useState([]) // 원본 데이터 저장
+  const [originalPosts, setOriginalPosts] = useState([]) 
   const [totalPages, setTotalPages] = useState(1)
   const [issearching, setIsSearching] = useState(false)
-  const [sortOption, setSortOption] = useState("latest") // 정렬 옵션 상태 추가: 'latest' 또는 'views'
-  const [dropdownOpen, setDropdownOpen] = useState(false) // 드롭다운 상태 추가
-  const dropdownRef = useRef(null) // 드롭다운 참조 추가
+  const [sortOption, setSortOption] = useState("latest") 
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const dropdownRef = useRef(null) 
 
-  // 드롭다운 외부 클릭 감지
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -64,7 +61,7 @@ function PostListPage() {
         createdAt: post.createdAt.split("T")[0],
       }))
       setPosts(formattedPosts)
-      setOriginalPosts(formattedPosts) // 원본 데이터 저장
+      setOriginalPosts(formattedPosts) 
       setCurrentPage(1)
       setTotalPages(response.data.totalPages)
       setIsSearching(true)
@@ -75,7 +72,7 @@ function PostListPage() {
     }
   }
 
-  //페이지 변경 또는 검색 상태 변경 시 자동으로 API를 요청해서 게시글을 불러오는 역할
+
   useEffect(() => {
     const fetchPosts = async () => {
       setLoading(true)
@@ -89,10 +86,10 @@ function PostListPage() {
         const formattedPosts = response.data.content.map((post) => ({
           ...post,
           createdAt: post.createdAt.split("T")[0],
-        })) //formattedPosts: 형식을 바꾼 데이터
+        })) 
 
         setPosts(formattedPosts)
-        setOriginalPosts(formattedPosts) // 원본 데이터 저장
+        setOriginalPosts(formattedPosts) 
         setTotalPages(response.data.totalPages)
         setLoading(false)
       } catch (error) {

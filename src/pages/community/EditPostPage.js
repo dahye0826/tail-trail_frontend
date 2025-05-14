@@ -1,5 +1,3 @@
-"use client"
-
 // 게시글 수정 페이지
 import { useNavigate, useParams } from "react-router-dom"
 import Navbar from "../../components/Navbar"
@@ -30,7 +28,7 @@ function EditPostPage() {
   const selectedItemRef = useRef(null)
 
 
-  // 게시글 데이터 불러오기
+
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -54,17 +52,17 @@ function EditPostPage() {
     fetchPost()
   }, [id, navigate])
 
-  // 선택된 결과가 키보드로 이동 시 화면에 보이도록 조정
+ 
   useEffect(() => {
     if (selectedItemRef.current) {
       selectedItemRef.current.scrollIntoView({
-        behavior: "smooth", // 부드럽게 이동
-        block: "nearest", // 가장 가까운 위치에 맞춰줌
+        behavior: "smooth", 
+        block: "nearest", 
       })
     }
   }, [selectedResultIndex])
 
-  // 장소 검색 요청
+
   const searchPlaces = async () => {
     if (!searchTerm.trim()) return setSearchResults([])
     setIsSearching(true)
@@ -218,11 +216,11 @@ function EditPostPage() {
                     />
                   </div>
 
-                  {/* 장소 선택 영역 - DB 검색 방식으로 변경 */}
+            
                   <div className="mb-4">
                   <label className="form-label post-form-label">장소 (선택사항)</label>
 
-                    {/* 선택된 장소가 있으면 표시 */}
+          
                     {selectedLocation && (
                       <div className="post-location-card mb-2">
                         <div className="card">

@@ -51,7 +51,6 @@
   font-size: 1.1rem;
 }
 
-/* 대시보드 카드 스타일 */
 .dashboard-card {
   border: none;
   border-radius: 10px;
@@ -95,7 +94,7 @@
   margin-right: 8px;
 }
 
-/* 버튼 색상을 차분한 톤으로 변경 */
+
 .dashboard-card .btn-info {
   background-color: #7a8793;
   border: none;
@@ -109,7 +108,7 @@
   transform: scale(1.05);
 }
 
-/* 관리자 섹션 헤더 */
+
 .admin-section-header {
   margin-bottom: 25px;
   border-bottom: 1px solid #e9ecef;
@@ -128,7 +127,7 @@
   margin-bottom: 0;
 }
 
-/* 프로필과 이름 수직 배치 스타일 */
+
 .profile-cell {
   text-align: center;
   padding: 8px 4px;
@@ -149,7 +148,7 @@
   color: #333333;
 }
 
-/* 테이블 스타일 수정 */
+
 .table {
   width: 100%;
   margin-bottom: 1rem;
@@ -160,7 +159,7 @@
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  table-layout: fixed; /* 테이블 레이아웃 고정 */
+  table-layout: fixed; 
 }
 
 .table thead th {
@@ -174,7 +173,6 @@
   white-space: nowrap;
 }
 
-/* 행 간격 늘리기 */
 .table td {
   padding: 12px 15px;
   vertical-align: middle;
@@ -184,13 +182,13 @@
   white-space: nowrap;
 }
 
-/* 테이블 행 hover 효과 추가 */
+
 .table tbody tr:hover {
   background-color: #f8f9fa;
   transition: background-color 0.2s ease;
 }
 
-/* 테이블 컬럼 너비 조정 */
+
 .table th.col-id,
 .table td.col-id {
   width: 5%;
@@ -214,7 +212,7 @@
 .table th.col-phone,
 .table td.col-phone {
   width: 12%;
-  text-align: right; /* 연락처 숫자 우측 정렬 */
+  text-align: right; 
 }
 
 .table th.col-pet,
@@ -237,7 +235,7 @@
   width: 10%;
 }
 
-/* 버튼 스타일 */
+
 .btn-info {
   color: #fff;
   background-color: #7a8793;
@@ -251,13 +249,13 @@
   border-color: #5d6b7a;
 }
 
-/* 탈퇴 버튼 스타일 수정 - hover 시 붉은색 강조 */
+
 .btn-outline-danger {
   color: #333333;
   border-color: #7a8793;
   font-weight: 500;
-  min-width: 80px; /* 버튼 최소 너비 설정 */
-  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+  min-width: 80px; 
+  white-space: nowrap;
   transition: all 0.3s ease;
 }
 
@@ -274,7 +272,7 @@
   border-radius: 0.2rem;
 }
 
-/* 뱃지 스타일 */
+
 .badge {
   display: inline-block;
   padding: 0.4em 0.65em;
@@ -287,19 +285,18 @@
   border-radius: 0.25rem;
 }
 
-/* 일반회원 뱃지 */
+
 .bg-info {
   background-color: #7a8793 !important;
   color: white;
 }
 
-/* 관리자 뱃지 - 파란색으로 변경 */
 .bg-danger {
   background-color: #3a7ab7 !important;
   color: white;
 }
 
-/* 카드 스타일 */
+
 .card {
   border: none;
   border-radius: 8px;
@@ -319,7 +316,7 @@
   color: #6c757d;
 }
 
-/* 검색 폼 스타일 */
+
 .search-form {
   display: flex;
   gap: 10px;
@@ -337,7 +334,7 @@
   box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25);
 }
 
-/* 페이지네이션 스타일 */
+
 .pagination {
   display: flex;
   padding-left: 0;
@@ -392,7 +389,7 @@
   border-color: #dee2e6;
 }
 
-/* 모달 스타일 */
+
 .modal-dialog {
   max-width: 500px;
   margin: 1.75rem auto;
@@ -425,7 +422,7 @@
   background-color: #f8f9fa;
 }
 
-/* 리스트 그룹 스타일 */
+
 .list-group {
   display: flex;
   flex-direction: column;
@@ -474,7 +471,6 @@
   background-color: #f8f9fa;
 }
 
-/* 폼 요소 스타일 */
 .form-control {
   display: block;
   width: 100%;
@@ -507,7 +503,7 @@
   appearance: none;
 }
 
-/* 유틸리티 클래스 */
+
 .text-center {
   text-align: center !important;
 }
@@ -547,22 +543,22 @@
     display: block;
     overflow-x: auto;
     white-space: nowrap;
-    table-layout: auto; /* 모바일에서는 자동 레이아웃 */
+    table-layout: auto; 
   }
 }
 
-/* 관리 버튼 컨테이너 */
+
 .action-cell {
   text-align: center;
   white-space: nowrap;
 }
 
-/* 행 간격 늘리기 */
+
 .table tbody tr {
-  height: 60px; /* 행 높이 증가 */
+  height: 60px; 
 }
 
-/* 버튼 hover 효과 추가 */
+
 .btn {
   transition: all 0.3s ease;
 }

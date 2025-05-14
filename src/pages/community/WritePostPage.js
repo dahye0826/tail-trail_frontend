@@ -1,6 +1,4 @@
-"use client"
 
-// 필요한 라이브러리 및 컴포넌트 import
 import axios from "axios"
 import { useState, useRef, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
@@ -11,7 +9,7 @@ import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 
 function WritePostPage() {
-  // 게시글 제목, 내용, 이미지 등 상태 관리
+
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
   const [selectedLocation, setSelectedLocation] = useState(null)
@@ -19,13 +17,13 @@ function WritePostPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(true)
 
-  // 장소 검색어 관련 상태
+
   const [searchTerm, setSearchTerm] = useState("")
   const [searchResults, setSearchResults] = useState([])
   const [isSearching, setIsSearching] = useState(false)
   const [selectedResultIndex, setSelectedResultIndex] = useState(-1)
 
-  // 검색 결과 DOM 참조용 ref
+
   const searchResultsRef = useRef(null)
   const selectedItemRef = useRef(null)
 
@@ -43,17 +41,17 @@ function WritePostPage() {
   }, [])
   const navigate = useNavigate()
 
-  // 선택된 결과 항목이 보이도록 자동 스크롤 처리
+
   useEffect(() => {
     if (selectedItemRef.current) {
       selectedItemRef.current.scrollIntoView({
-        behavior: "smooth", // 부드럽게 이동
-        block: "nearest", // 가장 가까운 위치에 맞춰줌
+        behavior: "smooth", 
+        block: "nearest", 
       })
     }
   }, [selectedResultIndex])
 
-  // 이미지 선택 시 상태 업데이트
+
   const handleImageChange = (e) => {
     const selectedFiles = Array.from(e.target.files)
     if (selectedFiles.length > 0) {
@@ -61,7 +59,7 @@ function WritePostPage() {
     }
   }
 
-  // 이미지 제거 함수
+
   const handleRemoveImage = (index) => {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index))
   }
@@ -87,7 +85,7 @@ function WritePostPage() {
     }
   }
 
-  // 입력창 변경 시 검색 자동 수행
+
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value)
     if (e.target.value.trim()) {
@@ -129,12 +127,12 @@ function WritePostPage() {
     setSelectedResultIndex(-1)
   }
 
-  // 선택된 장소 제거
+
   const removeSelectedLocation = () => {
     setSelectedLocation(null)
   }
 
-  // 게시글 등록 제출 함수
+  
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -172,7 +170,7 @@ function WritePostPage() {
     }
   }
 
-  // 렌더링 UI
+
   return (
     <>
       <Navbar isLoggedIn={isLoggedIn} />
